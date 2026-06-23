@@ -3,4 +3,4 @@
 - Course Material on Canvas
 - 
 ## AI Tools used
-- 
+- ChatGPT used to find Dockerfile issue (initial deployment)

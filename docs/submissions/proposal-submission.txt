@@ -5,7 +5,7 @@ App name: FriendFinderSFU
 
 GitHub URL: https://github.com/tahabornoosh/cmpt276-grouproject
 
-Render URL:
+Render URL: https://cmpt276-grouproject-3.onrender.com
 
 Team members:
  - Taha Bornoosh: tba92 (Computing ID), taha015626 (Discord), tahabornoosh (GitHub)

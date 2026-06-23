@@ -1,0 +1,107 @@
+# CMPT 276 Group Projects \- Group 3
+
+## Name and Abstract of our Application
+
+Our app name: **FriendFinderSFU**
+
+Our app is a hybrid and innovative university-specific social app which acts as a dating app, a friend finding app, and an academic study buddy (study partner) app. Specifically, users will have the option to use any of these features by creating separate profiles for each, and then getting matched to other users who share their interests or meet their specified criteria.
+
+## The problem our App solves
+
+Meeting people in a large university is a challenge for everyone, especially new students. New students (and sometimes even upper-year students) often have to meet lots of people before they find their community, which in itself can be difficult and at times very awkward. While all universities have this problem to some extent, SFU in particular is famous for having a poor social environment.
+
+Our app is designed to help mitigate this problem by providing an easy, fast, and organized way to meet people within the university, whether it be for making new friends, finding a romantic partner, or finding a study buddy.
+
+## Currently Available Solutions
+
+The closest existing public-facing solution is **Bumble**\[1\], which is a hybrid dating/friendship app. It has features such as friend-finding, dating, and clubs. There are many other dating apps as well, mostly focusing on dating. There are also some university-specific solutions such as **College Mixer** for Western University\[2\]. However, most of these solutions focus solely on dating, and not friendships or non-romantic relationships.
+
+## Customers’ Needs (projected)
+
+1. An easy and fast way to meet new friends, study buddies, or romantic partners online within the university.  
+2. A way to find people who share their interests (and possibly preferences), which can be difficult in a large university or for people with niche hobbies and interests.  
+3. A way to stay safe from dating-app-related online threats, such as harassment and “catfishing”.  
+4. A secure communication channel with potential new friends or partners which is exclusive to a trusted community (university community) and minimizes risks of online harassment.
+
+## Target Audience
+
+Our app is exclusively targeted toward **SFU students**, with the possibility of having versions for other universities as well in the future. We will focus on single-university instances of the application (no cross-university memberships) since the goal is for students to form lasting friendships and relationships within their home university. There are also potential security advantages with this approach as users will have to prove their student status, which both puts an initial filter on potential bad actors and enables additional resources (for example the university board of student conduct) in case issues occur.
+
+## Competitive Analysis (SWOT)
+
+Strengths:
+
+1. Our app will be developed by SFU students, for SFU students, boosting acceptance and fitness to the task as we can relate to many issues students face.  
+2. If connected to SFU’s CAS server, our app needs very little support/maintenance to function.  
+3. Our app will be using the SFU computing id and email so it should limit spam accounts and catfishing.
+
+Weaknesses:
+
+1. Our app would need lots of users to be potentially profitable as a SaaS.  
+2. Our app would be accessible on web only in the first release (most dating apps have mobile versions)  
+3. Compared to social media which has a lot more features and a larger user group, our app will need to start from zero.
+
+Opportunities:
+
+1. There are no direct competitors within the SFU community (and many other universities)  
+2. There is an atmosphere of risk in public opinion around public-facing dating apps.
+
+Threats:
+
+1. Public-facing dating apps have been around for a long time and already have many users.  
+2. The study buddy finding feature in our app is very new, with little data on whether it will be met with enthusiasm by university students in the context of a larger social app.
+
+## Our App’s Value
+
+Our app provides equal focus on romantic relationships, friendships, and study buddies among university students. Most similar apps focus on dating only, which ignores the growing needs for social community finding specially for new students.
+
+Additionally, our app provides a host of features such as deterministic (score based) matching, text chats, voice and video calls, event/date planning, and more, to meet the needs of all users.
+
+## List of Epics/Features 
+
+- Profiles: One profile per feature (dating, friendship, study buddies) with the possibility of disabling each one. Includes questions about interests, preferences, exclusions, and academic/professional experiences (for study buddies only)  
+- Score/Match function: used to establish a partial order on users given their profile properties set (e.g., interests, preferences, skills (for study buddies), etc.) to facilitate match-making and suggestions.  
+- Feeds: Allow users to see profiles matched to their profile and send expressions of interest.  
+- Chat and virtual meeting features: Individual chats with security features (e.g., blocking, no media/photo sharing) and voice/video calls (outsourced \- using **APIs** of either Zoom, BigBlueButton, or similar solution)  
+- Login and CAS Integration: app allows logging in with a CAS server (with the ultimate goal being the SFU CAS server), using a username and password, or both.  
+- Administration (minimal): panel that allows admins to view and suspend/edit/delete users, and regular users to edit or delete their account and profiles.  
+- Profile (global) optimization: Users can edit their profile adding pictures, biography, and description \- not directly used for matching (with some automated moderation)
+
+## Distribution of Features
+
+Our app will have three parallel big features (dating, friend-finding, study buddies) with smaller sub-features in each (chats, matching, etc.). We have 1.4 (7/5) epics per group member.
+
+## Group Members and Expertise
+
+- David  
+  - 2nd-year Computer Science student.  
+  - Familiar with C++. and Java.  
+  - Comfortable with backend development
+
+  	
+
+- Parsa  
+  - 2nd-year Computer Science student at Simon Fraser University.  
+  - Experienced with Python and familiar with C, C++, Haskell, and Java.  
+  - Comfortable with both frontend and backend development.  
+  - Strong interest in frontend development and user interface design.  
+      
+- Pravit  
+  - Second-year Computer Science student at Simon Fraser University with hands-on experience in full-stack development, machine learning, and software testing. Proficient in Python, Java, JavaScript, and SQL with practical experience building production-grade ML pipelines (PyTorch, scikit-learn, Pandas) and modern web apps (React, Next.js, FastAPI, Flask, Streamlit).   
+      
+- Taha  
+  - 1st year CS student  
+  - Some experience with PHP and Django  
+  - Proficient in Java, C++, and Python  
+- William  
+  - 3rd year SOSY student  
+  - Main coding language is C++, experience in Python, Java, SQL  
+  - Preference for backend coding
+
+## Works Cited (this file)
+
+[1] M. Zhao, “Review: Swiping right on College Mixer, the dating app for Western students,” *The Gazette • Western University’s Student Newspaper*, Feb. 12, 2024\. https://westerngazette.ca/culture/student\_life/review-swiping-right-on-college-mixer-the-dating-app-for-western-students/article\_c73dce46-c9c2-11ee-90c4-27de88c99ac6.html (accessed Jun. 19, 2026).  
+[2]	Bumble, “Bumble \- Date, Meet, Network Better,” *Bumble*, 2023\. https://bumble.com/ (accessed Jun. 19, 2026).  
+
+## Other Project Acknowledgements
+See docs/DECLARATIONS.md

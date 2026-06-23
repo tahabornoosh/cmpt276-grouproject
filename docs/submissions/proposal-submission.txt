@@ -1,0 +1,15 @@
+CMPT 276 D100 - Group Projects 3
+Project Proposal
+
+App name: FriendFinderSFU
+
+GitHub URL: https://github.com/tahabornoosh/cmpt276-grouproject
+
+Render URL:
+
+Team members:
+ - Taha Bornoosh: tba92 (Computing ID), taha015626 (Discord), tahabornoosh (GitHub)
+ - Parsa BarzegariMollan: pba42 (Computing ID), parsabrz (Discord), bpa42 (GitHub)
+ - David He: dha138 (Computing ID), icebeargg.(Discord), junxianhe (GitHub)
+ - Pravit Hundal: pha55 (Computing ID), prav_13218 (Discord), Prav1t (GitHub)
+ - William Lam: wla203 (Computing ID), shiiby (Discord), 2WLawn (GitHub)

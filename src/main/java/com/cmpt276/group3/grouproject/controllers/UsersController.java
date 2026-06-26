@@ -10,6 +10,9 @@ import com.cmpt276.group3.grouproject.models.User;
 import com.cmpt276.group3.grouproject.models.UsersRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @Controller
@@ -19,6 +22,22 @@ public class UsersController {
     public UsersController(UsersRepository usersRepository) {
         this.UR = usersRepository;
     }
+
+    @GetMapping("/login")
+    public String login_controller(Model model) {
+        return "empty"; // to be implemented
+    }
+
+    @PostMapping("/process_login")
+    public String login_post_controller(@RequestParam String email, @RequestParam String password, Model model) {
+        return "empty"; // to be implemented
+    }
+    
+    @GetMapping("/logout")
+    public String logout_controller(@RequestParam String param, Model model) {
+        return "empty"; // to be implemented
+    }
+    
 
     /*
     @PostMapping("/testuser")

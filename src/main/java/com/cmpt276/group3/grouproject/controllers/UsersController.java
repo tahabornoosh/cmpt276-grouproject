@@ -80,5 +80,11 @@ public class UsersController {
         return "empty";
     }
     */
+
+    @GetMapping("/test")
+    public String template_test(Model model) {
+        return "example";
+    }
+    
     
 }

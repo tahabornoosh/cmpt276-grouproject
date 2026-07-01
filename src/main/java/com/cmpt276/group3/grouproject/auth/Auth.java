@@ -21,12 +21,12 @@ public class Auth {
         return null;
     }
 
-    public boolean logout(HttpSession session) {
+    public boolean logout() {
         return false;
         // to be implemented
     }
 
-    public boolean login(HttpSession session, String email, String password) {
+    public boolean login(String email, String password) {
         return false;
         // to be implemented
     }

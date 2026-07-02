@@ -22,8 +22,8 @@ public class UserService {
             );
         }
 
-        /* 
-        Should be validated by controller, placeholder
+        
+        //Should be validated by controller, placeholder
         if (newUser.getPassword() == null || newUser.getPassword().isBlank()) {
             throw new IllegalArgumentException(
                 "Password cannot be empty"
@@ -35,7 +35,8 @@ public class UserService {
                 "Email cannot be empty"
             );
         }
-        */
+        //
+        
         hashPassword(newUser);
         return userRepository.save(newUser);
     }
@@ -49,6 +50,17 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
+    public User findUserByEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return null;
+        }
+
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+    public User findUserById(Integer id) {
+        return userRepository.findById(id).orElse(null);
+    }
     // Helpers
 
     private void hashPassword(User targetUser) {

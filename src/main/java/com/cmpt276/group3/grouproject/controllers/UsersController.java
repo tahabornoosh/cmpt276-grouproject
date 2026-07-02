@@ -67,8 +67,8 @@ public class UsersController {
     @GetMapping("/logout")
     public String logout_controller(HttpServletRequest request, HttpServletResponse response) {
         Auth auth = new Auth(request.getSession());
-        if (auth.logout()) return "redirect:/login?success=1";
-        return "redirect:/?error=-1";
+        auth.logout();
+        return "redirect:/login?success=1";
     }
     
 
@@ -81,8 +81,10 @@ public class UsersController {
     }
     */
 
-    @GetMapping("/test")
-    public String template_test(Model model) {
+    @GetMapping("/")
+    public String template_test(HttpServletRequest request, HttpServletResponse response) {
+        Auth auth = new Auth(request.getSession());
+        if (!auth.IsLoggedIn()) return "redirect:/login";
         return "example";
     }
     

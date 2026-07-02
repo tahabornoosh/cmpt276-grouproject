@@ -19,7 +19,6 @@ public class User {
     private String last_name;
     @Column(unique = true)
     private String email;
-    @Size(min=60, max=60) // BCrypt String Size
     private String password;
     @Enumerated(EnumType.STRING)
     private Role role;

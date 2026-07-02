@@ -11,6 +11,7 @@ import com.cmpt276.group3.grouproject.enums.Gender;
 import com.cmpt276.group3.grouproject.enums.Role;
 import com.cmpt276.group3.grouproject.models.User;
 import com.cmpt276.group3.grouproject.models.UsersRepository;
+import com.cmpt276.group3.grouproject.services.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,49 +26,46 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class UsersController {
-    private final UsersRepository UR;
+    private final UserService US;
+    private final Auth auth;
 
-    public UsersController(UsersRepository usersRepository) {
-        this.UR = usersRepository;
+    public UsersController(UserService userService) {
+        this.US = userService;
+        auth = new Auth(US);
     }
 
     @GetMapping("/login")
     public String login_controller(Model model, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
-        Auth auth = new Auth(session);
-        if (auth.IsLoggedIn()) return "redirect:/"; // already logged in
+        if (auth.isLoggedIn(session)) return "redirect:/"; // already logged in
         return "login";
     }
 
     @PostMapping("/process_login")
     public String login_post_controller(@RequestParam Map<String,String> formData, Model model, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
-        Auth auth = new Auth(request.getSession());
-        if (auth.IsLoggedIn()) return "redirect:/";
-        if (auth.login(formData.get("email"), formData.get("password"))) {
+        if (auth.isLoggedIn(session)) return "redirect:/";
+        if (auth.login(session, formData.get("email"), formData.get("password"))) {
             response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
             response.setHeader("Pragma", "no-cache");
             response.setHeader("Expires", "0");
-            model.addAttribute("user", auth.getUser());
+            model.addAttribute("user", auth.getUser(session));
             return "redirect:/";
         } else return "redirect:/login?error=1";
     }
 
     @GetMapping("/signup")
     public String signup_controller(Model model, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
-        Auth auth = new Auth(session);
-        if (auth.IsLoggedIn()) return "redirect:/"; // already logged in
+        if (auth.isLoggedIn(session)) return "redirect:/"; // already logged in
         return "signup";
     }
 
     @PostMapping("/process_signup")
     public String signup_post_controller(@RequestParam Map<String,String> formData, Model model, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
-        Auth auth = new Auth(request.getSession());
         return "empty"; // to be implemented
     }
     
     @GetMapping("/logout")
     public String logout_controller(HttpServletRequest request, HttpServletResponse response) {
-        Auth auth = new Auth(request.getSession());
-        auth.logout();
+        auth.logout(request.getSession());
         return "redirect:/login?success=1";
     }
     
@@ -82,9 +80,9 @@ public class UsersController {
     */
 
     @GetMapping("/")
-    public String template_test(HttpServletRequest request, HttpServletResponse response) {
-        Auth auth = new Auth(request.getSession());
-        if (!auth.IsLoggedIn()) return "redirect:/login";
+    public String template_test(HttpServletRequest request, HttpServletResponse response, Model model) {
+        if (!auth.isLoggedIn(request.getSession())) return "redirect:/login";
+        model.addAttribute(auth.getUser(request.getSession()));
         return "example";
     }
     

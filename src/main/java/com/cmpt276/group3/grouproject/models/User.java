@@ -19,7 +19,7 @@ public class User {
     private String last_name;
     @Column(unique = true)
     private String email;
-    @Size(min=64, max=64) // sha256
+    
     private String password;
     @Enumerated(EnumType.STRING)
     private Role role;

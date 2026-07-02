@@ -22,13 +22,37 @@ public class UserService {
             );
         }
 
-        String hashedPassword = PasswordUtil.hashPassword(newUser.getPassword());
-        newUser.setPassword(hashedPassword);
+        /* 
+        Should be validated by controller, placeholder
+        if (newUser.getPassword() == null || newUser.getPassword().isBlank()) {
+            throw new IllegalArgumentException(
+                "Password cannot be empty"
+            );
+        }
 
+        if (newUser.getEmail() == null || newUser.getEmail().isBlank()) {
+            throw new IllegalArgumentException(
+                "Email cannot be empty"
+            );
+        }
+        */
+        hashPassword(newUser);
         return userRepository.save(newUser);
+    }
+
+    public User updatePassword(User targetUser, String plainPassword) {
+        hashPassword(targetUser);
+        return userRepository.save(targetUser);
     }
 
     public boolean emailExists(String email) {
         return userRepository.existsByEmail(email);
     }
+
+    // Helpers
+
+    private void hashPassword(User targetUser) {
+        String hashedPassword = PasswordUtil.hashPassword(targetUser.getPassword());
+        targetUser.setPassword(hashedPassword);
+    } 
 }

@@ -79,7 +79,7 @@ public class UsersController {
         }
 
         if (!password.equals(confirmPassword)) {
-            return "redirect:/signup?error=1";
+            return "redirect:/signup?passwordMismatch=1";
         }
 
         try {

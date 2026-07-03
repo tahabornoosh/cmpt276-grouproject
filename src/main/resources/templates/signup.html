@@ -32,6 +32,9 @@
       <div th:if="${param.error}" class="alert alert-danger text-center">
         Signup failed. Please check your information.
       </div>
+      <div th:if="${param.passwordMismatch}" class="alert alert-danger text-center">
+        Passwords do not match.
+      </div>
 
       <form action="/process_signup" method="post">
 

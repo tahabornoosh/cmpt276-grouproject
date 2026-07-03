@@ -29,8 +29,8 @@ public class Auth {
             return null;
         }
 
-        Integer userId = (Integer) userIdObj;
-        return userService.findUserById(userId);
+        Long userId = (Long) userIdObj;
+        return userService.findUserById(userId.intValue());
     }
 
     public void logout(HttpSession session) {

@@ -60,47 +60,7 @@ public class UsersController {
 
     @PostMapping("/process_signup")
     public String signup_post_controller(@RequestParam Map<String,String> formData, Model model, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
-        if (auth.isLoggedIn(session)) return "redirect:/";
-
-        String firstName = formData.get("first_name");
-        String lastName = formData.get("last_name");
-        String email = formData.get("email");
-        String password = formData.get("password");
-        String confirmPassword = formData.get("confirm_password");
-        String genderValue = formData.get("gender");
-
-        if (firstName == null || firstName.isBlank()
-                || lastName == null || lastName.isBlank()
-                || email == null || email.isBlank()
-                || password == null || password.isBlank()
-                || confirmPassword == null || confirmPassword.isBlank()
-                || genderValue == null || genderValue.isBlank()) {
-            return "redirect:/signup?error=1";
-        }
-
-        if (!password.equals(confirmPassword)) {
-            return "redirect:/signup?passwordMismatch=1";
-        }
-
-        try {
-            Gender gender = Gender.valueOf(genderValue);
-
-            User newUser = new User(
-                firstName,
-                lastName,
-                email,
-                password,
-                Role.USER,
-                gender,
-                ""
-            );
-
-            US.registerUser(newUser);
-            return "redirect:/login?registered=1";
-
-        } catch (Exception e) {
-            return "redirect:/signup?error=1";
-        }
+        return "empty"; // to be implemented
     }
     
     @GetMapping("/logout")
@@ -119,12 +79,5 @@ public class UsersController {
     }
     */
 
-    @GetMapping("/")
-    public String template_test(HttpServletRequest request, HttpServletResponse response, Model model) {
-        if (!auth.isLoggedIn(request.getSession())) return "redirect:/login";
-        model.addAttribute(auth.getUser(request.getSession()));
-        return "example";
-    }
-    
-    
+   
 }

@@ -1,0 +1,67 @@
+<th:block th:replace="~{fragments/layout :: head('Profile')}"></th:block>
+<th:block th:replace="~{fragments/layout :: bodyStart}"></th:block>
+<input type="hidden" id="activeMenuItem" name="activeMenuItem" value="menu-dashboard" />
+
+<main class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 th:text="${profileUser.first_name} + ' ' + ${profileUser.last_name}">Profile</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item active">Profile</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card card-primary card-outline">
+            <div class="card-body box-profile text-center">
+              <img class="profile-user-img img-fluid img-circle"
+                   th:src="${profileUser.avatar} ?: @{/alte/dist/img/default-150x150.png}"
+                   alt="Profile picture">
+              <h3 class="profile-username text-center"
+                  th:text="${profileUser.first_name} + ' ' + ${profileUser.last_name}"></h3>
+              <p class="text-muted text-center" th:text="${profileUser.gender}"></p>
+
+              <span th:if="${isOwnProfile}" class="badge badge-info d-block mb-2">This is your profile</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-8">
+          <div class="card card-primary card-outline">
+            <div class="card-header p-2">
+              <ul class="nav nav-pills">
+                <li class="nav-item"><a class="nav-link active" href="#about" data-toggle="tab">About</a></li>
+              </ul>
+            </div>
+            <div class="card-body">
+              <div id="about" class="tab-pane active">
+                <strong><i class="fas fa-venus-mars mr-1"></i> Gender</strong>
+                <p class="text-muted" th:text="${profileUser.gender}"></p>
+                <hr>
+                <strong><i class="far fa-address-card mr-1"></i> Bio &amp; Interests</strong>
+                <p class="text-muted">
+                  This user hasn't filled out a questionnaire yet. Once the Profiles/Questionnaire
+                  feature is live, their interests, preferences, and dating/friendship/study-buddy
+                  info will show up here.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<th:block th:replace="~{fragments/layout :: bodyEnd}"></th:block>

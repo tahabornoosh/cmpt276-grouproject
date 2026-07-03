@@ -37,6 +37,10 @@
         You have successfully logged out.
       </div>
 
+      <div th:if="${param.registered}" class="alert alert-success text-center">
+        Account created successfully. Please log in.
+      </div>
+
       <form action="/process_login" method="post">
         <div class="input-group mb-3">
           <input type="email" name="email" class="form-control" placeholder="SFU Email" required>

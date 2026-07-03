@@ -41,22 +41,10 @@
     <ul class="navbar-nav">
       <li class="nav-item"><a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a></li>
       <li class="nav-item d-none d-sm-inline-block"><a href="#" class="nav-link">Home</a></li>
-      <li hidden class="nav-item d-none d-sm-inline-block"><a href="#" class="nav-link">Contact</a></li>
+      <li hidden="true" class="nav-item d-none d-sm-inline-block"><a href="/logout" class="nav-link">Log out</a></li>
     </ul>
     <ul class="navbar-nav ml-auto">
-      <li class="nav-item">
-        <a class="nav-link" data-widget="navbar-search" href="#" role="button"><i class="fas fa-search"></i></a>
-        <div class="navbar-search-block">
-          <form class="form-inline"><div class="input-group input-group-sm">
-            <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
-            <div class="input-group-append">
-              <button class="btn btn-navbar" type="submit"><i class="fas fa-search"></i></button>
-              <button class="btn btn-navbar" type="button" data-widget="navbar-search"><i class="fas fa-times"></i></button>
-            </div>
-          </div></form>
-        </div>
-      </li>
-      <li class="nav-item dropdown">
+      <li hidden class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#"><i class="far fa-bell"></i><span class="badge badge-warning navbar-badge">3</span></a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
           <span class="dropdown-header">3 Notifications</span>
@@ -67,21 +55,21 @@
       <li class="nav-item">
         <button id="themeToggle" type="button" class="nav-link btn btn-link" title="Toggle light/dark theme"><i class="fas fa-moon"></i></button>
       </li>
-      <li class="nav-item"><a class="nav-link" data-widget="fullscreen" href="#" role="button"><i class="fas fa-expand-arrows-alt"></i></a></li>
-      <li class="nav-item"><a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button"><i class="fas fa-th-large"></i></a></li>
+      <li hidden class="nav-item"><a class="nav-link" data-widget="fullscreen" href="#" role="button"><i class="fas fa-expand-arrows-alt"></i></a></li>
+      <li hidden class="nav-item"><a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button"><i class="fas fa-th-large"></i></a></li>
     </ul>
   </nav>
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="#" class="brand-link">
-      <img th:src="@{/alte/dist/img/AdminLTELogo.png}" src="/alte/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3.2</span>
+      <img th:src="@{/logo.png}" src="/logo.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <span class="brand-text font-weight-light">FriendFinderSFU</span>
     </a>
     <div class="sidebar">
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image"><img th:src="@{/alte/dist/img/user2-160x160.jpg}" src="/alte/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image"></div>
-        <div class="info"><a href="#" class="d-block">Alexander Pierce</a></div>
+        <div class="info"><a href="#" class="d-block">User</a></div>
       </div>
-      <div class="form-inline">
+      <div hidden class="form-inline">
         <div class="input-group" data-widget="sidebar-search">
           <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
           <div class="input-group-append"><button class="btn btn-sidebar"><i class="fas fa-search fa-fw"></i></button></div>
@@ -89,20 +77,8 @@
       </div>
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-          <li class="nav-item">
-            <a id="menu-dashboard" href="#" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard<i class="right fas fa-angle-left"></i></p></a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item"><a id="menu-dashboard-v1" href="#" class="nav-link"><i class="far fa-circle nav-icon"></i><p>Dashboard v1</p></a></li>
-              <li class="nav-item"><a id="menu-dashboard-v2" href="#" class="nav-link"><i class="far fa-circle nav-icon"></i><p>Dashboard v2</p></a></li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <a id="menu-tables" href="#" class="nav-link"><i class="nav-icon fas fa-table"></i><p>Tables<i class="right fas fa-angle-left"></i></p></a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item"><a id="menu-data-tables" href="#" class="nav-link"><i class="far fa-circle nav-icon"></i><p>DataTables</p></a></li>
-              <li class="nav-item"><a id="menu-simple-tables" href="#" class="nav-link"><i class="far fa-circle nav-icon"></i><p>Simple Tables</p></a></li>
-            </ul>
-          </li>
+          <li class="nav-item"><a id="menu-dashboard" href="/" class="nav-link"><i class="nav-icon fas fa-th"></i><p>Dashboard</p></a></li>
+          <li class="nav-item"><a id="menu-profile" href="/profile" class="nav-link"><i class="nav-icon fas fa-th"></i><p>Your Profile</p></a></li>
           <li class="nav-item"><a id="menu-widgets" href="#" class="nav-link"><i class="nav-icon fas fa-th"></i><p>Widgets<span class="right badge badge-danger">New</span></p></a></li>
         </ul>
       </nav>
@@ -111,7 +87,7 @@
 </th:block>
 <th:block th:fragment="bodyEnd">
   <aside class="control-sidebar control-sidebar-dark"></aside>
-  <footer class="main-footer"><strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.</footer>
+  <footer class="main-footer"><strong>Created by Parsa, David, Taha, William, and Pravit.</strong>Template by AdminLTE.</footer>
 </div>
   <script th:src="@{/alte/plugins/jquery/jquery.min.js}" src="/alte/plugins/jquery/jquery.min.js"></script>
   <script th:src="@{/alte/plugins/jquery-ui/jquery-ui.min.js}" src="/alte/plugins/jquery-ui/jquery-ui.min.js"></script>

@@ -1,7 +1,5 @@
 package com.cmpt276.group3.grouproject.models;
 
-import org.springframework.context.annotation.Profile;
-
 import com.cmpt276.group3.grouproject.enums.Gender;
 import com.cmpt276.group3.grouproject.enums.Hobby;
 import com.cmpt276.group3.grouproject.enums.Sport;
@@ -18,8 +16,9 @@ public class MatchingProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @OneToOne(mappedBy = "users", cascade = CascadeType.ALL)
-    private User user; // link to the user
+    @OneToOne
+    @JoinColumn(name = "user_id", unique = true)
+    private User user; // link to the user - to be managed by the service to prevent duplicates
 
     // visibility/matchability
     private boolean display_friendship_profile;

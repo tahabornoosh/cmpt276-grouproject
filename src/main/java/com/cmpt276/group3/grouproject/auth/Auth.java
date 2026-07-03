@@ -30,7 +30,7 @@ public class Auth {
         }
 
         Long userId = (Long) userIdObj;
-        return userService.findUserById(userId.intValue());
+        return userService.findUserById(userId);
     }
 
     public void logout(HttpSession session) {

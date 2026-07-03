@@ -1,0 +1,49 @@
+<!-- PLACEHOLDER: David owns the real "Admin Page (users datatables)" template per the task board.
+     This just proves the controller/model wiring works until his version lands. -->
+<th:block th:replace="~{fragments/layout :: head('Admin Dashboard')}"></th:block>
+<th:block th:replace="~{fragments/layout :: bodyStart}"></th:block>
+<input type="hidden" id="activeMenuItem" name="activeMenuItem" value="menu-dashboard" />
+
+<main class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6"><h1>Admin Dashboard</h1></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">Users</h3></div>
+        <div class="card-body">
+          <table id="usersTable" class="table table-bordered table-striped">
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Gender</th><th>Role</th><th></th></tr>
+            </thead>
+            <tbody>
+              <tr th:each="u : ${users}">
+                <td th:text="${u.first_name} + ' ' + ${u.last_name}"></td>
+                <td th:text="${u.email}"></td>
+                <td th:text="${u.gender}"></td>
+                <td th:text="${u.role}"></td>
+                <td><a th:href="@{'/profile/' + ${u.id}}" class="btn btn-sm btn-info">View profile</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.jQuery && window.jQuery.fn.DataTable) {
+        $('#usersTable').DataTable({ responsive: true, lengthChange: false, autoWidth: false });
+      }
+    });
+  </script>
+</main>
+
+<th:block th:replace="~{fragments/layout :: bodyEnd}"></th:block>

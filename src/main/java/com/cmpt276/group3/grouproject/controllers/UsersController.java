@@ -79,6 +79,5 @@ public class UsersController {
     }
     */
 
-    // NOTE: the old GET "/" -> "example" placeholder was moved to LandingController.
-    // Keeping two handlers on "/" throws an ambiguous mapping error at startup.
+   
 }

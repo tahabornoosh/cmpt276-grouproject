@@ -119,12 +119,5 @@ public class UsersController {
     }
     */
 
-    @GetMapping("/")
-    public String template_test(HttpServletRequest request, HttpServletResponse response, Model model) {
-        if (!auth.isLoggedIn(request.getSession())) return "redirect:/login";
-        model.addAttribute(auth.getUser(request.getSession()));
-        return "example";
-    }
-    
-    
+   
 }

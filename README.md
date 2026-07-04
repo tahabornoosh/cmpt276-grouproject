@@ -1,7 +1,7 @@
 # FriendFinderSFU
 A friend-finding (and more!) app dedicated to the SFU community. CMPT 276 group projects 3.
 
-## Glossary
+## Table of Contents
 
 - Abstract
 - The problem our App solves
@@ -118,6 +118,31 @@ Additionally, our app provides a host of features such as deterministic (score b
 See docs/DECLARATIONS.md
 
 # User Stories
+
+## Case: Auth-wall
+**Personas/Actors**
+1. Primary actor: Jane - a random person
+
+**Pre-conditions**
+None
+
+**Actions/Triggers**
+Jane attempts to go to the app's dashboard or other authenticated page by opening the app URL.
+
+**Acceptance Criteria**
+- If Jane has an active session (has logged in before), she must be able to view the dashboard or requested page
+- If Jane has not yet logged in, she should be redirected to the login page
+
+**Post-conditions**
+- If Jane has not logged in, she should not be served any protected information from the database (other users' profiles, etc)
+
+**Non-functional requirements**
+- An average user should be able to understand why they have been redirected to the login page through the UX
+- All pages should load in less than one second
+
+**Tests**
+- An unauthenticated user sending a request to the application root (dashboard) should be redirected to `/login`
+- An authenticated user sending a request to the application root should get a 200-level result code and should not be redirected.
 
 ## Case: Sign-up
 **Personas/Actors**

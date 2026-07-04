@@ -33,7 +33,7 @@ public class MatchingAlgorithm {
             res+=a.get(i)*b.get(i);
         } 
 
-        return 13*Math.log(res*3); // curved (empirically found curve - identical profile with no match gives ~48, full repitition gives ~61)
+        return 13*Math.log(res*3); // curved (empirically found curve - identical profile with no repeat gives ~48, full repitition gives ~61)
     } 
 
     public static int friendshipMatch(MatchingProfile base, MatchingProfile target) {
@@ -50,6 +50,6 @@ public class MatchingAlgorithm {
         if (base.getFavourite_sport()==target.getFavourite_sport()) score+=8; // 8 - same favourite sport
         if (base.getPreferred_venue()==target.getPreferred_venue()) score+=7; // 7 - same preferred venue
 
-        return (score<=102) ? (int) score:102; // cut to 102%
+        return (score<=102) ? (int) score:102; // capped at 102%
     }
 }

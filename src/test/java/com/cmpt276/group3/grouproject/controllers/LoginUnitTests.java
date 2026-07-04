@@ -1,0 +1,111 @@
+package com.cmpt276.group3.grouproject.controllers;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
+import java.util.Locale;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.ViewResolver;
+
+import com.cmpt276.group3.grouproject.models.User;
+import com.cmpt276.group3.grouproject.models.UsersRepository;
+import com.cmpt276.group3.grouproject.services.UserService;
+
+public class LoginUnitTests {
+
+    private MockMvc mockMvc;
+
+    @Mock
+    private UsersRepository usersRepository;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+
+        UserService userService = new UserService(usersRepository);
+        UsersController usersController = new UsersController(userService);
+
+        ViewResolver viewResolver = new ViewResolver() {
+            @Override
+            public View resolveViewName(String viewName, Locale locale) {
+                if (viewName.startsWith("redirect:")) {
+                    return new org.springframework.web.servlet.view.RedirectView(
+                            viewName.substring("redirect:".length()),
+                            true
+                    );
+                }
+
+                return (model, request, response) -> {
+                    // Fake normal view. Prevents circular view path for "login".
+                };
+            }
+        };
+
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(usersController)
+                .setViewResolvers(viewResolver)
+                .build();
+    }
+
+    @Test
+    void load_login_page() throws Exception {
+        mockMvc.perform(get("/login"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("login"));
+    }
+
+    @Test
+    void login_success() throws Exception {
+        User mockUser = new User();
+        mockUser.setEmail("test@sfu.ca");
+
+        String hashedPassword = BCrypt.hashpw("12345", BCrypt.gensalt());
+        mockUser.setPassword(hashedPassword);
+
+        when(usersRepository.findByEmail("test@sfu.ca"))
+                .thenReturn(Optional.of(mockUser));
+
+        mockMvc.perform(post("/process_login")
+                .param("email", "test@sfu.ca")
+                .param("password", "12345"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
+    }
+
+    @Test
+    void login_fail() throws Exception {
+        User mockUser = new User();
+        mockUser.setEmail("test@sfu.ca");
+
+        String hashedPassword = BCrypt.hashpw("12345", BCrypt.gensalt());
+        mockUser.setPassword(hashedPassword);
+
+        when(usersRepository.findByEmail("test@sfu.ca"))
+                .thenReturn(Optional.of(mockUser));
+
+        mockMvc.perform(post("/process_login")
+                .param("email", "test@sfu.ca")
+                .param("password", "123456")) // wrong password
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/login?error=1"));
+        
+        mockMvc.perform(post("/process_login")
+                .param("email", "test1@sfu.com") // wrong email
+                .param("password", "12345")) 
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/login?error=1"));
+    }
+}

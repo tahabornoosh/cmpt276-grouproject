@@ -6,3 +6,4 @@
 ## AI Tools used
 - ChatGPT used to find Dockerfile issue (initial deployment)
 - AI used to adapt AdminLTE to Thymeleaf (including menu, header, and footer as fragments)
+- AI used help generate and debug login tests

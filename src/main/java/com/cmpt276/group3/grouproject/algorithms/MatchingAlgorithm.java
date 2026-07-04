@@ -6,6 +6,9 @@ import com.cmpt276.group3.grouproject.enums.Hobby;
 import com.cmpt276.group3.grouproject.models.MatchingProfile;
 
 public class MatchingAlgorithm {
+    private static int abs(int x) {
+        return x<0 ? -x:x;
+    }
     private static double hobbiesScore(MatchingProfile base, MatchingProfile target) {
         ArrayList<Double> a = new ArrayList<Double>();
         ArrayList<Double> b = new ArrayList<Double>();
@@ -43,13 +46,13 @@ public class MatchingAlgorithm {
 
         double score = hobbiesScore(base, target);
         // linear factors
-        if (base.getAge()-target.getAge()<=5) score+=3*(5-(base.getAge()-target.getAge())); // 15 - age closeness
-        if (base.getYear_of_study()-target.getYear_of_study()<=3) score+=5*(3-(base.getAge()-target.getAge())); // 15 - year of study closeness
+        if (abs(base.getAge()-target.getAge())<=5) score+=3*(5-abs(base.getAge()-target.getAge())); // 15 - age closeness
+        if (abs(base.getYear_of_study()-target.getYear_of_study())<=3) score+=5*(3-abs(base.getAge()-target.getAge())); // 15 - year of study closeness
         if (base.getStudy_field()==target.getStudy_field()) score+=8; // 8 - same field of study
         if (base.isRegularly_goes_to_gym()==target.isRegularly_goes_to_gym()) score+=7; // 7 - both gym-goers (or not)
         if (base.getFavourite_sport()==target.getFavourite_sport()) score+=8; // 8 - same favourite sport
         if (base.getPreferred_venue()==target.getPreferred_venue()) score+=7; // 7 - same preferred venue
 
-        return (score<=102) ? (int) score:102; // capped at 102%
+        return (score<102) ? 1+((int) score):102; // capped at 102%
     }
 }

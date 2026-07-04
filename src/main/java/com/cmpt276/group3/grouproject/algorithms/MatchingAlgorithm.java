@@ -9,11 +9,13 @@ public class MatchingAlgorithm {
     private static int abs(int x) {
         return x<0 ? -x:x;
     }
+
     private static double hobbiesScore(MatchingProfile base, MatchingProfile target) {
         ArrayList<Double> a = new ArrayList<Double>();
         ArrayList<Double> b = new ArrayList<Double>();
 
         for (Hobby h:Hobby.values()) {
+            if (h==Hobby.NONE) continue; // do not count NONE's
             Double item = 0.0;
             if (base.getHobby1()==h) item+=4;
             if (base.getHobby2()==h) item+=2;
@@ -46,12 +48,25 @@ public class MatchingAlgorithm {
 
         double score = hobbiesScore(base, target);
         // linear factors
-        if (abs(base.getAge()-target.getAge())<=5) score+=3*(5-abs(base.getAge()-target.getAge())); // 15 - age closeness
-        if (abs(base.getYear_of_study()-target.getYear_of_study())<=3) score+=5*(3-abs(base.getAge()-target.getAge())); // 15 - year of study closeness
-        if (base.getStudy_field()==target.getStudy_field()) score+=8; // 8 - same field of study
-        if (base.isRegularly_goes_to_gym()==target.isRegularly_goes_to_gym()) score+=7; // 7 - both gym-goers (or not)
-        if (base.getFavourite_sport()==target.getFavourite_sport()) score+=8; // 8 - same favourite sport
-        if (base.getPreferred_venue()==target.getPreferred_venue()) score+=7; // 7 - same preferred venue
+        if (abs(base.getAge()-target.getAge())<=5) score+=(5-abs(base.getAge()-target.getAge())); // 5 - age closeness
+        if (abs(base.getYear_of_study()-target.getYear_of_study())<=3) score+=(3-abs(base.getAge()-target.getAge())); // 3 - year of study closeness
+        if (base.getStudy_field()==target.getStudy_field()) score+=3; 
+        if (base.isRegularly_goes_to_gym()==target.isRegularly_goes_to_gym()) score+=3; 
+        if (base.getFavourite_sport()==target.getFavourite_sport()) score+=3; 
+        if (base.getPreferred_venue()==target.getPreferred_venue()) score+=3; 
+
+        if (base.getKind_of_friendship()==target.getKind_of_friendship()) score+=4;
+        if (base.getSocial_style()==target.getSocial_style()) score+=3;
+        if (base.getHangout_frequency()==target.getHangout_frequency()) score+=4;
+        if (base.getFriend_activity()==target.getFriend_activity()) score+=3;
+        if (base.getPlanning_style()==target.getPlanning_style()) score+=3;
+        if (base.getConversation_style()==target.getConversation_style()) score+=3;
+        if (base.getCommunication_style()==target.getCommunication_style()) score+=4;
+        if (base.getPersonality_trait()==target.getPersonality_trait()) score+=3;
+        if (base.getFriendship_value()==target.getFriendship_value()) score+=3;
+        if (base.getAvailability()==target.getAvailability()) score+=4;
+        if (base.getMotivation()==target.getMotivation()) score+=3;
+        if (base.getFriend_type()==target.getFriend_type()) score+=3;
 
         return (score<102) ? 1+((int) score):102; // capped at 102%
     }

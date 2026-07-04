@@ -8,3 +8,4 @@
 - AI used to adapt AdminLTE to Thymeleaf (including menu, header, and footer as fragments)
 - Agents used to help debug login and signup templates and controllers
 - AI used to find information on how to configure one-to-one keys in models
+- AI used to create enums from mass question list for the questionnair

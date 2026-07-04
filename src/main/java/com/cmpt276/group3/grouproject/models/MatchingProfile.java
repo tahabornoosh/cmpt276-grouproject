@@ -1,10 +1,6 @@
 package com.cmpt276.group3.grouproject.models;
 
-import com.cmpt276.group3.grouproject.enums.Gender;
-import com.cmpt276.group3.grouproject.enums.Hobby;
-import com.cmpt276.group3.grouproject.enums.Sport;
-import com.cmpt276.group3.grouproject.enums.StudyField;
-import com.cmpt276.group3.grouproject.enums.Venue;
+import com.cmpt276.group3.grouproject.enums.*;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
@@ -43,7 +39,7 @@ public class MatchingProfile {
     @Nullable
     private Venue preferred_venue;
     @Nullable
-    private Hobby hobby1; // can be repeated for over-emphasis - priorities: 4 2 1 0.5 0.25
+    private Hobby hobby1; // a hobby can be repeated for over-emphasis - priorities: 4 2 1 0.5 0.25
     @Nullable 
     private Hobby hobby2;
     @Nullable
@@ -52,6 +48,32 @@ public class MatchingProfile {
     private Hobby hobby4;
     @Nullable
     private Hobby hobby5;
+
+    // friendship-specific questions
+    @Nullable
+    private FriendshipStyle kind_of_friendship;
+    @Nullable
+    private SocialStyle social_style;
+    @Nullable
+    private HangoutFrequency hangout_frequency;
+    @Nullable
+    private FriendActivity friend_activity;
+    @Nullable
+    private PlanningStyle planning_style;
+    @Nullable
+    private ConversationStyle conversation_style;
+    @Nullable
+    private CommunicationStyle communication_style;
+    @Nullable
+    private PersonalityTrait personality_trait;
+    @Nullable
+    private FriendshipValue friendship_value;
+    @Nullable
+    private Availability availability;
+    @Nullable
+    private Motivation motivation;
+    @Nullable
+    private FriendType friend_type;
 
     // dating - nullable but service should not allow null enteries with display_dating_profile set to true
     @Nullable
@@ -74,13 +96,17 @@ public class MatchingProfile {
     @Nullable
     @Min(1)
     private int buddy_max_year_of_study;
-    public MatchingProfile(long id, User user, boolean display_friendship_profile, boolean display_dating_profile,
+
+    public MatchingProfile(User user, boolean display_friendship_profile, boolean display_dating_profile,
             boolean display_study_buddy_profile, @Min(18) int age, StudyField study_field, @Min(1) int year_of_study,
             boolean has_job, boolean regularly_goes_to_gym, Sport favourite_sport, Venue preferred_venue, Hobby hobby1,
-            Hobby hobby2, Hobby hobby3, Hobby hobby4, Hobby hobby5, boolean looking_for_short_term_relationship,
+            Hobby hobby2, Hobby hobby3, Hobby hobby4, Hobby hobby5, FriendshipStyle kind_of_friendship,
+            SocialStyle social_style, HangoutFrequency hangout_frequency, FriendActivity friend_activity,
+            PlanningStyle planning_style, ConversationStyle conversation_style, CommunicationStyle communication_style,
+            PersonalityTrait personality_trait, FriendshipValue friendship_value, Availability availability,
+            Motivation motivation, FriendType friend_type, boolean looking_for_short_term_relationship,
             @Min(18) int min_partner_age, @Min(18) int max_partner_age, Gender partner_gender,
             StudyField buddy_area_of_study, @Min(1) int buddy_min_year_of_study, @Min(1) int buddy_max_year_of_study) {
-        this.id = id;
         this.user = user;
         this.display_friendship_profile = display_friendship_profile;
         this.display_dating_profile = display_dating_profile;
@@ -97,6 +123,18 @@ public class MatchingProfile {
         this.hobby3 = hobby3;
         this.hobby4 = hobby4;
         this.hobby5 = hobby5;
+        this.kind_of_friendship = kind_of_friendship;
+        this.social_style = social_style;
+        this.hangout_frequency = hangout_frequency;
+        this.friend_activity = friend_activity;
+        this.planning_style = planning_style;
+        this.conversation_style = conversation_style;
+        this.communication_style = communication_style;
+        this.personality_trait = personality_trait;
+        this.friendship_value = friendship_value;
+        this.availability = availability;
+        this.motivation = motivation;
+        this.friend_type = friend_type;
         this.looking_for_short_term_relationship = looking_for_short_term_relationship;
         this.min_partner_age = min_partner_age;
         this.max_partner_age = max_partner_age;
@@ -244,6 +282,102 @@ public class MatchingProfile {
 
     public void setHobby5(Hobby hobby5) {
         this.hobby5 = hobby5;
+    }
+
+    public FriendshipStyle getKind_of_friendship() {
+        return kind_of_friendship;
+    }
+
+    public void setKind_of_friendship(FriendshipStyle kind_of_friendship) {
+        this.kind_of_friendship = kind_of_friendship;
+    }
+
+    public SocialStyle getSocial_style() {
+        return social_style;
+    }
+
+    public void setSocial_style(SocialStyle social_style) {
+        this.social_style = social_style;
+    }
+
+    public HangoutFrequency getHangout_frequency() {
+        return hangout_frequency;
+    }
+
+    public void setHangout_frequency(HangoutFrequency hangout_frequency) {
+        this.hangout_frequency = hangout_frequency;
+    }
+
+    public FriendActivity getFriend_activity() {
+        return friend_activity;
+    }
+
+    public void setFriend_activity(FriendActivity friend_activity) {
+        this.friend_activity = friend_activity;
+    }
+
+    public PlanningStyle getPlanning_style() {
+        return planning_style;
+    }
+
+    public void setPlanning_style(PlanningStyle planning_style) {
+        this.planning_style = planning_style;
+    }
+
+    public ConversationStyle getConversation_style() {
+        return conversation_style;
+    }
+
+    public void setConversation_style(ConversationStyle conversation_style) {
+        this.conversation_style = conversation_style;
+    }
+
+    public CommunicationStyle getCommunication_style() {
+        return communication_style;
+    }
+
+    public void setCommunication_style(CommunicationStyle communication_style) {
+        this.communication_style = communication_style;
+    }
+
+    public PersonalityTrait getPersonality_trait() {
+        return personality_trait;
+    }
+
+    public void setPersonality_trait(PersonalityTrait personality_trait) {
+        this.personality_trait = personality_trait;
+    }
+
+    public FriendshipValue getFriendship_value() {
+        return friendship_value;
+    }
+
+    public void setFriendship_value(FriendshipValue friendship_value) {
+        this.friendship_value = friendship_value;
+    }
+
+    public Availability getAvailability() {
+        return availability;
+    }
+
+    public void setAvailability(Availability availability) {
+        this.availability = availability;
+    }
+
+    public Motivation getMotivation() {
+        return motivation;
+    }
+
+    public void setMotivation(Motivation motivation) {
+        this.motivation = motivation;
+    }
+
+    public FriendType getFriend_type() {
+        return friend_type;
+    }
+
+    public void setFriend_type(FriendType friend_type) {
+        this.friend_type = friend_type;
     }
 
     public boolean isLooking_for_short_term_relationship() {

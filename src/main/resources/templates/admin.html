@@ -1,7 +1,7 @@
 
 <th:block th:replace="~{fragments/layout :: head('Admin Dashboard')}"></th:block>
 <th:block th:replace="~{fragments/layout :: bodyStart}"></th:block>
-<input type="hidden" id="activeMenuItem" name="activeMenuItem" value="menu-dashboard" />
+<input type="hidden" id="activeMenuItem" name="activeMenuItem" value="menu-admin" />
 
 <main class="content-wrapper">
   <section class="content-header">
@@ -19,7 +19,7 @@
         <div class="card-body">
           <table id="usersTable" class="table table-bordered table-striped">
             <thead>
-              <tr><th>Name</th><th>Email</th><th>Gender</th><th>Role</th><th></th></tr>
+              <tr><th>Name</th><th>Email</th><th>Gender</th><th>Role</th><th>Actions</th></tr>
             </thead>
             <tbody>
               <tr th:each="u : ${users}">
@@ -27,7 +27,10 @@
                 <td th:text="${u.email}"></td>
                 <td th:text="${u.gender}"></td>
                 <td th:text="${u.role}"></td>
-                <td><a th:href="@{'/profile/' + ${u.id}}" class="btn btn-sm btn-info">View profile</a></td>
+                <td>
+                  <a th:href="@{'/profile/' + ${u.id}}" class="btn btn-info btn-sm">View Public Profile</a>
+                  <a th:if="${currentUser.isAdmin()}" th:href="@{'/account/edit/' + ${u.id}}" class="btn btn-warning btn-sm">Edit Account</a>
+                </td>
               </tr>
             </tbody>
           </table>

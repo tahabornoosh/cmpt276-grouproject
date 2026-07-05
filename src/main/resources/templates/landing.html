@@ -23,6 +23,7 @@
           <p><strong>Email:</strong> <span th:text="${currentUser.email}"></span></p>
           <p><strong>Gender:</strong> <span th:text="${currentUser.gender}"></span></p>
           <a th:href="@{'/profile/' + ${currentUser.id}}" class="btn btn-primary btn-sm">View my public profile</a>
+          <a th:href="@{'/account/edit/' + ${currentUser.id}}" class="btn btn-secondary btn-sm">Edit account or change password</a>
           <a th:if="${currentUser.role.name() == 'ADMIN'}" th:href="@{/admin}" class="btn btn-secondary btn-sm">Admin dashboard</a>
         </div>
       </div>

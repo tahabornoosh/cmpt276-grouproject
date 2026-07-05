@@ -104,4 +104,12 @@ public class User {
     public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
+
+    public boolean isAdmin() {
+        return role==Role.ADMIN;
+    }
+
+    public boolean isMod() {
+        return role==Role.MOD;
+    }
 }

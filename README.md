@@ -204,3 +204,51 @@ He then enters his username and password and clicks on the Log in button.
 **Tests**
 - The correct email address and password should produce a redirect to the dashboard page, and result in a session variable creation
 - Any of wrong password, wrong email, or both, should result redirection back to the login page. No session variable should be set.
+
+## Case: Questionnair Completion
+**Personas/Actors**
+1. Primary actor: Ryan - a second-year SFU student looking to make friends
+
+**Pre-conditions**
+- Ryan must have an active account and must be logged in
+- Ryan must be on the survey page
+
+**Actions/Triggers**
+Ryan fills out the required fields and clicks "Submit"
+
+**Acceptance Criteria**
+- If all required fields have been filled, the form must be submitted and a success message must be displayed
+- If there are missing fields, Ryan should be redirected back to the questionnair
+**Post-conditions**
+- If there are no missing fields, the matching profile for Ryan must be created or updated
+
+**Non-functional requirements**
+- All pages should load in less than one second
+- Errors must be easy to understand
+
+**Tests**
+- A fully complete questionnair must be accepted and result in a record update/creation
+- If the user has indicated that they would like to have a friendship profile and then leaves friendship questions empty, their input must be rejected and they should get an error message.
+
+## Case: Questionnair Loading
+**Personas/Actors**
+1. Primary actor: Ryan - a second-year SFU student looking to make friends
+
+**Pre-conditions**
+- Ryan must have an active account and must be logged in
+
+**Actions/Triggers**
+Ryan clicks on the questionnair link from the menu in any other page of the app
+
+**Acceptance Criteria**
+- If Ryan has previously completed the survey, he should see a form pre-filled with his previous answers
+- If Ryan has not previously completed the survey, he should see an empty form
+**Post-conditions**
+- None
+
+**Non-functional requirements**
+- All pages should load in less than one second
+
+**Tests**
+- A user with an existing questionnair/matching profile record must see their information pre-filled in the form
+- A user who has not yet completed the survey must see an empty form

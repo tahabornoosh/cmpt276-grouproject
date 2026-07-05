@@ -153,7 +153,7 @@ public class UsersController {
     }
     
     
-
+    /* 
     @GetMapping("/testadmin")
     public String testadmin(Model model) {
         User newUser = new User(
@@ -168,6 +168,6 @@ public class UsersController {
 
         US.registerUser(newUser);
         return "empty";
-    }
+    } */
    
 }

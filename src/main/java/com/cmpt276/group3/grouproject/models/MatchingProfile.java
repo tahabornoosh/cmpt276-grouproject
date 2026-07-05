@@ -24,16 +24,16 @@ public class MatchingProfile {
     // basic matching questions - everything optional
     @Nullable
     @Min(18)
-    private int age;
+    private Integer age;
     @Nullable
     private StudyField study_field;
     @Min(1)
     @Nullable
-    private int year_of_study;
+    private Integer year_of_study;
     @Nullable
-    private boolean has_job;
+    private Boolean has_job;
     @Nullable
-    private boolean regularly_goes_to_gym;
+    private Boolean regularly_goes_to_gym;
     @Nullable
     private Sport favourite_sport;
     @Nullable
@@ -77,13 +77,13 @@ public class MatchingProfile {
 
     // dating - nullable but service should not allow null enteries with display_dating_profile set to true
     @Nullable
-    private boolean looking_for_short_term_relationship;
+    private Boolean looking_for_short_term_relationship;
     @Nullable
     @Min(18)
-    private int min_partner_age;
+    private Integer min_partner_age;
     @Nullable
     @Min(18)
-    private int max_partner_age;
+    private Integer max_partner_age;
     @Nullable
     private Gender partner_gender;
 
@@ -92,21 +92,21 @@ public class MatchingProfile {
     private StudyField buddy_area_of_study;
     @Nullable
     @Min(1)
-    private int buddy_min_year_of_study;
+    private Integer buddy_min_year_of_study;
     @Nullable
     @Min(1)
-    private int buddy_max_year_of_study;
+    private Integer buddy_max_year_of_study;
 
     public MatchingProfile(User user, boolean display_friendship_profile, boolean display_dating_profile,
-            boolean display_study_buddy_profile, @Min(18) int age, StudyField study_field, @Min(1) int year_of_study,
-            boolean has_job, boolean regularly_goes_to_gym, Sport favourite_sport, Venue preferred_venue, Hobby hobby1,
+            boolean display_study_buddy_profile, @Min(18) Integer age, StudyField study_field, @Min(1) Integer year_of_study,
+            Boolean has_job, boolean regularly_goes_to_gym, Sport favourite_sport, Venue preferred_venue, Hobby hobby1,
             Hobby hobby2, Hobby hobby3, Hobby hobby4, Hobby hobby5, FriendshipStyle kind_of_friendship,
             SocialStyle social_style, HangoutFrequency hangout_frequency, FriendActivity friend_activity,
             PlanningStyle planning_style, ConversationStyle conversation_style, CommunicationStyle communication_style,
             PersonalityTrait personality_trait, FriendshipValue friendship_value, Availability availability,
-            Motivation motivation, FriendType friend_type, boolean looking_for_short_term_relationship,
-            @Min(18) int min_partner_age, @Min(18) int max_partner_age, Gender partner_gender,
-            StudyField buddy_area_of_study, @Min(1) int buddy_min_year_of_study, @Min(1) int buddy_max_year_of_study) {
+            Motivation motivation, FriendType friend_type, Boolean looking_for_short_term_relationship,
+            @Min(18) Integer min_partner_age, @Min(18) Integer max_partner_age, Gender partner_gender,
+            StudyField buddy_area_of_study, @Min(1) Integer buddy_min_year_of_study, @Min(1) Integer buddy_max_year_of_study) {
         this.user = user;
         this.display_friendship_profile = display_friendship_profile;
         this.display_dating_profile = display_dating_profile;
@@ -188,11 +188,11 @@ public class MatchingProfile {
         this.display_study_buddy_profile = display_study_buddy_profile;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 
@@ -212,19 +212,19 @@ public class MatchingProfile {
         this.year_of_study = year_of_study;
     }
 
-    public boolean isHas_job() {
+    public Boolean isHas_job() {
         return has_job;
     }
 
-    public void setHas_job(boolean has_job) {
+    public void setHas_job(Boolean has_job) {
         this.has_job = has_job;
     }
 
-    public boolean isRegularly_goes_to_gym() {
+    public Boolean isRegularly_goes_to_gym() {
         return regularly_goes_to_gym;
     }
 
-    public void setRegularly_goes_to_gym(boolean regularly_goes_to_gym) {
+    public void setRegularly_goes_to_gym(Boolean regularly_goes_to_gym) {
         this.regularly_goes_to_gym = regularly_goes_to_gym;
     }
 
@@ -380,27 +380,27 @@ public class MatchingProfile {
         this.friend_type = friend_type;
     }
 
-    public boolean isLooking_for_short_term_relationship() {
+    public Boolean isLooking_for_short_term_relationship() {
         return looking_for_short_term_relationship;
     }
 
-    public void setLooking_for_short_term_relationship(boolean looking_for_short_term_relationship) {
+    public void setLooking_for_short_term_relationship(Boolean looking_for_short_term_relationship) {
         this.looking_for_short_term_relationship = looking_for_short_term_relationship;
     }
 
-    public int getMin_partner_age() {
+    public Integer getMin_partner_age() {
         return min_partner_age;
     }
 
-    public void setMin_partner_age(int min_partner_age) {
+    public void setMin_partner_age(Integer min_partner_age) {
         this.min_partner_age = min_partner_age;
     }
 
-    public int getMax_partner_age() {
+    public Integer getMax_partner_age() {
         return max_partner_age;
     }
 
-    public void setMax_partner_age(int max_partner_age) {
+    public void setMax_partner_age(Integer max_partner_age) {
         this.max_partner_age = max_partner_age;
     }
 
@@ -420,19 +420,19 @@ public class MatchingProfile {
         this.buddy_area_of_study = buddy_area_of_study;
     }
 
-    public int getBuddy_min_year_of_study() {
+    public Integer getBuddy_min_year_of_study() {
         return buddy_min_year_of_study;
     }
 
-    public void setBuddy_min_year_of_study(int buddy_min_year_of_study) {
+    public void setBuddy_min_year_of_study(Integer buddy_min_year_of_study) {
         this.buddy_min_year_of_study = buddy_min_year_of_study;
     }
 
-    public int getBuddy_max_year_of_study() {
+    public Integer getBuddy_max_year_of_study() {
         return buddy_max_year_of_study;
     }
 
-    public void setBuddy_max_year_of_study(int buddy_max_year_of_study) {
+    public void setBuddy_max_year_of_study(Integer buddy_max_year_of_study) {
         this.buddy_max_year_of_study = buddy_max_year_of_study;
     }
 

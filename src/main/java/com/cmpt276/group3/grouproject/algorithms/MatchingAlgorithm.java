@@ -30,6 +30,7 @@ public class MatchingAlgorithm {
             if (target.getHobby3()==h) item+=1;
             if (target.getHobby4()==h) item+=0.5;
             if (target.getHobby5()==h) item+=0.25;
+            b.add(item);
         }
 
         double res = 0;

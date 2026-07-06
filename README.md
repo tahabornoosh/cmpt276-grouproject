@@ -272,7 +272,6 @@ Albert, when logged into the app, presses the Log out button
 - After logout, the user's session should be removed
 - After logout, attempting to access dashboard should redirect to login page
 
-
 ## Case: Questionnair Completion
 **Personas/Actors**
 1. Primary actor: Ryan - a second-year SFU student looking to make friends
@@ -339,7 +338,7 @@ Joyce opens the profile page for a user by opening a URL sent to them by a frien
 - If the user exists, but they have not yet completed the profile, then Joyce must see only their name and gender.
 - If the user exists and has completed the questionnair, then Joyce must see their answers to the questionnair questions as well as their name and gender, subject to that user's preferences for displaying friendship, dating, or study-buddy-related profile sections.
 - If the user does not exist, then a 404 error page must be displayed to Joyce
-- If the user exists, has completed their profile, and is not Joyce herself, then a friendship match percentage must be displayed ranging from 0% to 102%
+- If the user exists, has completed their profile, and is not Joyce herself, then a friendship match percentage must be displayed ranging from 0% to 100%
 **Post-conditions**
 - None
 

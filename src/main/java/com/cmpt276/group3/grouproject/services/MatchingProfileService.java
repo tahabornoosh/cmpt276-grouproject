@@ -90,17 +90,38 @@ public class MatchingProfileService {
         toUpdate.setAvailability(updateFrom.getAvailability());
         toUpdate.setMotivation(updateFrom.getMotivation());
         toUpdate.setFriend_type(updateFrom.getFriend_type());
+        toUpdate.setCampus(updateFrom.getCampus());
+        toUpdate.setLifestyle(updateFrom.getLifestyle());
+        toUpdate.setTop_interests(updateFrom.getTop_interests());
 
         // Dating data
         toUpdate.setLooking_for_short_term_relationship(updateFrom.isLooking_for_short_term_relationship());
         toUpdate.setMin_partner_age(updateFrom.getMin_partner_age());
         toUpdate.setMax_partner_age(updateFrom.getMax_partner_age());
         toUpdate.setPartner_gender(updateFrom.getPartner_gender());
+        toUpdate.setRelationship_goal(updateFrom.getRelationship_goal());
+        toUpdate.setRelationship_personality(updateFrom.getRelationship_personality());
+        toUpdate.setRelationship_communication_style(updateFrom.getRelationship_communication_style());
+        toUpdate.setRelationship_texting_style(updateFrom.getRelationship_texting_style());
+        toUpdate.setRelationship_free_time(updateFrom.getRelationship_free_time());
+        toUpdate.setRelationship_value(updateFrom.getRelationship_value());
+        toUpdate.setRelationship_conflict_style(updateFrom.getRelationship_conflict_style());
+        toUpdate.setRelationship_lifestyle(updateFrom.getRelationship_lifestyle());
+        toUpdate.setRelationship_ambition_importance(updateFrom.getRelationship_ambition_importance());
+        toUpdate.setRelationship_care_style(updateFrom.getRelationship_care_style());
+        toUpdate.setRelationship_personal_space(updateFrom.getRelationship_personal_space());
+        toUpdate.setRelationship_date_activity(updateFrom.getRelationship_date_activity());
+        toUpdate.setRelationship_social_life(updateFrom.getRelationship_social_life());
+        toUpdate.setRelationship_humor_style(updateFrom.getRelationship_humor_style());
+        toUpdate.setRelationship_strength(updateFrom.getRelationship_strength());
 
         // Buddy Data
         toUpdate.setBuddy_area_of_study(updateFrom.getBuddy_area_of_study());
         toUpdate.setBuddy_min_year_of_study(updateFrom.getBuddy_min_year_of_study());
         toUpdate.setBuddy_max_year_of_study(updateFrom.getBuddy_max_year_of_study());
+        toUpdate.setStudy_buddy_program(updateFrom.getStudy_buddy_program());
+        toUpdate.setStudy_buddy_courses(updateFrom.getStudy_buddy_courses());
+        toUpdate.setStudy_buddy_gender_preference(updateFrom.getStudy_buddy_gender_preference());
 
     }
 

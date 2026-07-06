@@ -3,6 +3,7 @@ package com.cmpt276.group3.grouproject.enums;
 public enum FriendshipValue {
     LOYALTY("Loyalty"),
     HONESTY("Honesty"),
+    SHARED_INTERESTS("Shared interests"),
     HAVING_FUN("Having fun");
 
     private final String displayName;

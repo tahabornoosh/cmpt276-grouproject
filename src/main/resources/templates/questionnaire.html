@@ -1,0 +1,458 @@
+<th:block th:replace="~{fragments/layout :: head('Questionnaire')}"></th:block>
+<th:block th:replace="~{fragments/layout :: bodyStart}"></th:block>
+<input type="hidden" id="activeMenuItem" name="activeMenuItem" value="menu-profile" />
+
+<main class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Questionnaire</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item active">Questionnaire</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+
+      <div th:if="${param.error}" class="alert alert-danger">
+        Could not save questionnaire. Please check your answers.
+      </div>
+
+      <form action="/questionnaire" method="post">
+
+        <div class="card card-primary card-outline">
+          <div class="card-header">
+            <h3 class="card-title">Basic Profile</h3>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>Age</label>
+              <input type="number" name="age" min="18" class="form-control"
+                     th:value="${hasQuestionnaire ? matchingProfile.age : ''}">
+            </div>
+
+            <div class="form-group">
+              <label>Year of study</label>
+              <input type="number" name="year_of_study" min="1" max="8" class="form-control"
+                     th:value="${hasQuestionnaire ? matchingProfile.year_of_study : ''}">
+            </div>
+
+            <div class="form-group">
+              <label>Study field</label>
+              <select name="study_field" class="form-control">
+                <option value="">Select one</option>
+                <option th:each="field : ${studyFields}"
+                        th:value="${field.name()}"
+                        th:text="${#strings.replace(#strings.toLowerCase(field.name()),'_',' ')}"
+                        th:selected="${hasQuestionnaire and matchingProfile.study_field == field}">
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-info card-outline">
+          <div class="card-header">
+            <h3 class="card-title">Friendship Questions</h3>
+            <div class="card-tools">
+              <div class="icheck-primary">
+                <input type="checkbox" id="displayFriendship" name="display_friendship_profile"
+                       th:checked="${!hasQuestionnaire or matchingProfile.display_friendship_profile}">
+                <label for="displayFriendship">Show friendship profile</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="form-group">
+              <label>1. What kind of friendship are you looking for?</label>
+              <select name="kind_of_friendship" class="form-control">
+                <option value="">Select one</option>
+                <option th:each="item : ${friendshipStyles}" th:value="${item.name()}" th:text="${item.displayName}"
+                        th:selected="${hasQuestionnaire and matchingProfile.kind_of_friendship == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>2. How would you describe yourself socially?</label>
+              <select name="social_style" class="form-control">
+                <option value="">Select one</option>
+                <option th:each="item : ${socialStyles}" th:value="${item.name()}" th:text="${item.displayName}"
+                        th:selected="${hasQuestionnaire and matchingProfile.social_style == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>3. How often do you like hanging out with friends?</label>
+              <select name="hangout_frequency" class="form-control">
+                <option value="">Select one</option>
+                <option th:each="item : ${hangoutFrequencies}" th:value="${item.name()}" th:text="${item.displayName}"
+                        th:selected="${hasQuestionnaire and matchingProfile.hangout_frequency == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>4. What do you usually enjoy doing with friends?</label>
+              <select name="friend_activity" class="form-control">
+                <option value="">Select one</option>
+                <option th:each="item : ${friendActivities}" th:value="${item.name()}" th:text="${item.displayName}"
+                        th:selected="${hasQuestionnaire and matchingProfile.friend_activity == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>5. How do you usually make plans?</label>
+              <select name="planning_style" class="form-control">
+                <option value="">Select one</option>
+                <option th:each="item : ${planningStyles}" th:value="${item.name()}" th:text="${item.displayName}"
+                        th:selected="${hasQuestionnaire and matchingProfile.planning_style == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>6. What kind of conversations do you enjoy most?</label>
+              <select name="conversation_style" class="form-control">
+                <option value="">Select one</option>
+                <option th:each="item : ${conversationStyles}" th:value="${item.name()}" th:text="${item.displayName}"
+                        th:selected="${hasQuestionnaire and matchingProfile.conversation_style == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>7. What is your communication style with friends?</label>
+              <select name="communication_style" class="form-control">
+                <option value="">Select one</option>
+                <option th:each="item : ${communicationStyles}" th:value="${item.name()}" th:text="${item.displayName}"
+                        th:selected="${hasQuestionnaire and matchingProfile.communication_style == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>8. Which personality trait describes you best?</label>
+              <select name="personality_trait" class="form-control">
+                <option value="">Select one</option>
+                <option th:each="item : ${personalityTraits}" th:value="${item.name()}" th:text="${item.displayName}"
+                        th:selected="${hasQuestionnaire and matchingProfile.personality_trait == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>9. What do you value most in friendship?</label>
+              <select name="friendship_value" class="form-control">
+                <option value="">Select one</option>
+                <option th:each="item : ${friendshipValues}" th:value="${item.name()}" th:text="${item.displayName}"
+                        th:selected="${hasQuestionnaire and matchingProfile.friendship_value == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>10. When are you usually free?</label>
+              <select name="availability" class="form-control">
+                <option value="">Select one</option>
+                <option th:each="item : ${availabilities}" th:value="${item.name()}" th:text="${item.displayName}"
+                        th:selected="${hasQuestionnaire and matchingProfile.availability == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>11. What campus do you spend most time at?</label>
+              <select name="campus" class="form-control">
+                <option value="">Select one</option>
+                <option value="BURNABY" th:selected="${hasQuestionnaire and matchingProfile.campus == 'BURNABY'}">Burnaby</option>
+                <option value="SURREY" th:selected="${hasQuestionnaire and matchingProfile.campus == 'SURREY'}">Surrey</option>
+                <option value="VANCOUVER" th:selected="${hasQuestionnaire and matchingProfile.campus == 'VANCOUVER'}">Vancouver</option>
+                <option value="MOSTLY_ONLINE" th:selected="${hasQuestionnaire and matchingProfile.campus == 'MOSTLY_ONLINE'}">Mostly online</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>12. What best describes your lifestyle?</label>
+              <select name="lifestyle" class="form-control">
+                <option value="">Select one</option>
+                <option value="BUSY" th:selected="${hasQuestionnaire and matchingProfile.lifestyle == 'BUSY'}">Busy</option>
+                <option value="BALANCED" th:selected="${hasQuestionnaire and matchingProfile.lifestyle == 'BALANCED'}">Balanced</option>
+                <option value="RELAXED" th:selected="${hasQuestionnaire and matchingProfile.lifestyle == 'RELAXED'}">Relaxed</option>
+                <option value="VERY_ACTIVE" th:selected="${hasQuestionnaire and matchingProfile.lifestyle == 'VERY_ACTIVE'}">Very active</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>13. What motivates you most?</label>
+              <select name="motivation" class="form-control">
+                <option value="">Select one</option>
+                <option th:each="item : ${motivations}" th:value="${item.name()}" th:text="${item.displayName}"
+                        th:selected="${hasQuestionnaire and matchingProfile.motivation == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>14. What type of friend are you?</label>
+              <select name="friend_type" class="form-control">
+                <option value="">Select one</option>
+                <option th:each="item : ${friendTypes}" th:value="${item.name()}" th:text="${item.displayName}"
+                        th:selected="${hasQuestionnaire and matchingProfile.friend_type == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>15. What are your top interests?</label>
+              <select name="top_interests" class="form-control">
+                <option value="">Select one</option>
+                <option value="SPORTS_FITNESS" th:selected="${hasQuestionnaire and matchingProfile.top_interests == 'SPORTS_FITNESS'}">Sports/fitness</option>
+                <option value="MUSIC_MOVIES" th:selected="${hasQuestionnaire and matchingProfile.top_interests == 'MUSIC_MOVIES'}">Music/movies</option>
+                <option value="GAMING_TECH" th:selected="${hasQuestionnaire and matchingProfile.top_interests == 'GAMING_TECH'}">Gaming/tech</option>
+                <option value="FOOD_TRAVEL" th:selected="${hasQuestionnaire and matchingProfile.top_interests == 'FOOD_TRAVEL'}">Food/travel</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-danger card-outline">
+          <div class="card-header">
+            <h3 class="card-title">Relationship Questions</h3>
+            <div class="card-tools">
+              <div class="icheck-danger">
+                <input type="checkbox" id="displayDating" name="display_dating_profile"
+                       th:checked="${hasQuestionnaire and matchingProfile.display_dating_profile}">
+                <label for="displayDating">Show relationship profile</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="form-group">
+              <label>1. What are you looking for right now?</label>
+              <select name="relationship_goal" class="form-control">
+                <option value="">Select one</option>
+                <option value="LONG_TERM" th:selected="${hasQuestionnaire and matchingProfile.relationship_goal == 'LONG_TERM'}">Long-term relationship</option>
+                <option value="CASUAL_DATING" th:selected="${hasQuestionnaire and matchingProfile.relationship_goal == 'CASUAL_DATING'}">Casual dating</option>
+                <option value="OPEN_TO_POSSIBILITIES" th:selected="${hasQuestionnaire and matchingProfile.relationship_goal == 'OPEN_TO_POSSIBILITIES'}">Open to possibilities</option>
+                <option value="NOT_SURE" th:selected="${hasQuestionnaire and matchingProfile.relationship_goal == 'NOT_SURE'}">Not sure yet</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>2. How would you describe your personality?</label>
+              <select name="relationship_personality" class="form-control">
+                <option value="">Select one</option>
+                <option value="INTROVERTED" th:selected="${hasQuestionnaire and matchingProfile.relationship_personality == 'INTROVERTED'}">Introverted</option>
+                <option value="EXTROVERTED" th:selected="${hasQuestionnaire and matchingProfile.relationship_personality == 'EXTROVERTED'}">Extroverted</option>
+                <option value="AMBIVERT" th:selected="${hasQuestionnaire and matchingProfile.relationship_personality == 'AMBIVERT'}">Ambivert</option>
+                <option value="DEPENDS_ON_SITUATION" th:selected="${hasQuestionnaire and matchingProfile.relationship_personality == 'DEPENDS_ON_SITUATION'}">Depends on the situation</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>3. How do you usually communicate?</label>
+              <select name="relationship_communication_style" class="form-control">
+                <option value="">Select one</option>
+                <option value="DIRECT_HONEST">Direct and honest</option>
+                <option value="PLAYFUL_JOKING">Playful and joking</option>
+                <option value="QUIET_AT_FIRST">Quiet at first</option>
+                <option value="DEEP_THOUGHTFUL">Deep and thoughtful</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>4. How often do you like to text someone you’re close to?</label>
+              <select name="relationship_texting_style" class="form-control">
+                <option value="">Select one</option>
+                <option value="THROUGHOUT_DAY">Throughout the day</option>
+                <option value="ONCE_OR_TWICE_DAY">Once or twice a day</option>
+                <option value="FEW_TIMES_WEEK">A few times a week</option>
+                <option value="PREFER_IN_PERSON">I prefer in-person more</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>5. What is your ideal way to spend free time?</label>
+              <select name="relationship_free_time" class="form-control">
+                <option value="">Select one</option>
+                <option value="RELAXING_HOME">Relaxing at home</option>
+                <option value="GOING_OUT">Going out socially</option>
+                <option value="NEW_ACTIVITIES">Trying new activities</option>
+                <option value="STUDYING_GOALS">Studying or working on goals</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>6. Which value is most important to you?</label>
+              <select name="relationship_value" class="form-control">
+                <option value="">Select one</option>
+                <option value="TRUST">Trust</option>
+                <option value="LOYALTY">Loyalty</option>
+                <option value="COMMUNICATION">Communication</option>
+                <option value="INDEPENDENCE">Independence</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>7. How do you handle conflict?</label>
+              <select name="relationship_conflict_style" class="form-control">
+                <option value="">Select one</option>
+                <option value="TALK_RIGHT_AWAY">Talk right away</option>
+                <option value="TAKE_TIME_THEN_TALK">Take time, then talk</option>
+                <option value="AVOID_CONFLICT">Avoid conflict</option>
+                <option value="DEPENDS_ON_ISSUE">Depends on the issue</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>8. What kind of lifestyle describes you best?</label>
+              <select name="relationship_lifestyle" class="form-control">
+                <option value="">Select one</option>
+                <option value="CALM_RELAXED">Calm and relaxed</option>
+                <option value="BUSY_GOAL_FOCUSED">Busy and goal-focused</option>
+                <option value="SOCIAL_OUTGOING">Social and outgoing</option>
+                <option value="BALANCED">Balanced</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>9. How important is school/career ambition to you personally?</label>
+              <select name="relationship_ambition_importance" class="form-control">
+                <option value="">Select one</option>
+                <option value="VERY_IMPORTANT">Very important</option>
+                <option value="SOMEWHAT_IMPORTANT">Somewhat important</option>
+                <option value="NOT_MAIN_FOCUS">Not a main focus</option>
+                <option value="FIGURING_OUT">I’m still figuring it out</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>10. How do you show care?</label>
+              <select name="relationship_care_style" class="form-control">
+                <option value="">Select one</option>
+                <option value="WORDS">Words</option>
+                <option value="QUALITY_TIME">Quality time</option>
+                <option value="HELPING">Helping with things</option>
+                <option value="THOUGHTFUL_ACTIONS">Small thoughtful actions</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>11. How much personal space do you need?</label>
+              <select name="relationship_personal_space" class="form-control">
+                <option value="">Select one</option>
+                <option value="A_LOT">A lot</option>
+                <option value="SOME">Some</option>
+                <option value="VERY_LITTLE">Very little</option>
+                <option value="DEPENDS_ON_SCHEDULE">Depends on my schedule</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>12. What type of dates/hangouts do you enjoy most?</label>
+              <select name="relationship_date_activity" class="form-control">
+                <option value="">Select one</option>
+                <option value="COFFEE_FOOD">Coffee or food</option>
+                <option value="WALKS_OUTDOORS">Walks or outdoor activities</option>
+                <option value="MOVIES_GAMES">Movies or games</option>
+                <option value="EVENTS_PARTIES">Events or parties</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>13. What best describes your social life?</label>
+              <select name="relationship_social_life" class="form-control">
+                <option value="">Select one</option>
+                <option value="MOSTLY_QUIET">Mostly quiet</option>
+                <option value="SMALL_GROUP">Small friend group</option>
+                <option value="VERY_SOCIAL">Very social</option>
+                <option value="CHANGES_OFTEN">Changes often</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>14. What is your sense of humor like?</label>
+              <select name="relationship_humor_style" class="form-control">
+                <option value="">Select one</option>
+                <option value="SARCASTIC">Sarcastic</option>
+                <option value="GOOFY">Goofy</option>
+                <option value="DRY">Dry</option>
+                <option value="LIGHT_FRIENDLY">Light and friendly</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>15. What is your biggest relationship strength?</label>
+              <select name="relationship_strength" class="form-control">
+                <option value="">Select one</option>
+                <option value="HONEST_COMMUNICATION">Honest communication</option>
+                <option value="EMOTIONAL_SUPPORT">Emotional support</option>
+                <option value="LOYALTY">Loyalty</option>
+                <option value="FUN_ENERGY">Fun energy</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-success card-outline">
+          <div class="card-header">
+            <h3 class="card-title">Study Buddy Questions</h3>
+            <div class="card-tools">
+              <div class="icheck-success">
+                <input type="checkbox" id="displayStudy" name="display_study_buddy_profile"
+                       th:checked="${hasQuestionnaire and matchingProfile.display_study_buddy_profile}">
+                <label for="displayStudy">Show study buddy profile</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="form-group">
+              <label>1. What is your major/program?</label>
+              <input type="text" name="study_buddy_program" class="form-control"
+                     placeholder="Example: Computing Science"
+                     th:value="${hasQuestionnaire ? matchingProfile.study_buddy_program : ''}">
+            </div>
+
+            <div class="form-group">
+              <label>2. What classes are you currently taking?</label>
+              <select name="study_buddy_courses" multiple class="form-control">
+                <option value="CMPT_276">CMPT 276</option>
+                <option value="CMPT_295">CMPT 295</option>
+                <option value="CMPT_225">CMPT 225</option>
+                <option value="MACM_201">MACM 201</option>
+                <option value="MATH_232">MATH 232</option>
+                <option value="STAT_270">STAT 270</option>
+              </select>
+              <small class="form-text text-muted">Hold Ctrl or Command to select more than one.</small>
+            </div>
+
+            <div class="form-group">
+              <label>3. What gender do you prefer for study buddies?</label>
+              <select name="study_buddy_gender_preference" class="form-control">
+                <option value="">Select one</option>
+                <option value="MALE" th:selected="${hasQuestionnaire and matchingProfile.study_buddy_gender_preference == 'MALE'}">Male</option>
+                <option value="FEMALE" th:selected="${hasQuestionnaire and matchingProfile.study_buddy_gender_preference == 'FEMALE'}">Female</option>
+                <option value="NON_BINARY" th:selected="${hasQuestionnaire and matchingProfile.study_buddy_gender_preference == 'NON_BINARY'}">Non-binary</option>
+                <option value="NO_PREFERENCE" th:selected="${hasQuestionnaire and matchingProfile.study_buddy_gender_preference == 'NO_PREFERENCE'}">No preference</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body text-right">
+            <a th:href="@{/}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save mr-1"></i> Save Questionnaire
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </section>
+</main>
+
+<th:block th:replace="~{fragments/layout :: bodyEnd}"></th:block>

@@ -2,6 +2,7 @@ package com.cmpt276.group3.grouproject.enums;
 
 public enum FriendActivity {
     COFFEE_OR_FOOD("Coffee or food"),
+    STUDYING_TOGETHER("Studying together"),
     OUTDOOR_ACTIVITIES("Outdoor activities"),
     GAMING_OR_MOVIES("Gaming or movies");
 

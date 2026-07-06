@@ -10,3 +10,4 @@
 - AI used to find information on how to configure one-to-one keys in models
 - AI used to create enums from mass question list for the questionnair
 - AI helped debug user edit and profile template and controller errors
+- AI helped debug database session issues

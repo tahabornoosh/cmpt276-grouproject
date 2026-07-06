@@ -6,6 +6,9 @@ import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name="profiles")
 public class MatchingProfile {
@@ -24,16 +27,16 @@ public class MatchingProfile {
     // basic matching questions - everything optional
     @Nullable
     @Min(18)
-    private int age;
+    private Integer age;
     @Nullable
     private StudyField study_field;
     @Min(1)
     @Nullable
-    private int year_of_study;
+    private Integer year_of_study;
     @Nullable
-    private boolean has_job;
+    private Boolean has_job;
     @Nullable
-    private boolean regularly_goes_to_gym;
+    private Boolean regularly_goes_to_gym;
     @Nullable
     private Sport favourite_sport;
     @Nullable
@@ -75,38 +78,86 @@ public class MatchingProfile {
     @Nullable
     private FriendType friend_type;
 
+    // extra friendship questionnaire questions
+    @Nullable
+    private String campus;
+    @Nullable
+    private String lifestyle;
+    @Nullable
+    private String top_interests;
+
     // dating - nullable but service should not allow null enteries with display_dating_profile set to true
     @Nullable
-    private boolean looking_for_short_term_relationship;
+    private Boolean looking_for_short_term_relationship;
     @Nullable
     @Min(18)
-    private int min_partner_age;
+    private Integer min_partner_age;
     @Nullable
     @Min(18)
-    private int max_partner_age;
+    private Integer max_partner_age;
     @Nullable
     private Gender partner_gender;
+
+    // relationship questionnaire questions
+    @Nullable
+    private String relationship_goal;
+    @Nullable
+    private String relationship_personality;
+    @Nullable
+    private String relationship_communication_style;
+    @Nullable
+    private String relationship_texting_style;
+    @Nullable
+    private String relationship_free_time;
+    @Nullable
+    private String relationship_value;
+    @Nullable
+    private String relationship_conflict_style;
+    @Nullable
+    private String relationship_lifestyle;
+    @Nullable
+    private String relationship_ambition_importance;
+    @Nullable
+    private String relationship_care_style;
+    @Nullable
+    private String relationship_personal_space;
+    @Nullable
+    private String relationship_date_activity;
+    @Nullable
+    private String relationship_social_life;
+    @Nullable
+    private String relationship_humor_style;
+    @Nullable
+    private String relationship_strength;
 
     // Study buddies
     @Nullable
     private StudyField buddy_area_of_study;
     @Nullable
     @Min(1)
-    private int buddy_min_year_of_study;
+    private Integer buddy_min_year_of_study;
     @Nullable
     @Min(1)
-    private int buddy_max_year_of_study;
+    private Integer buddy_max_year_of_study;
+
+    // study buddy questionnaire questions
+    @Nullable
+    private String study_buddy_program;
+    @Nullable
+    private String study_buddy_courses;
+    @Nullable
+    private String study_buddy_gender_preference;
 
     public MatchingProfile(User user, boolean display_friendship_profile, boolean display_dating_profile,
-            boolean display_study_buddy_profile, @Min(18) int age, StudyField study_field, @Min(1) int year_of_study,
-            boolean has_job, boolean regularly_goes_to_gym, Sport favourite_sport, Venue preferred_venue, Hobby hobby1,
+            boolean display_study_buddy_profile, @Min(18) Integer age, StudyField study_field, @Min(1) Integer year_of_study,
+            Boolean has_job, boolean regularly_goes_to_gym, Sport favourite_sport, Venue preferred_venue, Hobby hobby1,
             Hobby hobby2, Hobby hobby3, Hobby hobby4, Hobby hobby5, FriendshipStyle kind_of_friendship,
             SocialStyle social_style, HangoutFrequency hangout_frequency, FriendActivity friend_activity,
             PlanningStyle planning_style, ConversationStyle conversation_style, CommunicationStyle communication_style,
             PersonalityTrait personality_trait, FriendshipValue friendship_value, Availability availability,
-            Motivation motivation, FriendType friend_type, boolean looking_for_short_term_relationship,
-            @Min(18) int min_partner_age, @Min(18) int max_partner_age, Gender partner_gender,
-            StudyField buddy_area_of_study, @Min(1) int buddy_min_year_of_study, @Min(1) int buddy_max_year_of_study) {
+            Motivation motivation, FriendType friend_type, Boolean looking_for_short_term_relationship,
+            @Min(18) Integer min_partner_age, @Min(18) Integer max_partner_age, Gender partner_gender,
+            StudyField buddy_area_of_study, @Min(1) Integer buddy_min_year_of_study, @Min(1) Integer buddy_max_year_of_study) {
         this.user = user;
         this.display_friendship_profile = display_friendship_profile;
         this.display_dating_profile = display_dating_profile;
@@ -188,11 +239,11 @@ public class MatchingProfile {
         this.display_study_buddy_profile = display_study_buddy_profile;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 
@@ -204,7 +255,7 @@ public class MatchingProfile {
         this.study_field = study_field;
     }
 
-    public int getYear_of_study() {
+    public Integer getYear_of_study() {
         return year_of_study;
     }
 
@@ -212,19 +263,19 @@ public class MatchingProfile {
         this.year_of_study = year_of_study;
     }
 
-    public boolean isHas_job() {
+    public Boolean isHas_job() {
         return has_job;
     }
 
-    public void setHas_job(boolean has_job) {
+    public void setHas_job(Boolean has_job) {
         this.has_job = has_job;
     }
 
-    public boolean isRegularly_goes_to_gym() {
+    public Boolean isRegularly_goes_to_gym() {
         return regularly_goes_to_gym;
     }
 
-    public void setRegularly_goes_to_gym(boolean regularly_goes_to_gym) {
+    public void setRegularly_goes_to_gym(Boolean regularly_goes_to_gym) {
         this.regularly_goes_to_gym = regularly_goes_to_gym;
     }
 
@@ -380,27 +431,27 @@ public class MatchingProfile {
         this.friend_type = friend_type;
     }
 
-    public boolean isLooking_for_short_term_relationship() {
+    public Boolean isLooking_for_short_term_relationship() {
         return looking_for_short_term_relationship;
     }
 
-    public void setLooking_for_short_term_relationship(boolean looking_for_short_term_relationship) {
+    public void setLooking_for_short_term_relationship(Boolean looking_for_short_term_relationship) {
         this.looking_for_short_term_relationship = looking_for_short_term_relationship;
     }
 
-    public int getMin_partner_age() {
+    public Integer getMin_partner_age() {
         return min_partner_age;
     }
 
-    public void setMin_partner_age(int min_partner_age) {
+    public void setMin_partner_age(Integer min_partner_age) {
         this.min_partner_age = min_partner_age;
     }
 
-    public int getMax_partner_age() {
+    public Integer getMax_partner_age() {
         return max_partner_age;
     }
 
-    public void setMax_partner_age(int max_partner_age) {
+    public void setMax_partner_age(Integer max_partner_age) {
         this.max_partner_age = max_partner_age;
     }
 
@@ -420,20 +471,202 @@ public class MatchingProfile {
         this.buddy_area_of_study = buddy_area_of_study;
     }
 
-    public int getBuddy_min_year_of_study() {
+    public Integer getBuddy_min_year_of_study() {
         return buddy_min_year_of_study;
     }
 
-    public void setBuddy_min_year_of_study(int buddy_min_year_of_study) {
+    public void setBuddy_min_year_of_study(Integer buddy_min_year_of_study) {
         this.buddy_min_year_of_study = buddy_min_year_of_study;
     }
 
-    public int getBuddy_max_year_of_study() {
+    public Integer getBuddy_max_year_of_study() {
         return buddy_max_year_of_study;
     }
 
-    public void setBuddy_max_year_of_study(int buddy_max_year_of_study) {
+    public void setBuddy_max_year_of_study(Integer buddy_max_year_of_study) {
         this.buddy_max_year_of_study = buddy_max_year_of_study;
+    }
+
+
+    public String getCampus() {
+        return campus;
+    }
+
+    public void setCampus(String campus) {
+        this.campus = campus;
+    }
+
+    public String getLifestyle() {
+        return lifestyle;
+    }
+
+    public void setLifestyle(String lifestyle) {
+        this.lifestyle = lifestyle;
+    }
+
+    public String getTop_interests() {
+        return top_interests;
+    }
+
+    public void setTop_interests(String top_interests) {
+        this.top_interests = top_interests;
+    }
+
+    public String getRelationship_goal() {
+        return relationship_goal;
+    }
+
+    public void setRelationship_goal(String relationship_goal) {
+        this.relationship_goal = relationship_goal;
+    }
+
+    public String getRelationship_personality() {
+        return relationship_personality;
+    }
+
+    public void setRelationship_personality(String relationship_personality) {
+        this.relationship_personality = relationship_personality;
+    }
+
+    public String getRelationship_communication_style() {
+        return relationship_communication_style;
+    }
+
+    public void setRelationship_communication_style(String relationship_communication_style) {
+        this.relationship_communication_style = relationship_communication_style;
+    }
+
+    public String getRelationship_texting_style() {
+        return relationship_texting_style;
+    }
+
+    public void setRelationship_texting_style(String relationship_texting_style) {
+        this.relationship_texting_style = relationship_texting_style;
+    }
+
+    public String getRelationship_free_time() {
+        return relationship_free_time;
+    }
+
+    public void setRelationship_free_time(String relationship_free_time) {
+        this.relationship_free_time = relationship_free_time;
+    }
+
+    public String getRelationship_value() {
+        return relationship_value;
+    }
+
+    public void setRelationship_value(String relationship_value) {
+        this.relationship_value = relationship_value;
+    }
+
+    public String getRelationship_conflict_style() {
+        return relationship_conflict_style;
+    }
+
+    public void setRelationship_conflict_style(String relationship_conflict_style) {
+        this.relationship_conflict_style = relationship_conflict_style;
+    }
+
+    public String getRelationship_lifestyle() {
+        return relationship_lifestyle;
+    }
+
+    public void setRelationship_lifestyle(String relationship_lifestyle) {
+        this.relationship_lifestyle = relationship_lifestyle;
+    }
+
+    public String getRelationship_ambition_importance() {
+        return relationship_ambition_importance;
+    }
+
+    public void setRelationship_ambition_importance(String relationship_ambition_importance) {
+        this.relationship_ambition_importance = relationship_ambition_importance;
+    }
+
+    public String getRelationship_care_style() {
+        return relationship_care_style;
+    }
+
+    public void setRelationship_care_style(String relationship_care_style) {
+        this.relationship_care_style = relationship_care_style;
+    }
+
+    public String getRelationship_personal_space() {
+        return relationship_personal_space;
+    }
+
+    public void setRelationship_personal_space(String relationship_personal_space) {
+        this.relationship_personal_space = relationship_personal_space;
+    }
+
+    public String getRelationship_date_activity() {
+        return relationship_date_activity;
+    }
+
+    public void setRelationship_date_activity(String relationship_date_activity) {
+        this.relationship_date_activity = relationship_date_activity;
+    }
+
+    public String getRelationship_social_life() {
+        return relationship_social_life;
+    }
+
+    public void setRelationship_social_life(String relationship_social_life) {
+        this.relationship_social_life = relationship_social_life;
+    }
+
+    public String getRelationship_humor_style() {
+        return relationship_humor_style;
+    }
+
+    public void setRelationship_humor_style(String relationship_humor_style) {
+        this.relationship_humor_style = relationship_humor_style;
+    }
+
+    public String getRelationship_strength() {
+        return relationship_strength;
+    }
+
+    public void setRelationship_strength(String relationship_strength) {
+        this.relationship_strength = relationship_strength;
+    }
+
+    public String getStudy_buddy_program() {
+        return study_buddy_program;
+    }
+
+    public void setStudy_buddy_program(String study_buddy_program) {
+        this.study_buddy_program = study_buddy_program;
+    }
+
+    public String getStudy_buddy_courses() {
+        return study_buddy_courses;
+    }
+
+    public void setStudy_buddy_courses(String study_buddy_courses) {
+        this.study_buddy_courses = study_buddy_courses;
+    }
+
+    public String getStudy_buddy_gender_preference() {
+        return study_buddy_gender_preference;
+    }
+
+    public void setStudy_buddy_gender_preference(String study_buddy_gender_preference) {
+        this.study_buddy_gender_preference = study_buddy_gender_preference;
+    }
+
+    // Convenience accessor for display purposes - the individual hobby1..hobby5
+    // fields keep their priority weighting for MatchingAlgorithm, but views just
+    // want a de-duplicated, non-empty list of the hobbies actually picked.
+    public List<Hobby> getHobbies() {
+        List<Hobby> hobbies = new ArrayList<>();
+        for (Hobby h : new Hobby[]{hobby1, hobby2, hobby3, hobby4, hobby5}) {
+            if (h != null && h != Hobby.NONE && !hobbies.contains(h)) {
+                hobbies.add(h);
+            }
+        }
+        return hobbies;
     }
 
 }

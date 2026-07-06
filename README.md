@@ -204,3 +204,79 @@ He then enters his username and password and clicks on the Log in button.
 **Tests**
 - The correct email address and password should produce a redirect to the dashboard page, and result in a session variable creation
 - Any of wrong password, wrong email, or both, should result redirection back to the login page. No session variable should be set.
+
+## Case: Questionnair Completion
+**Personas/Actors**
+1. Primary actor: Ryan - a second-year SFU student looking to make friends
+
+**Pre-conditions**
+- Ryan must have an active account and must be logged in
+- Ryan must be on the questionnair page
+
+**Actions/Triggers**
+Ryan fills out the required fields and clicks "Submit"
+
+**Acceptance Criteria**
+- If all required fields have been filled, the form must be submitted and a success message must be displayed
+- If there are missing fields, Ryan should be redirected back to the questionnair with an error message
+**Post-conditions**
+- If there are no missing fields, the matching profile for Ryan must be created or updated
+
+**Non-functional requirements**
+- All pages should load in less than one second
+- Errors must be easy to understand
+
+**Tests**
+- A fully complete questionnair must be accepted and result in a record update/creation
+- If the user has indicated that they would like to have a friendship profile and then leaves friendship questions empty, their input must be rejected and they should get an error message.
+
+## Case: Questionnair Loading
+**Personas/Actors**
+1. Primary actor: Ryan - a second-year SFU student looking to make friends
+
+**Pre-conditions**
+- Ryan must have an active account and must be logged in
+
+**Actions/Triggers**
+Ryan clicks on the questionnair link from the menu in any other page of the app
+
+**Acceptance Criteria**
+- If Ryan has previously completed the survey, he should see a form pre-filled with his previous answers
+- If Ryan has not previously completed the survey, he should see an empty form
+**Post-conditions**
+- None
+
+**Non-functional requirements**
+- All pages should load in less than one second
+
+**Tests**
+- A user with an existing questionnair/matching profile record must see their information pre-filled in the form
+- A user who has not yet completed the survey must see an empty form
+
+
+## Case: Profile Viewing
+**Personas/Actors**
+1. Primary actor: Joyce - a second-year SFU student
+
+**Pre-conditions**
+- Joyce must have an active account and must be logged in
+- Joyce must have completed the profile questionnair
+
+**Actions/Triggers**
+Joyce opens the profile page for a user by opening a URL sent to them by a friend (in the future this will also happen through feeds)
+
+**Acceptance Criteria**
+- If the user exists, but they have not yet completed the profile, then Joyce must see only their name and gender.
+- If the user exists and has completed the questionnair, then Joyce must see their answers to the questionnair questions as well as their name and gender, subject to that user's preferences for displaying friendship, dating, or study-buddy-related profile sections.
+- If the user does not exist, then a 404 error page must be displayed to Joyce
+- If the user exists, has completed their profile, and is not Joyce herself, then a friendship match percentage must be displayed ranging from 0% to 102%
+**Post-conditions**
+- None
+
+**Non-functional requirements**
+- All pages should load in less than one second
+
+**Tests**
+- The profile URL for a non-existing user must result in a 404 error.
+- An existing user's profile URL should not return a 404 error, even if the questionnair is not completed
+- An existing user's profile should display their 5 selected hobbies if they have completed the questionnair

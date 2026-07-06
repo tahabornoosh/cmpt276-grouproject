@@ -19,6 +19,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.View;
@@ -29,8 +30,7 @@ import com.cmpt276.group3.grouproject.models.User;
 import com.cmpt276.group3.grouproject.models.UsersRepository;
 import com.cmpt276.group3.grouproject.services.UserService;
 
-public class LoginUnitTests {
-
+public class EditUnitTests {
     private MockMvc mockMvc;
 
     @Mock
@@ -66,105 +66,58 @@ public class LoginUnitTests {
     }
 
     @Test
-    void load_login_page() throws Exception {
-        mockMvc.perform(get("/login"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("login"));
-    }
-
-    @Test
-    void login_success() throws Exception {
+    void edit_authentication_check() throws Exception {
         User mockUser = new User();
         mockUser.setEmail("test@sfu.ca");
+        mockUser.setId(1);
 
         String hashedPassword = BCrypt.hashpw("12345", BCrypt.gensalt());
         mockUser.setPassword(hashedPassword);
 
         when(usersRepository.findByEmail("test@sfu.ca"))
                 .thenReturn(Optional.of(mockUser));
+        
+        when(usersRepository.findById(1l))
+                .thenReturn(Optional.of(mockUser));
 
-        mockMvc.perform(post("/process_login")
-                .param("email", "test@sfu.ca")
-                .param("password", "12345"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loggedUserId", 1l);
+
+        mockMvc.perform(get("/account/edit/1")).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/login"));
+        mockMvc.perform(get("/account/edit/1").session(session)).andExpect(status().is2xxSuccessful());
+        mockMvc.perform(get("/account/edit/2").session(session)).andExpect(status().is3xxRedirection()); // should not allow editing others' accounts
     }
 
     @Test
-    void login_fail() throws Exception {
+    void edit_valid_invalid() throws Exception {
         User mockUser = new User();
+        mockUser.setFirst_name("Test");
+        mockUser.setLast_name("Test");
         mockUser.setEmail("test@sfu.ca");
+        mockUser.setId(1);
 
         String hashedPassword = BCrypt.hashpw("12345", BCrypt.gensalt());
         mockUser.setPassword(hashedPassword);
 
         when(usersRepository.findByEmail("test@sfu.ca"))
                 .thenReturn(Optional.of(mockUser));
-
-        mockMvc.perform(post("/process_login")
-                .param("email", "test@sfu.ca")
-                .param("password", "123456")) // wrong password
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/login?error=1"));
         
-        mockMvc.perform(post("/process_login")
-                .param("email", "test1@sfu.com") // wrong email
-                .param("password", "12345")) 
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/login?error=1"));
-    }
+        when(usersRepository.findById(1l))
+                .thenReturn(Optional.of(mockUser));
 
-    @Test
-    void signup_success() throws Exception {
-        mockMvc.perform(post("/process_signup")
-            .param("first_name", "Mike")
-            .param("last_name", "Test")
-            .param("email", "mike@sfu.ca")
-            .param("password", "1234")
-            .param("confirm_password", "1234")
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loggedUserId", 1l);
+
+        mockMvc.perform(post("/account/edit/1").session(session)
+            .param("first_name", "Test2")
+            .param("last_name", "Test2")
             .param("gender", "MALE")
-            .param("terms", "agree")
-        ).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/login?registered=1"));
+        ).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/account/edit/1?success=1"));
 
-        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-        verify(usersRepository).save(userCaptor.capture());
-
-        User savedUser = userCaptor.getValue();
-
-        assertEquals(savedUser.getFirst_name(), "Mike");
-        assertEquals(savedUser.getEmail(), "mike@sfu.ca");
-        assertEquals(savedUser.getRole(), Role.USER);        
-    }
-
-    @Test
-    void signup_fail() throws Exception {
-        mockMvc.perform(post("/process_signup")
-            //.param("first_name", "Mike") missing first name
-            .param("last_name", "Test")
-            .param("email", "mike@sfu.ca")
-            .param("password", "1234")
-            .param("confirm_password", "1234")
+        mockMvc.perform(post("/account/edit/1").session(session)
+            .param("first_name", "") // empty
+            .param("last_name", "Test2")
             .param("gender", "MALE")
-            .param("terms", "agree")
-        ).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/signup?error=1"));
-        
-        try {
-            ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-            userCaptor.capture();
-            User savedUser = userCaptor.getValue();
-            fail();
-        } catch(Exception e) {
-
-        }
-
-        mockMvc.perform(post("/process_signup")
-            .param("first_name", "Mike") 
-            .param("last_name", "Test")
-            .param("email", "mike@sfu.ca")
-            .param("password", "1234")
-            .param("confirm_password", "12345")
-            .param("gender", "MALE")
-            .param("terms", "agree")
-        ).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/signup?passwordMismatch=1"));
+        ).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/account/edit/1?error=1"));
     }
 }

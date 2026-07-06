@@ -20,6 +20,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -27,10 +28,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class UsersController {
     private final UserService US;
+    private final UsersRepository UR;
     private final Auth auth;
 
-    public UsersController(UserService userService) {
+    public UsersController(UserService userService, UsersRepository usersRepository) {
         this.US = userService;
+        this.UR = usersRepository;
         auth = new Auth(US);
     }
 
@@ -108,16 +111,63 @@ public class UsersController {
         auth.logout(request.getSession());
         return "redirect:/login?success=1";
     }
-    
 
-    /*
-    @PostMapping("/testuser")
-    public String create_test_user(Model model) {
-        User u = new User("Test", "User", "test@example.com", "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4", Role.USER, Gender.MALE, ""); // password 1234
-        UR.save(u);
-        return "empty";
+    @GetMapping("/account/edit/{id}")
+    public String getMethodName(@PathVariable("id") long id, HttpServletRequest request, HttpServletResponse response, Model model) {
+        if (!auth.isLoggedIn(request.getSession())) return "redirect:/login";
+        if (!(auth.getUser(request.getSession()).getId()==id || auth.getUser(request.getSession()).isAdmin())) return "redirect:/";
+        model.addAttribute("currentUser", auth.getUser(request.getSession()));
+        User u = US.findUserById(id);
+        if (u==null) return "errors/404";
+        model.addAttribute("user", u);
+        model.addAttribute("genders", Gender.values());
+
+        return "editaccount";
     }
-    */
 
+    @PostMapping("/account/edit/{id}")
+    public String getMethodName(@PathVariable("id") long id, @RequestParam Map<String, String> formData, HttpServletRequest request, HttpServletResponse response, Model model) {
+        if (!auth.isLoggedIn(request.getSession())) return "redirect:/login";
+        if (!(auth.getUser(request.getSession()).getId()==id || auth.getUser(request.getSession()).isAdmin())) return "redirect:/";
+        model.addAttribute("currentUser", auth.getUser(request.getSession()));
+        User u = US.findUserById(id);
+        if (u==null) return "errors/404";
+        model.addAttribute("user", u);
+        model.addAttribute("genders", Gender.values());
+
+        if (!formData.containsKey("first_name") || formData.get("first_name")=="") return "redirect:/account/edit/"+String.valueOf(id)+"?error=1";
+        if (!formData.containsKey("last_name") || formData.get("last_name")=="") return "redirect:/account/edit/"+String.valueOf(id)+"?error=1";
+        if (!formData.containsKey("gender") || formData.get("gender")=="") return "redirect:/account/edit/"+String.valueOf(id)+"?error=1";
+
+        u.setFirst_name(formData.get("first_name"));
+        u.setLast_name(formData.get("last_name"));
+        u.setGender(Gender.valueOf(formData.get("gender")));
+        
+        if (formData.containsKey("password") && formData.get("password")!="")  {
+            u.setPassword(formData.get("password"));
+            US.updatePassword(u, formData.get("password"));
+        }
+
+        UR.save(u);
+        return "redirect:/account/edit/"+String.valueOf(id)+"?success=1";
+    }
+    
+    
+    /* 
+    @GetMapping("/testadmin")
+    public String testadmin(Model model) {
+        User newUser = new User(
+                "Admin",
+                "User",
+                "admin@sfu.ca",
+                "admin123",
+                Role.MOD,
+                Gender.MALE,
+                ""
+        );
+
+        US.registerUser(newUser);
+        return "empty";
+    } */
    
 }

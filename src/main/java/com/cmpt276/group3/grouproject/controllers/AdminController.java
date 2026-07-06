@@ -32,12 +32,12 @@ public class AdminController {
         User currentUser = auth.getUser(session);
 
         // Not an admin -> bounce to the landing page instead of exposing the dashboard.
-        if (currentUser == null || currentUser.getRole() != Role.ADMIN) {
+        if (currentUser == null || currentUser.getRole() == Role.USER) {
             return "redirect:/";
         }
 
         // Admins manage regular accounts; admin accounts themselves aren't listed here.
-        List<User> users = usersRepository.findByRole(Role.USER);
+        List<User> users = usersRepository.findAll();
 
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("users", users);

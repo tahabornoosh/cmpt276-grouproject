@@ -42,6 +42,14 @@ public class UserService {
     }
 
     public User updatePassword(User targetUser, String plainPassword) {
+        if (targetUser == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
+        if (plainPassword == null || plainPassword.isBlank()) {
+            throw new IllegalArgumentException("Password cannot be empty");
+        }
+        targetUser.setPassword(plainPassword);
         hashPassword(targetUser);
         return userRepository.save(targetUser);
     }

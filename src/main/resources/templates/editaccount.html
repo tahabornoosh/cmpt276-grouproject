@@ -1,0 +1,86 @@
+<th:block th:replace="~{fragments/layout :: head('Edit User')}"></th:block>
+<th:block th:replace="~{fragments/layout :: bodyStart}"></th:block>
+<input type="hidden" id="activeMenuItem" name="activeMenuItem" value="none" />
+
+<main class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6"><h1>Edit User Account: <span th:text="${user.first_name}"></span> <span th:text="${user.last_name}"></span></h1></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card card-primary card-outline mb-4">
+                  <div class="card-header">
+                    <div class="card-title">Edit User</div>
+                    <div hidden class="alert alert-success" id="success">Success!</div>
+                    <div hidden class="alert alert-danger" id="error">Your input is invalid. Please try again.</div>
+                    <script>
+                        const urlParams = new URLSearchParams(window.location.search);
+
+                        const err = urlParams.get('error');
+                        const succ = urlParams.get('success');
+
+                        if (err=="1") {
+                            document.getElementById("error").hidden = false;
+                            history.replaceState({}, "", window.location.pathname);
+                        } if (succ=="1") {
+                            document.getElementById("success").hidden = false;
+                            history.replaceState({}, "", window.location.pathname);
+                        }
+                    </script>
+                  </div>
+                  <form th:action="@{/account/edit/{id}(id=${user.id})}" th:object="${user}" method="POST">
+                    <div class="card-body">
+                      <div class="mb-3">
+                        <label for="firstname" class="form-label">First Name</label>
+                        <input th:field="*{first_name}" type="text" class="form-control" id="firstname" aria-describedby="firstname">
+                      </div>
+
+                        <div class="mb-3">
+                        <label for="lastname" class="form-label">Last Name</label>
+                        <input th:field="*{last_name}" type="text" class="form-control" id="lastname" aria-describedby="lastname">
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label" for="select-default">Gender</label>
+
+                        <select class="form-control" id="select-default"
+                                th:field="*{gender}">
+                            <option th:each="r : ${genders}"
+                                    th:value="${r}"
+                                    th:text="${r}">
+                            </option>
+                        </select>
+                    </div>
+
+
+                      <div class="mb-3">
+                        <label for="email" class="form-label">Password (leave empty to not change)</label>
+                        <input th:field="*{password}" type="password" class="form-control" id="password" aria-describedby="password">
+                      </div>
+                    
+                    <div class="card-footer">
+                      <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                  </form>
+                </div>
+        </div>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.jQuery && window.jQuery.fn.DataTable) {
+        $('#usersTable').DataTable({ responsive: true, lengthChange: false, autoWidth: false });
+      }
+    });
+  </script>
+</main>
+
+<th:block th:replace="~{fragments/layout :: bodyEnd}"></th:block>
+

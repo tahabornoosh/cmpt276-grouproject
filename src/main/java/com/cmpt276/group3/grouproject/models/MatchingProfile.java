@@ -6,6 +6,9 @@ import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name="profiles")
 public class MatchingProfile {
@@ -204,7 +207,7 @@ public class MatchingProfile {
         this.study_field = study_field;
     }
 
-    public int getYear_of_study() {
+    public Integer getYear_of_study() {
         return year_of_study;
     }
 
@@ -434,6 +437,19 @@ public class MatchingProfile {
 
     public void setBuddy_max_year_of_study(Integer buddy_max_year_of_study) {
         this.buddy_max_year_of_study = buddy_max_year_of_study;
+    }
+
+    // Convenience accessor for display purposes - the individual hobby1..hobby5
+    // fields keep their priority weighting for MatchingAlgorithm, but views just
+    // want a de-duplicated, non-empty list of the hobbies actually picked.
+    public List<Hobby> getHobbies() {
+        List<Hobby> hobbies = new ArrayList<>();
+        for (Hobby h : new Hobby[]{hobby1, hobby2, hobby3, hobby4, hobby5}) {
+            if (h != null && h != Hobby.NONE && !hobbies.contains(h)) {
+                hobbies.add(h);
+            }
+        }
+        return hobbies;
     }
 
 }

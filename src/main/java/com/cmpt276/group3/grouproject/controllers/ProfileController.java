@@ -34,13 +34,17 @@ public class ProfileController {
     }
 
     @GetMapping("/questionnaire")
-    public String questionnaire(HttpSession session, Model model) {
+    public String questionnaire(@RequestParam(value = "edit", required = false) String edit, HttpSession session, Model model) {
         if (!auth.isLoggedIn(session)) {
             return "redirect:/login";
         }
 
         User currentUser = auth.getUser(session);
         MatchingProfile matchingProfile = matchingProfileService.getProfileByUser(currentUser);
+
+        if (matchingProfile != null && edit == null) {
+            return "redirect:/profile/" + currentUser.getId();
+        }
 
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("matchingProfile", matchingProfile);
@@ -72,6 +76,22 @@ public class ProfileController {
         User currentUser = auth.getUser(session);
         if (currentUser == null) {
             return "redirect:/login";
+        }
+
+        if (!basicProfileComplete(formData)) {
+            return "redirect:/questionnaire?edit=1&basicIncomplete=1";
+        }
+
+        if (formData.containsKey("display_friendship_profile") && !friendshipComplete(formData)) {
+            return "redirect:/questionnaire?edit=1&friendshipIncomplete=1";
+        }
+
+        if (formData.containsKey("display_dating_profile") && !relationshipComplete(formData)) {
+            return "redirect:/questionnaire?edit=1&relationshipIncomplete=1";
+        }
+
+        if (formData.containsKey("display_study_buddy_profile") && !studyBuddyComplete(formData, request)) {
+            return "redirect:/questionnaire?edit=1&studyBuddyIncomplete=1";
         }
 
         MatchingProfile profile = new MatchingProfile();
@@ -128,11 +148,20 @@ public class ProfileController {
         profile.setStudy_buddy_program(blankToNull(formData.get("study_buddy_program")));
         profile.setStudy_buddy_gender_preference(blankToNull(formData.get("study_buddy_gender_preference")));
 
-        String[] selectedCourses = request.getParameterValues("study_buddy_courses");
-        if (selectedCourses != null) {
-            profile.setStudy_buddy_courses(String.join(", ", selectedCourses));
+        String[] enteredCourses = request.getParameterValues("study_buddy_course");
+        if (enteredCourses != null) {
+            StringBuilder courses = new StringBuilder();
+            for (String course : enteredCourses) {
+                if (course != null && !course.isBlank()) {
+                    if (courses.length() > 0) {
+                        courses.append(", ");
+                    }
+                    courses.append(course.trim());
+                }
+            }
+            profile.setStudy_buddy_courses(courses.length() > 0 ? courses.toString() : null);
         } else {
-            profile.setStudy_buddy_courses(blankToNull(formData.get("study_buddy_courses")));
+            profile.setStudy_buddy_courses(null);
         }
 
         try {
@@ -218,4 +247,83 @@ public class ProfileController {
             return null;
         }
     }
+
+    private boolean basicProfileComplete(Map<String, String> formData) {
+        return allPresent(formData, "age", "year_of_study", "study_field");
+    }
+
+    private boolean friendshipComplete(Map<String, String> formData) {
+        return allPresent(formData,
+            "kind_of_friendship",
+            "social_style",
+            "hangout_frequency",
+            "friend_activity",
+            "planning_style",
+            "conversation_style",
+            "communication_style",
+            "personality_trait",
+            "friendship_value",
+            "availability",
+            "campus",
+            "lifestyle",
+            "motivation",
+            "friend_type",
+            "top_interests"
+        );
+    }
+
+    private boolean relationshipComplete(Map<String, String> formData) {
+        return allPresent(formData,
+            "relationship_goal",
+            "relationship_personality",
+            "relationship_communication_style",
+            "relationship_texting_style",
+            "relationship_free_time",
+            "relationship_value",
+            "relationship_conflict_style",
+            "relationship_lifestyle",
+            "relationship_ambition_importance",
+            "relationship_care_style",
+            "relationship_personal_space",
+            "relationship_date_activity",
+            "relationship_social_life",
+            "relationship_humor_style",
+            "relationship_strength"
+        );
+    }
+
+    private boolean studyBuddyComplete(Map<String, String> formData, HttpServletRequest request) {
+        if (!allPresent(formData, "study_buddy_program", "study_buddy_gender_preference", "class_count")) {
+            return false;
+        }
+
+        Integer classCount = parseInteger(formData.get("class_count"));
+        if (classCount == null || classCount < 1 || classCount > 6) {
+            return false;
+        }
+
+        String[] enteredCourses = request.getParameterValues("study_buddy_course");
+        if (enteredCourses == null || enteredCourses.length != classCount) {
+            return false;
+        }
+
+        for (String course : enteredCourses) {
+            if (course == null || course.isBlank()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean allPresent(Map<String, String> formData, String... fieldNames) {
+        for (String fieldName : fieldNames) {
+            String value = formData.get(fieldName);
+            if (value == null || value.isBlank()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

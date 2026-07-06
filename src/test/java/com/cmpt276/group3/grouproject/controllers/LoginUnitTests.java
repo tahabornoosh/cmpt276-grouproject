@@ -1,5 +1,8 @@
 package com.cmpt276.group3.grouproject.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -13,6 +16,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,6 +24,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 
+import com.cmpt276.group3.grouproject.enums.Role;
 import com.cmpt276.group3.grouproject.models.User;
 import com.cmpt276.group3.grouproject.models.UsersRepository;
 import com.cmpt276.group3.grouproject.services.UserService;
@@ -107,5 +112,49 @@ public class LoginUnitTests {
                 .param("password", "12345")) 
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/login?error=1"));
+    }
+
+    @Test
+    void signup_success() throws Exception {
+        mockMvc.perform(post("/process_signup")
+            .param("first_name", "Mike")
+            .param("last_name", "Test")
+            .param("email", "mike@sfu.ca")
+            .param("password", "1234")
+            .param("confirm_password", "1234")
+            .param("gender", "MALE")
+            .param("terms", "agree")
+        ).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/login?registered=1"));
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(usersRepository).save(userCaptor.capture());
+
+        User savedUser = userCaptor.getValue();
+
+        assertEquals(savedUser.getFirst_name(), "Mike");
+        assertEquals(savedUser.getEmail(), "mike@sfu.ca");
+        assertEquals(savedUser.getRole(), Role.USER);        
+    }
+
+    @Test
+    void signup_fail() throws Exception {
+        mockMvc.perform(post("/process_signup")
+            //.param("first_name", "Mike") missing first name
+            .param("last_name", "Test")
+            .param("email", "mike@sfu.ca")
+            .param("password", "1234")
+            .param("confirm_password", "1234")
+            .param("gender", "MALE")
+            .param("terms", "agree")
+        ).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/signup?error=1"));
+        
+        try {
+            ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+            userCaptor.capture();
+            User savedUser = userCaptor.getValue();
+            fail();
+        } catch(Exception e) {
+
+        }
     }
 }

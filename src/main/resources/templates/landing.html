@@ -16,6 +16,38 @@
 
   <section class="content">
     <div class="container-fluid">
+      <div th:if="${currentUser.isAdmin()}" class="row">
+          <div class="col">
+            <!-- small box -->
+            <div class="small-box bg-danger" style="width:100%">
+              <div class="inner">
+                <h3>You are an Admin</h3>
+
+                <p>You have management permissions</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-pie-graph"></i>
+              </div>
+              <a href="/admin" class="small-box-footer">Go to Admin Dashboard<i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+        </div>
+              <div th:if="${currentUser.isMod()}" class="row">
+          <div class="col">
+            <!-- small box -->
+            <div class="small-box bg-primary" style="width:100%">
+              <div class="inner">
+                <h3>You are a Moderator</h3>
+
+                <p>You have limited management permissions</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-pie-graph"></i>
+              </div>
+              <a href="/admin" class="small-box-footer">Go to Admin Dashboard<i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+        </div>
       <div class="card" th:if="${currentUser}">
         <div class="card-header"><h3 class="card-title">Your Details</h3></div>
         <div class="card-body">
@@ -24,7 +56,6 @@
           <p><strong>Gender:</strong> <span th:text="${currentUser.gender}"></span></p>
           <a th:href="@{'/profile/' + ${currentUser.id}}" class="btn btn-primary btn-sm">View my public profile</a>
           <a th:href="@{'/account/edit/' + ${currentUser.id}}" class="btn btn-secondary btn-sm">Edit account or change password</a>
-          <a th:if="${currentUser.role.name() == 'ADMIN'}" th:href="@{/admin}" class="btn btn-secondary btn-sm">Admin dashboard</a>
         </div>
       </div>
     </div>

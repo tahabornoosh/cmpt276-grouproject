@@ -204,6 +204,35 @@ He then enters his username and password and clicks on the Log in button.
 **Tests**
 - The correct email address and password should produce a redirect to the dashboard page, and result in a session variable creation
 - Any of wrong password, wrong email, or both, should result redirection back to the login page. No session variable should be set.
+- Empty email, password or both should stop login attempt and display a message notifying the user that the fields should not be empty. No session variable should be set.
+
+## Case: Log out
+**Personas/Actors**
+1. Primary actor: Albert - Second year sfu student
+
+**Pre-conditions**
+- Albert must be currently logged in
+- Albert must have an active session
+
+**Actions/Triggers**
+Albert, when logged into the app, presses the Log out button
+
+**Acceptance Critera**
+- If Albert presses log out, his session variable should be reset and be redirected to the login screen
+
+**Post-conditions**
+- Session variable should be cleared
+
+**Non-functional requirements**
+- Redirection to log in screen should load in less than one second
+- Log out button should be easy to find
+- Site should indicate that the user has been successfully logged out
+
+**Tests**
+- Logged in user clicking log out button should be redirected to login page
+- After logout, the user's session should be removed
+- After logout, attempting to access dashboard should redirect to login page
+
 
 ## Case: Questionnair Completion
 **Personas/Actors**

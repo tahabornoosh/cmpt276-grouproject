@@ -2,6 +2,8 @@ package com.cmpt276.group3.grouproject.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -148,14 +150,7 @@ public class LoginUnitTests {
             .param("terms", "agree")
         ).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/signup?error=1"));
         
-        try {
-            ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-            userCaptor.capture();
-            User savedUser = userCaptor.getValue();
-            fail();
-        } catch(Exception e) {
-
-        }
+        verify(usersRepository, never()).save(any(User.class));
 
         mockMvc.perform(post("/process_signup")
             .param("first_name", "Mike") 

@@ -517,7 +517,8 @@
       input.type = 'text';
       input.name = 'study_buddy_course';
       input.className = 'form-control mb-2';
-      input.placeholder = i === 0 ? 'e.g. MACM 101' : 'e.g. CMPT 276';
+      const placeholders = ['e.g. MACM 101', 'e.g. CMPT 276', 'e.g. MATH 232', 'e.g. STAT 270', 'e.g. CMPT 225', 'e.g. BUS 251'];
+      input.placeholder = placeholders[i] || 'e.g. CMPT 276';
       input.value = existingCourses[i] || '';
       container.appendChild(input);
     }
@@ -549,6 +550,35 @@
     return firstMissing;
   }
 
+
+  function findDuplicateCourseFields() {
+    const courseFields = Array.from(document.querySelectorAll('[name="study_buddy_course"]'));
+    const courseMap = new Map();
+    const duplicates = [];
+
+    courseFields.forEach(field => {
+      const normalized = field.value.trim().replace(/\s+/g, ' ').toUpperCase();
+
+      if (normalized === '') {
+        return;
+      }
+
+      if (!courseMap.has(normalized)) {
+        courseMap.set(normalized, []);
+      }
+
+      courseMap.get(normalized).push(field);
+    });
+
+    courseMap.forEach(fields => {
+      if (fields.length > 1) {
+        duplicates.push(...fields);
+      }
+    });
+
+    return duplicates;
+  }
+
   function validateQuestionnaire(event) {
     clearValidation();
 
@@ -572,6 +602,18 @@
 
     if (studyChecked) {
       firstMissing = firstMissing || markMissing('[name="study_buddy_program"], [name="study_buddy_gender_preference"], [name="class_count"], [name="study_buddy_course"]');
+
+      const duplicateCourseFields = findDuplicateCourseFields();
+      if (duplicateCourseFields.length > 0) {
+        duplicateCourseFields.forEach(field => field.classList.add('is-invalid'));
+
+        const errorBox = document.getElementById('clientValidationError');
+        if (errorBox) {
+          errorBox.textContent = 'You cannot enter the same class more than once. Please fix the highlighted class boxes.';
+        }
+
+        firstMissing = firstMissing || duplicateCourseFields[0];
+      }
     }
 
     if (firstMissing) {

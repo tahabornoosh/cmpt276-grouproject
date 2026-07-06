@@ -307,10 +307,19 @@ public class ProfileController {
             return false;
         }
 
+        java.util.HashSet<String> seenCourses = new java.util.HashSet<>();
+
         for (String course : enteredCourses) {
             if (course == null || course.isBlank()) {
                 return false;
             }
+
+            String normalizedCourse = course.trim().replaceAll("\\s+", " ").toUpperCase();
+            if (seenCourses.contains(normalizedCourse)) {
+                return false;
+            }
+
+            seenCourses.add(normalizedCourse);
         }
 
         return true;

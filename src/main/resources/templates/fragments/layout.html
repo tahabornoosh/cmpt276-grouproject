@@ -79,7 +79,7 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <li class="nav-item"><a id="menu-dashboard" href="/" class="nav-link"><i class="nav-icon fas fa-th"></i><p>Dashboard</p></a></li>
           <li class="nav-item"><a id="menu-questionnair" th:href="@{/questionnair/{id}(id=${currentUser.id})}" class="nav-link"><i class="nav-icon fas fa-user-alt"></i><p>Your Profile</p></a></li>
-          <li class="nav-item"><a id="menu-profile" th:href="@{/profile/{id}(id=${currentUser.id})}" class="nav-link"><i class="nav-icon fas fa-question-circle"></i><p>Your Questionnair</p></a></li>
+          <li class="nav-item"><a id="menu-profile" th:href="@{/questionnaire}" class="nav-link"><i class="nav-icon fas fa-question-circle"></i><p>Your Questionnaire</p></a></li>
           <li th:if="${currentUser.isAdmin() || currentUser.isMod()}" class="nav-item"><a id="menu-admin" href="/admin" class="nav-link"><i class="nav-icon fas fa-cogs"></i><p>Administration<span th:if="${currentUser.isMod()}" class="right badge badge-danger">Read-only</span></p></a></li>
         </ul>
       </nav>

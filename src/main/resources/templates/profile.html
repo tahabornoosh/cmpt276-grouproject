@@ -1,6 +1,6 @@
 <th:block th:replace="~{fragments/layout :: head('Profile')}"></th:block>
 <th:block th:replace="~{fragments/layout :: bodyStart}"></th:block>
-<input type="hidden" id="activeMenuItem" name="activeMenuItem" value="menu-dashboard" />
+<input type="hidden" id="activeMenuItem" name="activeMenuItem" value="menu-profile" />
 
 <main class="content-wrapper">
   <section class="content-header">
@@ -26,7 +26,7 @@
           <div class="card card-primary card-outline">
             <div class="card-body box-profile text-center">
               <img class="profile-user-img img-fluid img-circle"
-                   th:src="${profileUser.avatar} ?: @{/alte/dist/img/default-150x150.png}"
+                   src="/user.png"
                    alt="Profile picture">
               <h3 class="profile-username text-center"
                   th:text="${profileUser.first_name} + ' ' + ${profileUser.last_name}"></h3>

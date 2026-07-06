@@ -47,7 +47,7 @@ public class MatchingAlgorithm {
         // 60% -> linear factors 
         // maximum possible match score: ~120% (very hard to achieve 90%+ unless profiles intentionally optimized or if a hobby is heavily repeated)
 
-        double score = hobbiesScore(base, target);
+        double score = 40;//change later
         // linear factors
         if (abs(base.getAge()-target.getAge())<=5) score+=(5-abs(base.getAge()-target.getAge())); // 5 - age closeness
         if (abs(base.getYear_of_study()-target.getYear_of_study())<=3) score+=(3-abs(base.getAge()-target.getAge())); // 3 - year of study closeness

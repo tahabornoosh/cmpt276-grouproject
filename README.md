@@ -206,6 +206,45 @@ He then enters his username and password and clicks on the Log in button.
 - Any of wrong password, wrong email, or both, should result redirection back to the login page. No session variable should be set.
 - Empty email, password or both should stop login attempt and display a message notifying the user that the fields should not be empty. No session variable should be set.
 
+## Case: Accessing Admin Controls by Role
+**Personas/Actors**
+1. Primary actor: Jason - App Admin
+2. Secondary actor: Alice - App Moderator
+3. Secondary actor: John - Normal user
+
+**Pre-conditions**
+- Jason has an existing admin account and is logged in
+- Alice has an existing moderator account and is logged in
+- John has an existing regular account and is logged in
+
+**Actions/Triggers**
+- Jason attempts to access the admin controls from dashboard
+- Alice attempts to access the admin controls from dashboard
+- John attempts to access the admin controls through url
+
+**Acceptance Criteria**
+- If Jason is logged in, he should be able to access all features of the admin controls
+- If Alice is logged in, she should be able to view and access moderator features of admin controls
+- If John is logged in, the admin page should redirect him back to dashboard
+- If an unauthorized user attempts to access page they should be redirected to login page
+
+**Post-conditions**
+- Admin-only actions should only be accessed and completed by admins
+- Moderator-only actions should only be accessed and completed by moderators and admins
+- Regular users and unauthenticated users should not be able to access admin controls
+
+**Non-function Requirements**
+- All pages should load in less than one second
+- Locked controls should be clearly shown to moderators
+
+**Tests**
+- A logged-in admin should be able to access the admin controls and use all admin controls
+- A logged in moderator should be able to access the admin controls and use only moderator controls
+- A logged in regular user should not be able to access admin controls
+- A logged in regular user should be redirected to dashboard
+- An unauthenticated user attempting to access admin controls should be redirected to log in
+- A moderator attempting to use admin-only controls should be denied
+
 ## Case: Log out
 **Personas/Actors**
 1. Primary actor: Albert - Second year sfu student
@@ -250,6 +289,7 @@ Ryan fills out the required fields and clicks "Submit"
 - If there are missing fields, Ryan should be redirected back to the questionnair with an error message
 **Post-conditions**
 - If there are no missing fields, the matching profile for Ryan must be created or updated
+- A successful questionnair saves and displays profile on page should it be active
 
 **Non-functional requirements**
 - All pages should load in less than one second
@@ -272,6 +312,7 @@ Ryan clicks on the questionnair link from the menu in any other page of the app
 **Acceptance Criteria**
 - If Ryan has previously completed the survey, he should see a form pre-filled with his previous answers
 - If Ryan has not previously completed the survey, he should see an empty form
+
 **Post-conditions**
 - None
 

@@ -72,12 +72,12 @@ Additionally, our app provides a host of features such as deterministic (score b
 
 ## List of Epics/Features 
 
-- Profiles and Questionnair: Three interleaved profiles built using a ~20-question questionnair, divided into three parts (dating, friendship, study buddies) with the possibility of disabling each profile. Includes questions about interests, preferences, exclusions, and academic experiences
+- Profiles and Questionnair (Completed Iteration 1): Three-part interleaved profile built using a comprehensive questionnair, divided into general questions and three specialized parts (dating, friendship, study buddies) with the possibility of disabling each part. Includes questions about interests, preferences, and academic experiences.
 - Score/Match function: used to establish a partial order on users given their profile properties set (e.g., interests, preferences, skills (for study buddies), etc.) to facilitate match-making and suggestions.  
 - Feeds: Allow users to see profiles matched to their profile and send expressions of interest.  
 - Chat and virtual meeting features: Individual chats with security features (e.g., blocking, no media/photo sharing) and voice/video calls (outsourced \- using **APIs** of either Zoom, BigBlueButton, or similar solution)  
   - APIs will be used to obtain meeting join links once a user initiates or joins a call, and involve sending the user's display name to the API.
-- Login and CAS Integration: app allows logging in with a CAS server (with the ultimate goal being the SFU CAS server), using a username and password, or both.  
+- Login (Completed Iteration 1) and CAS Integration: app allows logging in with a CAS server (with the ultimate goal being the SFU CAS server), using a username and password, or both.  
 - Administration (minimal): panel that allows admins to view and suspend/edit/delete users.
 - Profile (global) optimization: Users can edit their profile adding pictures, biography, and description \- not directly used for matching (with some automated moderation)
 
@@ -103,6 +103,7 @@ Additionally, our app provides a host of features such as deterministic (score b
   - 1st year CS student  
   - Some experience with PHP and Django  
   - Proficient in Java, C++, and Python  
+
 - William  
   - 3rd year SOSY student  
   - Main coding language is C++, experience in Python, Java, SQL  
@@ -115,7 +116,10 @@ Additionally, our app provides a host of features such as deterministic (score b
 [2]	Bumble, “Bumble \- Date, Meet, Network Better,” *Bumble*, 2023\. https://bumble.com/ (accessed Jun. 19, 2026).  
 
 ## Other Project Acknowledgements
-See docs/DECLARATIONS.md
+See `docs/DECLARATIONS.md` in project repository
+
+## Meeting Notes
+See `docs/meeting-notes` in project repository
 
 # User Stories
 
@@ -177,12 +181,12 @@ Mike then enters his information and clicks Submit to create his account.
 - Using the email address "mikesfuca" in the first test scenario be rejected and redirected back to the sign-up page with an error message
 
 
-## Case: Log in - regular user
+## Case: Log in
 **Personas/Actors**
 1. Primary actor: John - a Second-year SFU student
 
 **Pre-conditions**
-- John must have an existing account in the app with a non-admin role
+- John must have an existing account in the app
 
 **Actions/Triggers**
 John opens the app URL, and is redirected to the login page with two inputs: email and password, as well as a Log in button. 
@@ -206,7 +210,34 @@ He then enters his username and password and clicks on the Log in button.
 - Any of wrong password, wrong email, or both, should result redirection back to the login page. No session variable should be set.
 - Empty email, password or both should stop login attempt and display a message notifying the user that the fields should not be empty. No session variable should be set.
 
-## Case: Accessing Admin Controls by Role
+## Case: Dashboard Loading
+**Personas/Actors**
+1. Primary actor: John - a Second-year SFU student
+
+**Pre-conditions**
+- John must have an existing account in the app
+
+**Actions/Triggers**
+John logs into the app and is redirected to the dashboard page, or clicks on the dashboard link in the app menu from any page in the app, or opens the base URL of the app
+
+**Acceptance Criteria**
+- If John is not signed in, then he should be redirected to the login page
+- If John is signed in and is a regular user, then he should see a dashboard consisting of his basic user information and options to view his profile or change his account details
+- If John is a moderator or an admin, then he should see a dashboard which, in addition to the above, contains a banner stating his role at the top of the page as well as a menu item for the admin panel.
+
+**Post-conditions**
+- None
+
+**Non-functional requirements**
+- All pages should load in less than one second
+- Admins and moderators should be able to get to the admin panel from the dashboard in one click without prior training
+
+**Tests**
+- A logged-out user must be redirected to the login page when attempting to open dashboard
+- A non-admin, non-moderator user who is logged in and opens the dashboard must not see a role banner or links to the admin panel
+- An admin user must see a link to the admin panel in the menu as well as a role banner
+
+## Case: Accessing Admin Panel by Role
 **Personas/Actors**
 1. Primary actor: Jason - App Admin
 2. Secondary actor: Alice - App Moderator
@@ -254,7 +285,7 @@ He then enters his username and password and clicks on the Log in button.
 - Albert must have an active session
 
 **Actions/Triggers**
-Albert, when logged into the app, presses the Log out button
+Albert, when logged into the app, presses the Log out link on the App's top menu from any page in the app
 
 **Acceptance Critera**
 - If Albert presses log out, his session variable should be reset and be redirected to the login screen
@@ -265,7 +296,7 @@ Albert, when logged into the app, presses the Log out button
 **Non-functional requirements**
 - Redirection to log in screen should load in less than one second
 - Log out button should be easy to find
-- Site should indicate that the user has been successfully logged out
+- The user should easily understand if they have been successfuly logged out (through UX)
 
 **Tests**
 - Logged in user clicking log out button should be redirected to login page
@@ -281,10 +312,10 @@ Albert, when logged into the app, presses the Log out button
 - Ryan must be on the questionnair page
 
 **Actions/Triggers**
-Ryan fills out the required fields and clicks "Submit"
+Ryan fills out the required fields, selects what specific sections (friendship, dating, studdy-buddies) he wishes to complete by checking the checkboxes next to the section names, completes the associated fields, and clicks "Submit"
 
 **Acceptance Criteria**
-- If all required fields have been filled, the form must be submitted and a success message must be displayed
+- If all required fields, including those in the user-specified sections, have been filled, the form must be submitted and Ryan should be redirected to his profile page
 - If there are missing fields, Ryan should be redirected back to the questionnair with an error message
 **Post-conditions**
 - If there are no missing fields, the matching profile for Ryan must be created or updated
@@ -306,7 +337,7 @@ Ryan fills out the required fields and clicks "Submit"
 - Ryan must have an active account and must be logged in
 
 **Actions/Triggers**
-Ryan clicks on the questionnair link from the menu in any other page of the app
+Ryan clicks on the questionnair link from his own profile page
 
 **Acceptance Criteria**
 - If Ryan has previously completed the survey, he should see a form pre-filled with his previous answers
@@ -323,9 +354,69 @@ Ryan clicks on the questionnair link from the menu in any other page of the app
 - A user who has not yet completed the survey must see an empty form
 
 
+## Case: Edit page loading
+**Personas/Actors**
+1. Primary actor: Joyce - a second-year SFU student
+2. Secondary actor(s): the user(s) whose accounts are being edited
+
+**Pre-conditions**
+- Joyce must have an active account and must be logged in
+
+**Actions/Triggers**
+Joyce either clicks on the associated button on her landing page, or clicks "edit" for a user in the admin panel, and is redirected to that user's edit page.
+
+**Acceptance Criteria**
+- If the user (for which the edit page is accessed) is Joyce herself, she should see a form pre-filled with her first name, last name, and gender, and an empty field for password.
+- If the user is not Joyce and Joyce is not an admin, then she should be redirected to the dashboard
+- If the user is not Joyce, the user exists, and Joyce is an admin, then she should see a form pre-filled with the user's first name, last name, and gender, and an empty field for password.
+- If the user does not exist and Joyce is an admin, then a 404 error page should be displayed
+
+**Post-conditions**
+- None
+
+**Non-functional requirements**
+- All pages should load in less than one second
+
+**Tests**
+- A user's own account edit page should load the form correctly
+- A regular user or moderator should get redirected to the dashboard if attempting to open another user's edit page
+- An admin should be able to open any existing user's edit page
+- An admin should see a 404 error page if attempting to open a non-existing user's edit page
+
+## Case: Edit page loading functionality
+**Personas/Actors**
+1. Primary actor: Joyce - a second-year SFU student
+2. Secondary actor(s): the user(s) whose accounts are being edited
+
+**Pre-conditions**
+- Joyce must have an active account and must be logged in
+- Joyce must be on the edit page associated with an existing user, and have permission to be on that page
+
+**Actions/Triggers**
+Joyce enters values for first name, last name, gender, and possibly password, and clicks "submit" on an edit page for a user.
+
+**Acceptance Criteria**
+- If all fields except password (first name, last name, and gender) have been filled in, then those values for the associated user account should be updated in the database and Joyce should see a success message
+- If all fields (including password) have been filled in, then those values should be updated in the database, the password should be hashed, and Joyce should see a success message
+- If a field other than password is left empty, then an error message should be displayed to Joyce
+
+**Post-conditions**
+- If successful, the associated records in the database must be updated
+
+**Non-functional requirements**
+- All pages should load in less than one second
+- Error message texts should be easy to understand
+
+**Tests**
+- An entry consisting of random string, the gender "MALE", and a non-empty password value should result in a success message and the modification of the associated field.
+- An entry missing first name or last name must result in an error message.
+- An entry missing the password field (only) should result in updates to all other query fields, but not password.
+
+
 ## Case: Profile Viewing
 **Personas/Actors**
 1. Primary actor: Joyce - a second-year SFU student
+2. Secondary actor: Joyce's friend - sends her the link to their profile
 
 **Pre-conditions**
 - Joyce must have an active account and must be logged in
@@ -338,7 +429,7 @@ Joyce opens the profile page for a user by opening a URL sent to them by a frien
 - If the user exists, but they have not yet completed the profile, then Joyce must see only their name and gender.
 - If the user exists and has completed the questionnair, then Joyce must see their answers to the questionnair questions as well as their name and gender, subject to that user's preferences for displaying friendship, dating, or study-buddy-related profile sections.
 - If the user does not exist, then a 404 error page must be displayed to Joyce
-- If the user exists, has completed their profile, and is not Joyce herself, then a friendship match percentage must be displayed ranging from 0% to 100%
+- If the user exists, has completed their profile, and is not Joyce herself, then a friendship match percentage must be displayed ranging from 40% to 100% (will be changed to (-1%)-102% in later iterations)
 **Post-conditions**
 - None
 

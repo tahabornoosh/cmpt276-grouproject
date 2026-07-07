@@ -430,6 +430,7 @@ Joyce opens the profile page for a user by opening a URL sent to them by a frien
 - If the user exists and has completed the questionnair, then Joyce must see their answers to the questionnair questions as well as their name and gender, subject to that user's preferences for displaying friendship, dating, or study-buddy-related profile sections.
 - If the user does not exist, then a 404 error page must be displayed to Joyce
 - If the user exists, has completed their profile, and is not Joyce herself, then a friendship match percentage must be displayed ranging from 40% to 100% (will be changed to (-1%)-102% in later iterations)
+- If the profile belongs to Joyce herself, she should see a link to complete or modify her questionnair at the top of the page
 **Post-conditions**
 - None
 

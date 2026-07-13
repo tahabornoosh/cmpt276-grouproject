@@ -219,27 +219,37 @@ public class MatchingAlgorithm {
         if (target.getYear_of_study() < base.getBuddy_min_year_of_study()
                 || base.getYear_of_study() < target.getBuddy_min_year_of_study())
             return -1;
-        int s = 40; // 40% for exclusions passing
-        // dicipline - 50%
+        int s = 20; // 20% for exclusions passing
+        // dicipline - 40%
         if (base.getStudy_field() == target.getStudy_field())
-            s += 15; // same field
+            s += 10; // same field
         if (base.getBuddy_area_of_study() == target.getStudy_field())
             s += 10; // target matching base preference
         if (target.getBuddy_area_of_study() == base.getStudy_field())
             s += 10;
         if (target.getStudy_buddy_program().toLowerCase().equals(base.getStudy_buddy_program().toLowerCase()))
-            s += 15;
-        // Courses - 30%
+            s += 10;
+        // Courses - 60%
         List<String> b = getStudyBuddyCourseList(base.getStudy_buddy_courses());
         List<String> c = getStudyBuddyCourseList(target.getStudy_buddy_courses());
         int p = 0;
         for (String a:b) {
             for (String d:c) {
-                if (a.equals(d)) p+=10;
+                if (a.equals(d)) p+=1;
             }
-        } p = p>30 ? 30:p; // capped to 3 matching courses
+        } 
 
-        return s+p>102 ? 102:s+p;
+        if (p!=0) {
+            int change = 30;
+            if (p>5) p = 5; // at most 5 courses considered
+            for (int i = 0; i<p; i++) {
+                s+=change;
+                if (change==15) change = 5;
+                if (change!=5) change = change/2;
+            } // matching course scores (1 matching, 2, 3, 4, 5+): 30, 45, 50, 55, 60 
+        }
+
+        return s>102 ? 102:s;
     }
 
     private static List<String> getStudyBuddyCourseList(String study_buddy_courses) {

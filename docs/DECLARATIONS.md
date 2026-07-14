@@ -14,3 +14,4 @@
 - AI helped debug database session issues
 - AI helped debug user edit and profile template and controller errors
 - AI used to help refactor and improve the questionnair/profile and their model, and to improve matching functions
+- AI used to help make an AdminLTE4 page (chat) compatible with AdminLTE3.2

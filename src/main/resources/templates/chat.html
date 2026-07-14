@@ -1,0 +1,352 @@
+<th:block th:replace="~{fragments/layout :: head('Chat')}"></th:block>
+<th:block th:replace="~{fragments/layout :: bodyStart}"></th:block>
+<input type="hidden" id="activeMenuItem" name="activeMenuItem" value="menu-chat" />
+
+    <style>
+      .overflow-hidden {
+        overflow: hidden !important;
+      }
+
+      .overflow-auto {
+        overflow: auto !important;
+      }
+
+      .flex-shrink-0 {
+        flex-shrink: 0 !important;
+      }
+
+      .chat-app {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 0;
+        height: calc(100vh - 14rem);
+        min-height: 40rem;
+        border-radius: 0.25rem;
+        overflow: hidden;
+        margin-bottom: 0;
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+      }
+      @media (max-width: 768px) {
+        .chat-app {
+          grid-template-columns: 1fr;
+        }
+        .chat-app .chat-contacts {
+          display: none;
+        }
+      }
+      .chat-contacts {
+        background: #f4f6f9;
+        border-right: 1px solid #dee2e6;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+      .chat-contact {
+        display: flex;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        border-bottom: 1px solid #dee2e6;
+        text-decoration: none;
+        color: inherit;
+      }
+      .chat-contact:hover {
+        background: #ffffff;
+      }
+      .chat-contact.active {
+        background: #ffffff;
+        border-left: 3px solid #007bff;
+        padding-left: calc(1rem - 3px);
+      }
+      .chat-avatar {
+        position: relative;
+        flex-shrink: 0;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.8rem;
+      }
+      .chat-avatar.online::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 10px;
+        height: 10px;
+        background: #28a745;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+      }
+      .chat-conversation {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+      .chat-header {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        background: #f4f6f9;
+      }
+      .chat-message {
+        display: flex;
+        margin-bottom: 0.75rem;
+      }
+      .chat-message.me {
+        justify-content: flex-end;
+      }
+      .chat-bubble {
+        max-width: 70%;
+        padding: 0.5rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+      .chat-message.them .chat-bubble {
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        border-bottom-left-radius: 0.25rem;
+      }
+      .chat-message.me .chat-bubble {
+        background: #007bff;
+        color: #fff;
+        border-bottom-right-radius: 0.25rem;
+      }
+      .chat-time {
+        font-size: 0.7rem;
+        opacity: 0.7;
+        display: block;
+        margin-top: 0.15rem;
+      }
+      .chat-composer {
+        padding: 0.75rem;
+        border-top: 1px solid #dee2e6;
+      }
+    </style>
+
+<main class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>
+            Chat
+          </h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item active">Chat</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="card card-primary card-outline chat-app">
+        <!-- Contacts -->
+        <aside class="chat-contacts">
+          <div class="p-3 border-bottom">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-white">
+                <i class="fas fa-search" aria-hidden="true"></i>
+              </span>
+              <input type="search" class="form-control" placeholder="Search contacts…" aria-label="Search contacts">
+            </div>
+          </div>
+          <div class="flex-grow-1 overflow-auto">
+            <a href="#" class="chat-contact active">
+              <span class="chat-avatar bg-primary text-white online"> OB </span>
+              <div class="flex-grow-1 overflow-hidden">
+                <div class="d-flex justify-content-between">
+                  <p class="mb-0 text-truncate font-weight-bold">Olivia Bennett</p>
+                  <small class="text-muted flex-shrink-0 ml-2"> 2m </small>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="text-truncate font-weight-bold">
+                    Approved — a few small notes…
+                  </small>
+                  <span class="badge badge-primary rounded-pill ml-2"> 2 </span>
+                </div>
+              </div>
+            </a><a href="#" class="chat-contact">
+              <span class="chat-avatar bg-success text-white online"> MR </span>
+              <div class="flex-grow-1 overflow-hidden">
+                <div class="d-flex justify-content-between">
+                  <p class="mb-0 text-truncate">Marcus Reyes</p>
+                  <small class="text-muted flex-shrink-0 ml-2"> 1h </small>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="text-truncate text-muted"> Lunch Thursday? </small>
+                </div>
+              </div>
+            </a><a href="#" class="chat-contact">
+              <span class="chat-avatar bg-info text-white"> SK </span>
+              <div class="flex-grow-1 overflow-hidden">
+                <div class="d-flex justify-content-between">
+                  <p class="mb-0 text-truncate">Sara Khan</p>
+                  <small class="text-muted flex-shrink-0 ml-2"> 3h </small>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="text-truncate text-muted">
+                    Customer interview notes are up.
+                  </small>
+                </div>
+              </div>
+            </a><a href="#" class="chat-contact">
+              <span class="chat-avatar bg-warning text-dark"> DS </span>
+              <div class="flex-grow-1 overflow-hidden">
+                <div class="d-flex justify-content-between">
+                  <p class="mb-0 text-truncate font-weight-bold">Diego Smania</p>
+                  <small class="text-muted flex-shrink-0 ml-2"> Yesterday </small>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="text-truncate font-weight-bold"> PR is ready for review. </small>
+                  <span class="badge badge-primary rounded-pill ml-2"> 1 </span>
+                </div>
+              </div>
+            </a><a href="#" class="chat-contact">
+              <span class="chat-avatar bg-danger text-white"> ED </span>
+              <div class="flex-grow-1 overflow-hidden">
+                <div class="d-flex justify-content-between">
+                  <p class="mb-0 text-truncate">Emma Dawson</p>
+                  <small class="text-muted flex-shrink-0 ml-2"> Yesterday </small>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="text-truncate text-muted">
+                    Heading out, see you Mon.
+                  </small>
+                </div>
+              </div>
+            </a><a href="#" class="chat-contact">
+              <span class="chat-avatar bg-primary text-white online"> LC </span>
+              <div class="flex-grow-1 overflow-hidden">
+                <div class="d-flex justify-content-between">
+                  <p class="mb-0 text-truncate">Liam Carter</p>
+                  <small class="text-muted flex-shrink-0 ml-2"> May 16 </small>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="text-truncate text-muted">
+                    Pushed the calendar fix.
+                  </small>
+                </div>
+              </div>
+            </a><a href="#" class="chat-contact">
+              <span class="chat-avatar bg-secondary text-white"> AF </span>
+              <div class="flex-grow-1 overflow-hidden">
+                <div class="d-flex justify-content-between">
+                  <p class="mb-0 text-truncate">Ava Foster</p>
+                  <small class="text-muted flex-shrink-0 ml-2"> May 15 </small>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="text-truncate text-muted">
+                    Adding you to the design crit.
+                  </small>
+                </div>
+              </div>
+            </a>
+          </div>
+        </aside>
+
+        <!-- Conversation -->
+        <section class="chat-conversation">
+          <header class="chat-header">
+            <span class="chat-avatar bg-primary text-white online"> OB </span>
+            <div class="flex-grow-1">
+              <p class="mb-0 font-weight-bold">Olivia Bennett</p>
+              <small class="text-success">
+                <i class="fas fa-circle" style="font-size: 0.5rem" aria-hidden="true"></i>
+                Online · typing…
+              </small>
+            </div>
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-secondary" type="button" title="Call">
+                <i class="fas fa-phone" aria-hidden="true"></i>
+              </button>
+              <button class="btn btn-outline-secondary" type="button" title="Video call">
+                <i class="fas fa-video" aria-hidden="true"></i>
+              </button>
+              <button class="btn btn-outline-secondary" type="button" title="More">
+                <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+              </button>
+            </div>
+          </header>
+
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-message them">
+              <div class="chat-bubble">
+                Hey Jane! Did you get a chance to look at the v2.4 candidate?
+                <span class="chat-time">10:38 AM</span>
+              </div>
+            </div>
+            <div class="chat-message me">
+              <div class="chat-bubble">
+                Just finished going through it. Overall really solid — the new motion
+                primitives are great.
+                <span class="chat-time">10:40 AM</span>
+              </div>
+            </div>
+            <div class="chat-message them">
+              <div class="chat-bubble">
+                Glad you like them. Any concerns?
+                <span class="chat-time">10:40 AM</span>
+              </div>
+            </div>
+            <div class="chat-message me">
+              <div class="chat-bubble">
+                Two small things: the success state on form inputs feels light, and the focus
+                ring is barely visible on dark theme.
+                <span class="chat-time">10:41 AM</span>
+              </div>
+            </div>
+            <div class="chat-message them">
+              <div class="chat-bubble">
+                Yeah, that focus ring issue has been bugging me too. I’ll bump the contrast
+                and ping you for another look.
+                <span class="chat-time">10:42 AM</span>
+              </div>
+            </div>
+            <div class="chat-message me">
+              <div class="chat-bubble">
+                Sounds good. Otherwise, ship it!
+                <span class="chat-time">10:42 AM</span>
+              </div>
+            </div>
+          </div>
+
+          <form class="chat-composer" id="chat-composer">
+            <div class="input-group">
+              <button class="btn btn-outline-secondary" type="button" title="Attach">
+                <i class="fas fa-paperclip" aria-hidden="true"></i>
+              </button>
+              <input type="text" class="form-control" placeholder="Type a message…" aria-label="Type a message"
+                id="chat-input">
+              <button class="btn btn-outline-secondary" type="button" title="Emoji">
+                <i class="far fa-smile" aria-hidden="true"></i>
+              </button>
+              <button class="btn btn-primary" type="submit">
+                <i class="fas fa-paper-plane" aria-hidden="true"></i>
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </section>
+</main>
+
+<th:block th:replace="~{fragments/layout :: bodyEnd}"></th:block>

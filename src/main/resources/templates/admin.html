@@ -1,4 +1,3 @@
-
 <th:block th:replace="~{fragments/layout :: head('Admin Dashboard')}"></th:block>
 <th:block th:replace="~{fragments/layout :: bodyStart}"></th:block>
 <input type="hidden" id="activeMenuItem" name="activeMenuItem" value="menu-admin" />
@@ -7,7 +6,10 @@
   <section class="content-header">
     <div class="container-fluid">
       <div class="row mb-2">
-        <div class="col-sm-6"><h1>Admin Dashboard</h1></div>
+        <div class="col-sm-6">
+          <h1>Admin Dashboard</h1>
+          
+        </div>
       </div>
     </div>
   </section>
@@ -15,11 +17,21 @@
   <section class="content">
     <div class="container-fluid">
       <div class="card">
-        <div class="card-header"><h3 class="card-title">Users</h3></div>
+        <div class="card-header">
+          <h3 class="card-title">Users</h3>
+        </div>
         <div class="card-body">
+                  <div class="alert alert-danger" hidden id="error">An error occured</div>
+        <div class="alert alert-success" hidden id="success">Success</div>
           <table id="usersTable" class="table table-bordered table-striped">
             <thead>
-              <tr><th>Name</th><th>Email</th><th>Gender</th><th>Role</th><th>Actions</th></tr>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Gender</th>
+                <th>Role</th>
+                <th>Actions</th>
+              </tr>
             </thead>
             <tbody>
               <tr th:each="u : ${users}">
@@ -28,8 +40,11 @@
                 <td th:text="${u.gender}"></td>
                 <td th:text="${u.role}"></td>
                 <td>
-                  <a th:href="@{'/profile/' + ${u.id}}" class="btn btn-info btn-sm">View Public Profile</a>
-                  <a th:if="${currentUser.isAdmin()}" th:href="@{'/account/edit/' + ${u.id}}" class="btn btn-warning btn-sm">Edit Account</a>
+                  <a th:href="@{'/profile/' + ${u.id}}" class="btn btn-info btn-sm">View Profile</a>
+                  <a th:if="${currentUser.isAdmin()}" th:href="@{'/account/edit/' + ${u.id}}"
+                    class="btn btn-warning btn-sm">Edit</a>
+                  <a th:if="${currentUser.isAdmin()}" th:href="@{'/account/admincontrols/' + ${u.id}}"
+                    class="btn btn-danger btn-sm">Delete/Role change</a>
                 </td>
               </tr>
             </tbody>
@@ -49,3 +64,33 @@
 </main>
 
 <th:block th:replace="~{fragments/layout :: bodyEnd}"></th:block>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+
+  const err = urlParams.get('error');
+  const succ = urlParams.get('success');
+
+  const errors = {
+    "1": "An error Occured",
+    "2": "Error: Record Not Found"
+  }
+
+  const successes = {
+    "1": "Success"
+  }
+
+  let text = errors[err];
+  if (text) {
+    document.getElementById("error").hidden = false;
+    document.getElementById("error").innerHTML = text;
+    history.replaceState({}, "", window.location.pathname);
+  }
+
+  text = successes[succ];
+  if (text) {
+    document.getElementById("success").hidden = false;
+    document.getElementById("success").innerHTML = text;
+    history.replaceState({}, "", window.location.pathname);
+  }
+</script>

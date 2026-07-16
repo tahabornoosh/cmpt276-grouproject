@@ -1,0 +1,108 @@
+<th:block th:replace="~{fragments/layout :: head('Expressions of Interest')}"></th:block>
+<th:block th:replace="~{fragments/layout :: bodyStart}"></th:block>
+
+<input type="hidden" id="activeMenuItem" value="menu-eois">
+
+<main class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Expressions of Interest</h1>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+
+      <div th:if="${param.success != null}"
+           class="alert alert-success">
+        Expression of interest deleted successfully.
+      </div>
+
+      <div th:if="${param.error != null}"
+           class="alert alert-danger">
+        The expression of interest could not be found or does not belong to you.
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Outstanding EOIs</h3>
+        </div>
+
+        <div class="card-body">
+          <div th:if="${#lists.isEmpty(eois)}"
+               class="alert alert-info mb-0">
+            You currently have no outstanding expressions of interest.
+          </div>
+
+          <div th:unless="${#lists.isEmpty(eois)}"
+               class="table-responsive">
+            <table id="eoisTable"
+                   class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th>From</th>
+                  <th>Stream</th>
+                  <th>Received</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr th:each="eoi : ${eois}">
+                  <td>
+                    <img th:src="${eoi.sender.avatar != null && !eoi.sender.avatar.isEmpty()}
+                                  ? ${eoi.sender.avatar}
+                                  : @{/user.png}"
+                         src="/user.png"
+                         alt="User avatar"
+                         class="img-circle mr-2"
+                         width="40"
+                         height="40">
+
+                    <a th:href="@{/profile/{id}(id=${eoi.sender.id})}"
+                       th:text="${eoi.sender.first_name + ' ' + eoi.sender.last_name}">
+                      Sender Name
+                    </a>
+                  </td>
+
+                  <td th:text="${eoi.stream.displayName}">
+                    Friendship
+                  </td>
+
+                  <td th:text="${#temporals.format(eoi.createdAt, 'MMM d, yyyy h:mm a')}">
+                    Jul 16, 2026 3:00 PM
+                  </td>
+
+                  <td>
+                    <a th:href="@{/chat(userId=${eoi.sender.id})}"
+                       class="btn btn-primary btn-sm">
+                      <i class="fas fa-comment"></i>
+                      Start Chat
+                    </a>
+
+                    <form th:action="@{/eois/{id}/delete(id=${eoi.id})}"
+                          method="post"
+                          class="d-inline"
+                          onsubmit="return confirm('Delete this expression of interest?');">
+                      <button type="submit"
+                              class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash"></i>
+                        Delete
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<th:block th:replace="~{fragments/layout :: bodyEnd}"></th:block>

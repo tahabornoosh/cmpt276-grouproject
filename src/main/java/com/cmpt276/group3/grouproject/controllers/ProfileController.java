@@ -1,5 +1,7 @@
 package com.cmpt276.group3.grouproject.controllers;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -63,6 +65,28 @@ public class ProfileController {
         model.addAttribute("availabilities", Availability.values());
         model.addAttribute("motivations", Motivation.values());
         model.addAttribute("friendTypes", FriendType.values());
+        model.addAttribute("campuses", Campus.values());
+        model.addAttribute("lifestyles", Lifestyle.values());
+        model.addAttribute("topInterests", TopInterest.values());
+        model.addAttribute("relationshipGoals", RelationshipGoal.values());
+        model.addAttribute("relationshipPersonalities", RelationshipPersonality.values());
+        model.addAttribute("relationshipCommunicationStyles", RelationshipCommunicationStyle.values());
+        model.addAttribute("relationshipTextingStyles", RelationshipTextingStyle.values());
+        model.addAttribute("relationshipFreeTimes", RelationshipFreeTime.values());
+        model.addAttribute("relationshipValues", RelationshipValue.values());
+        model.addAttribute("relationshipConflictStyles", RelationshipConflictStyle.values());
+        model.addAttribute("relationshipLifestyles", RelationshipLifestyle.values());
+        model.addAttribute("relationshipAmbitionImportances", RelationshipAmbitionImportance.values());
+        model.addAttribute("relationshipCareStyles", RelationshipCareStyle.values());
+        model.addAttribute("relationshipPersonalSpaces", RelationshipPersonalSpace.values());
+        model.addAttribute("relationshipDateActivities", RelationshipDateActivity.values());
+        model.addAttribute("relationshipSocialLives", RelationshipSocialLife.values());
+        model.addAttribute("relationshipHumorStyles", RelationshipHumorStyle.values());
+        model.addAttribute("relationshipStrengths", RelationshipStrength.values());
+        model.addAttribute("sports", Sport.values());
+        model.addAttribute("venues", Venue.values());
+        model.addAttribute("hobbies", Hobby.values());
+        model.addAttribute("genders", Gender.values());
 
         return "questionnaire";
     }
@@ -109,6 +133,16 @@ public class ProfileController {
             profile.setYear_of_study(yearOfStudy);
         }
 
+        profile.setHas_job(parseBoolean(formData.get("has_job")));
+        profile.setRegularly_goes_to_gym(parseBoolean(formData.get("regularly_goes_to_gym")));
+        profile.setFavourite_sport(parseEnum(formData.get("favourite_sport"), Sport.class));
+        profile.setPreferred_venue(parseEnum(formData.get("preferred_venue"), Venue.class));
+        profile.setHobby1(parseEnum(formData.get("hobby1"), Hobby.class));
+        profile.setHobby2(parseEnum(formData.get("hobby2"), Hobby.class));
+        profile.setHobby3(parseEnum(formData.get("hobby3"), Hobby.class));
+        profile.setHobby4(parseEnum(formData.get("hobby4"), Hobby.class));
+        profile.setHobby5(parseEnum(formData.get("hobby5"), Hobby.class));
+
         profile.setKind_of_friendship(parseEnum(formData.get("kind_of_friendship"), FriendshipStyle.class));
         profile.setSocial_style(parseEnum(formData.get("social_style"), SocialStyle.class));
         profile.setHangout_frequency(parseEnum(formData.get("hangout_frequency"), HangoutFrequency.class));
@@ -119,34 +153,38 @@ public class ProfileController {
         profile.setPersonality_trait(parseEnum(formData.get("personality_trait"), PersonalityTrait.class));
         profile.setFriendship_value(parseEnum(formData.get("friendship_value"), FriendshipValue.class));
         profile.setAvailability(parseEnum(formData.get("availability"), Availability.class));
-        profile.setCampus(blankToNull(formData.get("campus")));
-        profile.setLifestyle(blankToNull(formData.get("lifestyle")));
+        profile.setCampus(parseEnum(formData.get("campus"), Campus.class));
+        profile.setLifestyle(parseEnum(formData.get("lifestyle"), Lifestyle.class));
         profile.setMotivation(parseEnum(formData.get("motivation"), Motivation.class));
         profile.setFriend_type(parseEnum(formData.get("friend_type"), FriendType.class));
-        profile.setTop_interests(blankToNull(formData.get("top_interests")));
+        profile.setTop_interests(parseEnum(formData.get("top_interests"), TopInterest.class));
 
-        profile.setRelationship_goal(blankToNull(formData.get("relationship_goal")));
-        profile.setRelationship_personality(blankToNull(formData.get("relationship_personality")));
-        profile.setRelationship_communication_style(blankToNull(formData.get("relationship_communication_style")));
-        profile.setRelationship_texting_style(blankToNull(formData.get("relationship_texting_style")));
-        profile.setRelationship_free_time(blankToNull(formData.get("relationship_free_time")));
-        profile.setRelationship_value(blankToNull(formData.get("relationship_value")));
-        profile.setRelationship_conflict_style(blankToNull(formData.get("relationship_conflict_style")));
-        profile.setRelationship_lifestyle(blankToNull(formData.get("relationship_lifestyle")));
-        profile.setRelationship_ambition_importance(blankToNull(formData.get("relationship_ambition_importance")));
-        profile.setRelationship_care_style(blankToNull(formData.get("relationship_care_style")));
-        profile.setRelationship_personal_space(blankToNull(formData.get("relationship_personal_space")));
-        profile.setRelationship_date_activity(blankToNull(formData.get("relationship_date_activity")));
-        profile.setRelationship_social_life(blankToNull(formData.get("relationship_social_life")));
-        profile.setRelationship_humor_style(blankToNull(formData.get("relationship_humor_style")));
-        profile.setRelationship_strength(blankToNull(formData.get("relationship_strength")));
+        profile.setRelationship_goal(parseEnum(formData.get("relationship_goal"), RelationshipGoal.class));
+        profile.setRelationship_personality(parseEnum(formData.get("relationship_personality"), RelationshipPersonality.class));
+        profile.setRelationship_communication_style(parseEnum(formData.get("relationship_communication_style"), RelationshipCommunicationStyle.class));
+        profile.setRelationship_texting_style(parseEnum(formData.get("relationship_texting_style"), RelationshipTextingStyle.class));
+        profile.setRelationship_free_time(parseEnum(formData.get("relationship_free_time"), RelationshipFreeTime.class));
+        profile.setRelationship_value(parseEnum(formData.get("relationship_value"), RelationshipValue.class));
+        profile.setRelationship_conflict_style(parseEnum(formData.get("relationship_conflict_style"), RelationshipConflictStyle.class));
+        profile.setRelationship_lifestyle(parseEnum(formData.get("relationship_lifestyle"), RelationshipLifestyle.class));
+        profile.setRelationship_ambition_importance(parseEnum(formData.get("relationship_ambition_importance"), RelationshipAmbitionImportance.class));
+        profile.setRelationship_care_style(parseEnum(formData.get("relationship_care_style"), RelationshipCareStyle.class));
+        profile.setRelationship_personal_space(parseEnum(formData.get("relationship_personal_space"), RelationshipPersonalSpace.class));
+        profile.setRelationship_date_activity(parseEnum(formData.get("relationship_date_activity"), RelationshipDateActivity.class));
+        profile.setRelationship_social_life(parseEnum(formData.get("relationship_social_life"), RelationshipSocialLife.class));
+        profile.setRelationship_humor_style(parseEnum(formData.get("relationship_humor_style"), RelationshipHumorStyle.class));
+        profile.setRelationship_strength(parseEnum(formData.get("relationship_strength"), RelationshipStrength.class));
 
-        profile.setLooking_for_short_term_relationship("CASUAL_DATING".equals(formData.get("relationship_goal")));
-        profile.setMin_partner_age(18);
-        profile.setMax_partner_age(99);
+        profile.setLooking_for_short_term_relationship(parseBoolean(formData.get("looking_for_short_term_relationship")));
+        profile.setMin_partner_age(parseInteger(formData.get("min_partner_age")));
+        profile.setMax_partner_age(parseInteger(formData.get("max_partner_age")));
+        profile.setPartner_gender(parseEnum(formData.get("partner_gender"), Gender.class));
 
+        profile.setBuddy_area_of_study(parseEnum(formData.get("buddy_area_of_study"), StudyField.class));
+        profile.setBuddy_min_year_of_study(parseInteger(formData.get("buddy_min_year_of_study")));
+        profile.setBuddy_max_year_of_study(parseInteger(formData.get("buddy_max_year_of_study")));
         profile.setStudy_buddy_program(blankToNull(formData.get("study_buddy_program")));
-        profile.setStudy_buddy_gender_preference(blankToNull(formData.get("study_buddy_gender_preference")));
+        profile.setStudy_buddy_gender_preference(parseEnum(formData.get("study_buddy_gender_preference"), Gender.class));
 
         String[] enteredCourses = request.getParameterValues("study_buddy_course");
         if (enteredCourses != null) {
@@ -195,17 +233,39 @@ public class ProfileController {
         MatchingProfile matchingProfile = matchingProfileService.getProfileByUser(profileUser);
         boolean hasQuestionnaire = matchingProfile != null;
 
-        Integer matchScore = null;
-        if (!isOwnProfile && hasQuestionnaire && matchingProfile.isDisplay_friendship_profile() && viewer != null) {
+        Integer friendshipMatchScore = null;
+        Integer relationshipMatchScore = null;
+        Integer studyBuddyMatchScore = null;
+
+        if (!isOwnProfile && hasQuestionnaire && viewer != null) {
             MatchingProfile viewerProfile = matchingProfileService.getProfileByUser(viewer);
+
             if (viewerProfile != null) {
-                try {
-                    matchScore = MatchingAlgorithm.friendshipMatch(viewerProfile, matchingProfile);
-                    if (matchScore < 0) {
-                        matchScore = 0;
+                if (matchingProfile.isDisplay_friendship_profile()
+                        && viewerProfile.isDisplay_friendship_profile()) {
+                    try {
+                        friendshipMatchScore = MatchingAlgorithm.friendshipMatch(viewerProfile, matchingProfile);
+                    } catch (RuntimeException e) {
+                        friendshipMatchScore = null;
                     }
-                } catch (RuntimeException e) {
-                    matchScore = null;
+                }
+
+                if (matchingProfile.isDisplay_dating_profile()
+                        && viewerProfile.isDisplay_dating_profile()) {
+                    try {
+                        relationshipMatchScore = MatchingAlgorithm.relationshipMatch(viewerProfile, matchingProfile);
+                    } catch (RuntimeException e) {
+                        relationshipMatchScore = null;
+                    }
+                }
+
+                if (matchingProfile.isDisplay_study_buddy_profile()
+                        && viewerProfile.isDisplay_study_buddy_profile()) {
+                    try {
+                        studyBuddyMatchScore = MatchingAlgorithm.studyBuddyMatch(viewerProfile, matchingProfile);
+                    } catch (RuntimeException e) {
+                        studyBuddyMatchScore = null;
+                    }
                 }
             }
         }
@@ -215,8 +275,29 @@ public class ProfileController {
         model.addAttribute("isOwnProfile", isOwnProfile);
         model.addAttribute("matchingProfile", matchingProfile);
         model.addAttribute("hasQuestionnaire", hasQuestionnaire);
-        model.addAttribute("matchScore", matchScore);
+        model.addAttribute("friendshipMatchScore", friendshipMatchScore);
+        model.addAttribute("relationshipMatchScore", relationshipMatchScore);
+        model.addAttribute("studyBuddyMatchScore", studyBuddyMatchScore);
+        model.addAttribute("studyBuddyCourses", parseStoredCourses(
+            hasQuestionnaire ? matchingProfile.getStudy_buddy_courses() : null
+        ));
         return "profile";
+    }
+
+    private List<String> parseStoredCourses(String storedCourses) {
+        List<String> courses = new ArrayList<>();
+
+        if (storedCourses == null || storedCourses.isBlank()) {
+            return courses;
+        }
+
+        for (String course : storedCourses.split(",")) {
+            if (course != null && !course.isBlank()) {
+                courses.add(course.trim());
+            }
+        }
+
+        return courses;
     }
 
     private String blankToNull(String value) {
@@ -237,6 +318,19 @@ public class ProfileController {
         }
     }
 
+    private Boolean parseBoolean(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        if ("true".equalsIgnoreCase(value)) {
+            return Boolean.TRUE;
+        }
+        if ("false".equalsIgnoreCase(value)) {
+            return Boolean.FALSE;
+        }
+        return null;
+    }
+
     private <T extends Enum<T>> T parseEnum(String value, Class<T> enumType) {
         try {
             if (value == null || value.isBlank()) {
@@ -249,7 +343,20 @@ public class ProfileController {
     }
 
     private boolean basicProfileComplete(Map<String, String> formData) {
-        return allPresent(formData, "age", "year_of_study", "study_field");
+        return allPresent(formData,
+            "age",
+            "year_of_study",
+            "study_field",
+            "has_job",
+            "regularly_goes_to_gym",
+            "favourite_sport",
+            "preferred_venue",
+            "hobby1",
+            "hobby2",
+            "hobby3",
+            "hobby4",
+            "hobby5"
+        );
     }
 
     private boolean friendshipComplete(Map<String, String> formData) {
@@ -288,17 +395,39 @@ public class ProfileController {
             "relationship_date_activity",
             "relationship_social_life",
             "relationship_humor_style",
-            "relationship_strength"
-        );
+            "relationship_strength",
+            "looking_for_short_term_relationship",
+            "min_partner_age",
+            "max_partner_age",
+            "partner_gender"
+        ) && validPartnerAgeRange(formData);
+    }
+
+    private boolean validPartnerAgeRange(Map<String, String> formData) {
+        Integer minAge = parseInteger(formData.get("min_partner_age"));
+        Integer maxAge = parseInteger(formData.get("max_partner_age"));
+        return minAge != null && maxAge != null && minAge >= 18 && maxAge >= minAge;
     }
 
     private boolean studyBuddyComplete(Map<String, String> formData, HttpServletRequest request) {
-        if (!allPresent(formData, "study_buddy_program", "study_buddy_gender_preference", "class_count")) {
+        if (!allPresent(formData,
+                "buddy_area_of_study",
+                "buddy_min_year_of_study",
+                "buddy_max_year_of_study",
+                "study_buddy_program",
+                "study_buddy_gender_preference",
+                "class_count")) {
             return false;
         }
 
         Integer classCount = parseInteger(formData.get("class_count"));
         if (classCount == null || classCount < 1 || classCount > 6) {
+            return false;
+        }
+
+        Integer buddyMinYear = parseInteger(formData.get("buddy_min_year_of_study"));
+        Integer buddyMaxYear = parseInteger(formData.get("buddy_max_year_of_study"));
+        if (buddyMinYear == null || buddyMaxYear == null || buddyMinYear < 1 || buddyMaxYear < buddyMinYear) {
             return false;
         }
 

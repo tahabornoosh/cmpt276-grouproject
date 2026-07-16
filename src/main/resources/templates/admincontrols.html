@@ -1,0 +1,127 @@
+<th:block th:replace="~{fragments/layout :: head('Admin Controls')}"></th:block>
+<th:block th:replace="~{fragments/layout :: bodyStart}"></th:block>
+<input type="hidden" id="activeMenuItem" name="activeMenuItem" value="menu-data-tables" />
+
+<main class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>
+            Admin Controls for <span th:text="${u.first_name}"></span>
+            <span th:text="${u.last_name}"></span>
+          </h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item active">Admin Controls</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="alert alert-danger" hidden id="error">An error occured</div>
+    <div class="alert alert-success" hidden id="success">Success</div>
+    <div class="container-fluid">
+      <div class="cold" style="width: 100%">
+        <div class="card card-warning card-outline mb-4">
+          <div class="card-header">
+            <div class="card-title">Role Change</div>
+          </div>
+          <form method="post" th:object="${u}" th:action="@{/account/admincontrols/{id}(id=${u.id})}">
+            <div class="card-body">
+              <div class="row mb-3">
+                <label for="role" class="col-sm-2 col-form-label">Role</label>
+                <select class="form-control" id="select-default" th:field="*{role}">
+                  <option th:each="r : ${roles}" th:value="${r}" th:text="${r}">
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="card-footer">
+              <button type="submit" class="btn btn-warning">Chang Role</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card card-danger card-outline mb-4">
+          <div class="card-header">
+            <div class="card-title">Delete User</div>
+          </div>
+          <form method="post" th:object="${u}" th:action="@{/account/admincontrols/{id}(id=${u.id})}">
+            <div class="card-body">
+              <div class="alert alert-danger">
+                This will permanently delete <span
+                    th:text="${u.first_name}"></span> <span th:text="${u.last_name}"></span>'s account and their
+                  profile. This is not reversible.
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-10 offset-sm-2">
+                  <div class="form-check">
+                    <input required name="delete" value="1" class="form-check-input" type="checkbox" id="delete">
+                    <label class="form-check-label" for="delete">I understand. Delete the account.</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <button type="submit" class="btn btn-danger">Delete User</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      if (window.jQuery && window.jQuery.fn.DataTable) {
+        $("#exampleTable")
+          .DataTable({
+            responsive: true,
+            lengthChange: false,
+            autoWidth: false,
+            buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
+          })
+          .buttons()
+          .container()
+          .appendTo("#exampleTable_wrapper .col-md-6:eq(0)");
+      }
+    });
+  </script>
+</main>
+
+<th:block th:replace="~{fragments/layout :: bodyEnd}"></th:block>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+
+  const err = urlParams.get('error');
+  const succ = urlParams.get('success');
+
+  const errors = {
+    "1": "An error Occured",
+    "2": "Error: Record Not Found"
+  }
+
+  const successes = {
+    "1": "Success"
+  }
+
+  let text = errors[err];
+  if (text) {
+    document.getElementById("error").hidden = false;
+    document.getElementById("error").innerHTML = text;
+    history.replaceState({}, "", window.location.pathname);
+  }
+
+  text = successes[succ];
+  if (text) {
+    document.getElementById("success").hidden = false;
+    document.getElementById("success").innerHTML = text;
+    history.replaceState({}, "", window.location.pathname);
+  }
+</script>

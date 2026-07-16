@@ -4,6 +4,7 @@ import com.cmpt276.group3.grouproject.auth.Auth;
 import com.cmpt276.group3.grouproject.enums.Gender;
 import com.cmpt276.group3.grouproject.enums.Role;
 import com.cmpt276.group3.grouproject.models.User;
+import com.cmpt276.group3.grouproject.models.MatchingProfileRepository;
 import com.cmpt276.group3.grouproject.models.UsersRepository;
 import com.cmpt276.group3.grouproject.services.UserService;
 
@@ -35,6 +36,9 @@ public class AdminControllerTest {
 
     @MockitoBean
     private UserService userService;
+
+    @MockitoBean
+    private MatchingProfileRepository matchingProfileRepository;
 
     private MockHttpSession session;
     private User adminUser;

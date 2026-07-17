@@ -8,7 +8,7 @@ import jakarta.persistence.*;
 @Table(name = "chat_messages")
 public class ChatMessage {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY);
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

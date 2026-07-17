@@ -77,7 +77,7 @@
                       <select required name="stream" id="type" class="form-control">
                         <option value="FRIENDSHIP">Friendship EOI</option>
                         <option value="RELATIONSHIP">Relationship EOI</option>
-                        <option value="STUDY-BUDDY">Study-Buddies EOI</option>
+                        <option value="STUDY_BUDDY">Study-Buddies EOI</option>
                       </select>
                     </div>
                     <button style="width:100%" type="submit" class="btn btn-primary">Send Expression of
@@ -452,6 +452,11 @@
   if (err == "2") {
     document.getElementById("error").hidden = false;
     document.getElementById("error").innerHTML = "You have already sent a pending EOI to this user. Please wait for a response.";
+    history.replaceState({}, "", window.location.pathname);
+  }
+  if (err == "3") {
+    document.getElementById("error").hidden = false;
+    document.getElementById("error").innerHTML = "Your Profiles are Incomplete or Incompatibe for the chosen stream.";
     history.replaceState({}, "", window.location.pathname);
   }
   if (succ == "1") {

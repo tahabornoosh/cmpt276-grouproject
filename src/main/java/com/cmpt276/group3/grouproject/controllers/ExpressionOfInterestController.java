@@ -1,9 +1,12 @@
 package com.cmpt276.group3.grouproject.controllers;
 
+import com.cmpt276.group3.grouproject.algorithms.MatchingAlgorithm;
 import com.cmpt276.group3.grouproject.auth.Auth;
 import com.cmpt276.group3.grouproject.enums.EOIStream;
 import com.cmpt276.group3.grouproject.models.ExpressionOfInterest;
 import com.cmpt276.group3.grouproject.models.ExpressionOfInterestRepository;
+import com.cmpt276.group3.grouproject.models.MatchingProfile;
+import com.cmpt276.group3.grouproject.models.MatchingProfileRepository;
 import com.cmpt276.group3.grouproject.models.User;
 import com.cmpt276.group3.grouproject.models.UsersRepository;
 
@@ -26,15 +29,18 @@ public class ExpressionOfInterestController {
     private final Auth auth;
     private final ExpressionOfInterestRepository expressionOfInterestRepository;
     private final UsersRepository usersRepository;
+    private final MatchingProfileRepository matchingProfileRepository;
 
     public ExpressionOfInterestController(
             Auth auth,
             ExpressionOfInterestRepository expressionOfInterestRepository,
-            UsersRepository usersRepository
+            UsersRepository usersRepository,
+            MatchingProfileRepository matchingProfileRepository
             ) {
         this.auth = auth;
         this.expressionOfInterestRepository = expressionOfInterestRepository;
         this.usersRepository = usersRepository;
+        this.matchingProfileRepository = matchingProfileRepository;
     }
 
     @GetMapping("/eois")
@@ -142,6 +148,18 @@ public class ExpressionOfInterestController {
         Optional<User> u = usersRepository.findById(id);
         if (u.isEmpty()) return "redirect:/?error=1"; // not found
         User profileUser = u.get();
+
+        MatchingProfile base = null;
+        MatchingProfile target = null;
+        try {
+            base = matchingProfileRepository.findByUser(currentUser).get();
+            target = matchingProfileRepository.findByUser(profileUser).get();
+        } catch (Exception e) {
+            return "redirect:/profile/"+String.valueOf(id)+"?error=3";
+        }
+        if (chosenStream == EOIStream.RELATIONSHIP && MatchingAlgorithm.relationshipMatch(base, target)==-1
+        || chosenStream == EOIStream.STUDY_BUDDY && MatchingAlgorithm.studyBuddyMatch(base, target)==-1)
+            return "redirect:/profile/"+String.valueOf(id)+"?error=3";
 
         List<ExpressionOfInterest> eois = expressionOfInterestRepository.findAll();
         for (ExpressionOfInterest e:eois) {

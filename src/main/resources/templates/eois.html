@@ -16,6 +16,14 @@
 
   <section class="content">
     <div class="container-fluid">
+      <div class="alert alert-secondary">
+        <h5>Glossary of Operations</h5>
+        <ul>
+          <li hidden><b>Start chat:</b> Deletes the EOI and redirects you to a chat window with the sender so you can connect.</li>
+          <li><b>Hide/Unhide: </b>Moves the EOI in/out of the hidden EOIs section below the main EOIs table. If you hide an EOI, you won't see it in the main table and the sender will not be able to send another one until you delete or respond to the hidden EOI. You can un-hide EOIs at any time.</li>
+          <li><b>Delete: </b>This permanently deletes the EOI. The sender can send you a new EOI any time after deletion</li>
+        </ul>
+      </div>
 
       <div th:if="${param.success != null}" class="alert alert-success">
         Operation Successful

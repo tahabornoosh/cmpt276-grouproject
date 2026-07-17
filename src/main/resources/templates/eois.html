@@ -17,13 +17,11 @@
   <section class="content">
     <div class="container-fluid">
 
-      <div th:if="${param.success != null}"
-           class="alert alert-success">
-        Expression of interest deleted successfully.
+      <div th:if="${param.success != null}" class="alert alert-success">
+        Operation Successful
       </div>
 
-      <div th:if="${param.error != null}"
-           class="alert alert-danger">
+      <div th:if="${param.error != null}" class="alert alert-danger">
         The expression of interest could not be found or does not belong to you.
       </div>
 
@@ -33,15 +31,12 @@
         </div>
 
         <div class="card-body">
-          <div th:if="${#lists.isEmpty(eois)}"
-               class="alert alert-info mb-0">
+          <div th:if="${#lists.isEmpty(eois)}" class="alert alert-info mb-0">
             You currently have no outstanding expressions of interest.
           </div>
 
-          <div th:unless="${#lists.isEmpty(eois)}"
-               class="table-responsive">
-            <table id="eoisTable"
-                   class="table table-bordered table-striped">
+          <div th:unless="${#lists.isEmpty(eois)}" class="table-responsive">
+            <table id="eoisTable" class="table table-bordered table-striped">
               <thead>
                 <tr>
                   <th>From</th>
@@ -56,15 +51,11 @@
                   <td>
                     <img th:src="${eoi.sender.avatar != null && !eoi.sender.avatar.isEmpty()}
                                   ? ${eoi.sender.avatar}
-                                  : @{/user.png}"
-                         src="/user.png"
-                         alt="User avatar"
-                         class="img-circle mr-2"
-                         width="40"
-                         height="40">
+                                  : @{/user.png}" src="/user.png" alt="User avatar" class="img-circle mr-2" width="40"
+                      height="40">
 
                     <a th:href="@{/profile/{id}(id=${eoi.sender.id})}"
-                       th:text="${eoi.sender.first_name + ' ' + eoi.sender.last_name}">
+                      th:text="${eoi.sender.first_name + ' ' + eoi.sender.last_name}">
                       Sender Name
                     </a>
                   </td>
@@ -78,18 +69,21 @@
                   </td>
 
                   <td>
-                    <a th:href="@{/chat(userId=${eoi.sender.id})}"
-                       class="btn btn-primary btn-sm">
+                    <a hidden th:href="@{/chat(userId=${eoi.sender.id})}" class="btn btn-primary btn-sm">
                       <i class="fas fa-comment"></i>
                       Start Chat
                     </a>
 
-                    <form th:action="@{/eois/{id}/delete(id=${eoi.id})}"
-                          method="post"
-                          class="d-inline"
-                          onsubmit="return confirm('Delete this expression of interest?');">
-                      <button type="submit"
-                              class="btn btn-danger btn-sm">
+                    <form th:action="@{/eois/{id}/hide(id=${eoi.id})}" method="post" class="d-inline">
+                      <button type="submit" class="btn btn-warning btn-sm">
+                        <i class="fas fa-eye"></i>
+                        Hide
+                      </button>
+                    </form>
+
+                    <form th:action="@{/eois/{id}/delete(id=${eoi.id})}" method="post" class="d-inline"
+                      onsubmit="return confirm('Delete this expression of interest?');">
+                      <button type="submit" class="btn btn-danger btn-sm">
                         <i class="fas fa-trash"></i>
                         Delete
                       </button>
@@ -101,7 +95,82 @@
           </div>
         </div>
       </div>
-    </div>
+      <div id="accordion">
+        <div class="card">
+          <div class="card-header" id="headingOne">
+            <h5 class="mb-0">
+              <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false"
+                aria-controls="collapseOne">
+                Hidden EOIs
+              </button>
+            </h5>
+          </div>
+
+          <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+            <div class="card-body">
+                      <div class="card-body">
+          <div th:if="${#lists.isEmpty(eois_hidden)}" class="alert alert-info mb-0">
+            No hidden EOIs
+          </div>
+
+          <div th:unless="${#lists.isEmpty(eois_hidden)}" class="table-responsive">
+            <table id="eoisTable" class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th>From</th>
+                  <th>Stream</th>
+                  <th>Received</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr th:each="eoi : ${eois_hidden}">
+                  <td>
+                    <img th:src="${eoi.sender.avatar != null && !eoi.sender.avatar.isEmpty()}
+                                  ? ${eoi.sender.avatar}
+                                  : @{/user.png}" src="/user.png" alt="User avatar" class="img-circle mr-2" width="40"
+                      height="40">
+
+                    <a th:href="@{/profile/{id}(id=${eoi.sender.id})}"
+                      th:text="${eoi.sender.first_name + ' ' + eoi.sender.last_name}">
+                      Sender Name
+                    </a>
+                  </td>
+
+                  <td th:text="${eoi.stream.displayName}">
+                    Friendship
+                  </td>
+
+                  <td th:text="${#temporals.format(eoi.createdAt, 'MMM d, yyyy h:mm a')}">
+                    Jul 16, 2026 3:00 PM
+                  </td>
+
+                  <td>
+                    <form th:action="@{/eois/{id}/hide(id=${eoi.id})}" method="post" class="d-inline">
+                      <button type="submit" class="btn btn-warning btn-sm">
+                        <i class="fas fa-eye"></i>
+                        Un-hide
+                      </button>
+                    </form>
+
+                    <form th:action="@{/eois/{id}/delete(id=${eoi.id})}" method="post" class="d-inline"
+                      onsubmit="return confirm('Delete this expression of interest?');">
+                      <button type="submit" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash"></i>
+                        Delete
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+            </div>
+          </div>
+        </div>
+      </div>
   </section>
 </main>
 

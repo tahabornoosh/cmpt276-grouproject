@@ -553,7 +553,7 @@ Joyce opens the profile page for Mike (through any route), and sees an option to
 - An EOI sent in the friends stream should succeed if both users have completed their friendship sections of the questionnair (since friendship scores cannot be "Incompatible")
 - An EOI successfuly sent should create a database record and be visible in the other user's EOIs page
 
-## Case: Viewing EOIs (2 points)
+## Case: Viewing EOIs (3 points)
 **Personas/Actors**
 1. Primary actor: Mike - a second-year SFU student
 2. Secondary actor: Joyce - a second-year SFU student
@@ -577,4 +577,30 @@ Mike should see a list of outstanding EOIs, including Joyce's EOI. He should als
 **Tests**
 - An EOI sent by Joyce to Mike but not opened by Mike should be viewable in Mike's EOIs page.
 - An EOI which has been opened should no longer be visible in Mike's EOIs page
+
+## Case: Using Feeds (3 points)
+**Personas/Actors**
+1. Primary actor: Mike - a second-year SFU student
+2. Secondary actors: Other users of the app
+
+**Pre-conditions**
+- All parties must have active accounts
+- Mike must be logged in and have completed at least one section of his profile
+
+**Actions/Triggers**
+Mike clicks on "Feeds" in the menu from any page in the app, and chooses the stream from the sub-menu that opens. He is then redirected to one of three feeds (friendships, relationships, study buddies)
+
+**Acceptance Criteria**
+- If mike has completed and enabled the stream in question in his questionnair, then he should see a list of users who have also completed that section of their questionnair, with their name and avatar on the left side, and match scores and a "view profile" button to the right of each record. The list should be ordered from the highest score to lowest score.
+- If mike has not completed the given stream in his questionnair, he should see an error message with a link to his questionnair (to potentially complete it)
+
+**Post-conditions**
+- None
+**Non-functional requirements**
+- All pages should load in less than one second
+- The error message should be informative and easy to understand
+
+**Tests**
+- If Mike has completed and enabled the relationships section in his questionnair, then he should see a list of potential matches when he opens his relationships feed.
+- If Mike has disabled his studdy-buddies section in his questionnair, then he should see an error message when he opens his study-buddies feed.
 </div>

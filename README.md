@@ -13,6 +13,7 @@ A friend-finding (and more!) app dedicated to the SFU community. CMPT 276 group 
 - List of Epics
 - Group members
 - Citations and Acknowledgements
+- Iteration 1 Notes
 - **User Stories and Use Cases**
 
 ## Abstract
@@ -121,9 +122,28 @@ See `docs/DECLARATIONS.md` in project repository
 ## Meeting Notes
 See `docs/meeting-notes` in project repository
 
+# Iteration Reflections
+## Iteration 1
+
+- Total story points completed: 21
+- Average velocity: 10.5 points/week
+- Week 1 velocity: 0 points/week (spent setting up templates, models, etc)
+- Week 2 velocity: 21 points/week
+
+**Process Improvement**
+- We did too much of the work in the second half of the iteration, which led to a high workload towards the end.
+- Having different people do different parts of the same feature (e.g., template and controller) led to inconsistencies and issues and was avoided in iteration 2.
+- We did not review PRs very thoroughly (primairly because of the first point) which led to errors being pushed to main in two occasions. This was avoided in iteration 2.
+
 # User Stories
 
-## Case: Auth-wall
+**Colors: blue-iteration 1, green-iteration 2, red-iteration 3**
+<div style='color:LightBlue'>
+
+## Case: Auth-wall (1 point)
+**Iteration**
+Completed in Iteration 1.
+
 **Personas/Actors**
 1. Primary actor: Jane - a random person
 
@@ -148,7 +168,10 @@ Jane attempts to go to the app's dashboard or other authenticated page by openin
 - An unauthenticated user sending a request to the application root (dashboard) should be redirected to `/login`
 - An authenticated user sending a request to the application root should get a 200-level result code and should not be redirected.
 
-## Case: Sign-up
+## Case: Sign-up (3 points)
+**Iteration**
+Completed in Iteration 1.
+
 **Personas/Actors**
 1. Primary actor: Mike - Second-year SFU student looking to meet new friends
 2. Secondary actor: Jane - Second-year SFU student already using the app to find new friends
@@ -181,7 +204,10 @@ Mike then enters his information and clicks Submit to create his account.
 - Using the email address "mikesfuca" in the first test scenario be rejected and redirected back to the sign-up page with an error message
 
 
-## Case: Log in
+## Case: Log in (2 points)
+**Iteration**
+Completed in Iteration 1.
+
 **Personas/Actors**
 1. Primary actor: John - a Second-year SFU student
 
@@ -210,7 +236,10 @@ He then enters his username and password and clicks on the Log in button.
 - Any of wrong password, wrong email, or both, should result redirection back to the login page. No session variable should be set.
 - Empty email, password or both should stop login attempt and display a message notifying the user that the fields should not be empty. No session variable should be set.
 
-## Case: Dashboard Loading
+## Case: Dashboard Loading (2 points)
+**Iteration**
+Completed in Iteration 1.
+
 **Personas/Actors**
 1. Primary actor: John - a Second-year SFU student
 
@@ -237,7 +266,10 @@ John logs into the app and is redirected to the dashboard page, or clicks on the
 - A non-admin, non-moderator user who is logged in and opens the dashboard must not see a role banner or links to the admin panel
 - An admin user must see a link to the admin panel in the menu as well as a role banner
 
-## Case: Accessing Admin Panel by Role
+## Case: Accessing Admin Panel by Role (2 points)
+**Iteration**
+Completed in Iteration 1.
+
 **Personas/Actors**
 1. Primary actor: Jason - App Admin
 2. Secondary actor: Alice - App Moderator
@@ -276,7 +308,10 @@ John logs into the app and is redirected to the dashboard page, or clicks on the
 - An unauthenticated user attempting to access admin controls should be redirected to log in
 - A moderator attempting to use admin-only controls should be denied
 
-## Case: Log out
+## Case: Log out (1 point)
+**Iteration**
+Completed in Iteration 1.
+
 **Personas/Actors**
 1. Primary actor: Albert - Second year sfu student
 
@@ -303,7 +338,12 @@ Albert, when logged into the app, presses the Log out link on the App's top menu
 - After logout, the user's session should be removed
 - After logout, attempting to access dashboard should redirect to login page
 
-## Case: Questionnair Completion
+## Case: Questionnair Completion (5 points)
+**Iteration**
+
+- Primairly completed in Iteration 1 (4 points)
+- <span style='color:LightGreen'>Some more questions added in Iteration 2 (1 point)</span>
+
 **Personas/Actors**
 1. Primary actor: Ryan - a second-year SFU student looking to make friends
 
@@ -329,7 +369,10 @@ Ryan fills out the required fields, selects what specific sections (friendship, 
 - A fully complete questionnair must be accepted and result in a record update/creation
 - If the user has indicated that they would like to have a friendship profile and then leaves friendship questions empty, their input must be rejected and they should get an error message.
 
-## Case: Questionnair Loading
+## Case: Questionnair Loading (2 points)
+**Iteration**
+Completed in Iteration 1.
+
 **Personas/Actors**
 1. Primary actor: Ryan - a second-year SFU student looking to make friends
 
@@ -354,7 +397,10 @@ Ryan clicks on the questionnair link from his own profile page
 - A user who has not yet completed the survey must see an empty form
 
 
-## Case: Edit page loading
+## Case: Edit page loading (1 point)
+**Iteration**
+Completed in Iteration 1.
+
 **Personas/Actors**
 1. Primary actor: Joyce - a second-year SFU student
 2. Secondary actor(s): the user(s) whose accounts are being edited
@@ -383,7 +429,10 @@ Joyce either clicks on the associated button on her landing page, or clicks "edi
 - An admin should be able to open any existing user's edit page
 - An admin should see a 404 error page if attempting to open a non-existing user's edit page
 
-## Case: Edit page loading functionality
+## Case: Edit page functionality (2 points)
+**Iteration**
+Completed in Iteration 1.
+
 **Personas/Actors**
 1. Primary actor: Joyce - a second-year SFU student
 2. Secondary actor(s): the user(s) whose accounts are being edited
@@ -413,7 +462,10 @@ Joyce enters values for first name, last name, gender, and possibly password, an
 - An entry missing the password field (only) should result in updates to all other query fields, but not password.
 
 
-## Case: Profile Viewing
+## Case: Profile Viewing (2 points)
+**Iteration**
+Completed in Iteration 1.
+
 **Personas/Actors**
 1. Primary actor: Joyce - a second-year SFU student
 2. Secondary actor: Joyce's friend - sends her the link to their profile
@@ -423,13 +475,12 @@ Joyce enters values for first name, last name, gender, and possibly password, an
 - Joyce must have completed the profile questionnair
 
 **Actions/Triggers**
-Joyce opens the profile page for a user by opening a URL sent to them by a friend (in the future this will also happen through feeds)
+Joyce opens the profile page for a user by opening a URL sent to them by a friend
 
 **Acceptance Criteria**
 - If the user exists, but they have not yet completed the profile, then Joyce must see only their name and gender.
 - If the user exists and has completed the questionnair, then Joyce must see their answers to the questionnair questions as well as their name and gender, subject to that user's preferences for displaying friendship, dating, or study-buddy-related profile sections.
 - If the user does not exist, then a 404 error page must be displayed to Joyce
-- If the user exists, has completed their profile, and is not Joyce herself, then a friendship match percentage must be displayed ranging from 40% to 100% (will be changed to (-1%)-102% in later iterations)
 - If the profile belongs to Joyce herself, she should see a link to complete or modify her questionnair at the top of the page
 **Post-conditions**
 - None
@@ -441,3 +492,89 @@ Joyce opens the profile page for a user by opening a URL sent to them by a frien
 - The profile URL for a non-existing user must result in a 404 error.
 - An existing user's profile URL should not return a 404 error, even if the questionnair is not completed
 - An existing user's profile should display their 5 selected hobbies if they have completed the questionnair
+<div>
+<div style='color:LightGreen'>
+
+## Case: Profile Scores (2 points)
+**Iteration**
+Completed in Iteration 2.
+
+**Personas/Actors**
+1. Primary actor: Joyce - a second-year SFU student
+2. Secondary actor: Mike, Joyce's friend
+
+**Pre-conditions**
+- Joyce must have an active account and must be logged in
+- Joyce must have completed the profile questionnair
+- Mike must have an active account
+
+**Actions/Triggers**
+
+Joyce opens the profile page for Mike either through feeds or through a URL sent to her
+
+**Acceptance Criteria**
+- For questionnair sections (except friendship) that have been completed and enabled by both users, a score ranging from "Incompatible" to 102% should be displayed. These scores should be obtained from the questionnairs of both users and indicate similarity and compatibility between the profiles, for each stream.
+- The friends stream score should never be "Incompatible", and should instead range from 0% to 102%.
+
+**Post-conditions**
+- None
+
+**Non-functional requirements**
+- All pages should load in less than one second
+
+**Tests**
+- If Joyce has not completed the relationships section in her questionnair, then she should not see a relationship score on Mike's profile
+- If Mike has disabled the study-buddies section of his questionnair, then Joyce should not see a study-buddies score in his profile page
+
+## Case: Sending EOIs (expressions of interest) (2 points)
+**Personas/Actors**
+1. Primary actor: Joyce - a second-year SFU student
+2. Secondary actor: Joyce's potential future friend/partner/study buddy, Mike
+
+**Pre-conditions**
+- Joyce and Mike both must have active accounts. Joyce must be logged in
+- Joyce and Mike must have completed the profile questionnairs for the stream in question (relationships, friendships, study-buddies)
+
+**Actions/Triggers**
+Joyce opens the profile page for Mike (through any route), and sees an option to send an expression of interest under the scores window and avatars in Mike's profile. She selects the stream she wants, and clicks "send".
+
+**Acceptance Criteria**
+- If both users have completed the section of the questionnair in question and are not incompatible (have a score of -1), then Joyce should see a success message and the EOI should be sent
+- If either user has not completed (or has hidden) their profile for the stream in question, or if the users have a score of (-1) for the given stream, then an error message should be displayed and the EOI should not be sent.
+**Post-conditions**
+- If EOI is sent successfuly, then it should be recorded in the database
+
+**Non-functional requirements**
+- All pages should load in less than one second
+- Error messages must be clear and easy to understand
+
+**Tests**
+- An EOI for relationships should not succeed and should result in an error message if the other user's relationships section of the questionnair has not been completed.
+- An EOI sent in the friends stream should succeed if both users have completed their friendship sections of the questionnair (since friendship scores cannot be "Incompatible")
+- An EOI successfuly sent should create a database record and be visible in the other user's EOIs page
+
+## Case: Viewing EOIs (2 points)
+**Personas/Actors**
+1. Primary actor: Mike - a second-year SFU student
+2. Secondary actor: Joyce - a second-year SFU student
+
+**Pre-conditions**
+- Joyce and Mike both must have active accounts. Mike must be logged in
+- Joyce and Mike must have completed the profile questionnairs for the stream in question (relationships, friendships, study-buddies)
+- Joyce must have sent mike an EOI
+
+**Actions/Triggers**
+Mike clicks on the "EOIs" menu item from anywhere in the app and goes to his EOIs page.
+
+**Acceptance Criteria**
+Mike should see a list of outstanding EOIs, including Joyce's EOI. He should also see two options next to each: start chat and delete. "Start chat" should open a new chat (or the users' existing chat) and delete the EOI, while the "delete" button should just delete the EOI.
+**Post-conditions**
+- If EOI is opened (by pressing "start chat" or "delete") successfuly, then it should be deleted from the database
+
+**Non-functional requirements**
+- All pages should load in less than one second
+
+**Tests**
+- An EOI sent by Joyce to Mike but not opened by Mike should be viewable in Mike's EOIs page.
+- An EOI which has been opened should no longer be visible in Mike's EOIs page
+</div>

@@ -10,14 +10,21 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
     
+    private final UserHandshakeHandler userHandshakeHandler;
+
+    public WebSocketConfig(UserHandshakeHandler userHandshakeHandler) {
+        this.userHandshakeHandler = userHandshakeHandler;
+    }
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/queue");
         registry.setApplicationDestinationPrefixes("/app");
+        registry.setUserDestinationPrefix("/user");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws-chat");
+        registry.addEndpoint("/ws-chat").setHandshakeHandler(userHandshakeHandler);
     }
 }

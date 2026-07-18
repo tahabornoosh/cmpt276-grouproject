@@ -10,6 +10,16 @@ import java.util.List;
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
     
     @Query("""
+            SELECT message
+            FROM ChatMessage message
+            WHERE message.sender.id = :userId
+               OR message.recipient.id = :userId
+            ORDER BY message.sentAt DESC
+            """)
+    List<ChatMessage> findMessagesForUser(
+        @Param("userId") long userId
+    );
+    @Query("""
         SELECT message
         FROM ChatMessage message
         WHERE (

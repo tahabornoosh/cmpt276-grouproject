@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import com.cmpt276.group3.grouproject.auth.Auth;
 import com.cmpt276.group3.grouproject.models.ChatMessage;
 import com.cmpt276.group3.grouproject.models.User;
+import com.cmpt276.group3.grouproject.models.UsersRepository;
 import com.cmpt276.group3.grouproject.services.ChatMessageService;
 import com.cmpt276.group3.grouproject.services.UserService;
 import com.cmpt276.group3.grouproject.util.MessageResponse;
@@ -29,28 +30,41 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 public class ChatController {
-    private final ChatMessageRepository chatMessageRepository;
+    private final UsersRepository usersRepository;
     private final Auth auth;
     private final UserService userService;
     private final ChatMessageService chatMessageService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public ChatController(Auth auth, UserService userService, ChatMessageService chatMessageService, SimpMessagingTemplate messagingTemplate, ChatMessageRepository chatMessageRepository) {
+    public ChatController(Auth auth, UserService userService, ChatMessageService chatMessageService, SimpMessagingTemplate messagingTemplate, UsersRepository usersRepository) {
         this.auth = auth;
         this.userService = userService;
         this.chatMessageService = chatMessageService;
         this.messagingTemplate = messagingTemplate;
-        this.chatMessageRepository = chatMessageRepository;
+        this.usersRepository = usersRepository;
     }
 
 
-    @GetMapping("/chat")
-    public String load_chat(HttpSession session, Model model) {
+     @GetMapping("/chat")
+    public String loadChat(HttpSession session, Model model) {
         if (!auth.isLoggedIn(session)) {
             return "redirect:/login";
         }
+
         User currentUser = auth.getUser(session);
+
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        var contacts = usersRepository.findAll()
+                .stream()
+                .filter(user -> user.getId() != currentUser.getId())
+                .toList();
+
         model.addAttribute("currentUser", currentUser);
+        model.addAttribute("contacts", contacts);
+
         return "chat";
     }
 
@@ -59,7 +73,14 @@ public class ChatController {
         SendMessageRequest request,
         Principal principal
     ) {
+        if (principal == null) {
+            throw new IllegalArgumentException(
+                "You must be logged in to send messages"
+            );
+        }
+
         User sender = getCurrentWebSocketUser(principal);
+
 
         ChatMessage savedMessage = 
                 chatMessageService.createMessage(
@@ -68,8 +89,13 @@ public class ChatController {
                     request.content()
                 );
 
-        messagingTemplate.convertAndSendToUser(String.valueOf(savedMessage.getRecipient().getId()),"/queue/messages", savedMessage);
+        MessageResponse response = MessageResponse.from(savedMessage);
 
+        String recipientId = String.valueOf(savedMessage.getRecipient().getId());
+        String senderId = String.valueOf(savedMessage.getSender().getId());
+
+        messagingTemplate.convertAndSendToUser(recipientId, "/queue/messages", response);
+        messagingTemplate.convertAndSendToUser(senderId, "/queue/messages", response);
     }
     
     @GetMapping("/api/chat/messages")

@@ -495,6 +495,48 @@ Joyce opens the profile page for a user by opening a URL sent to them by a frien
 <div>
 <div style='color:LightGreen'>
 
+## Case: Admin Controls (2 points)
+**Iteration**
+Completed in Iteration 2.
+
+**Personas/Actors**
+1. Primary actor: Brad - FriendFinderSFU's admin
+2. Secondary actor: Joyce - a second-year SFU student
+
+**Pre-conditions**
+- Brad must have an admin account and be logged in
+- Brad must be on the admin page
+- Joyce must have an account in the system
+
+**Actions/Triggers**
+
+Brad clicks on the "Delete/Change role" button in the table in the row associated with Joyce's account and is redirected to a page with two forms. 
+
+The first form is to change Joyce's role, and should have a dropdown allowing Brad to choose any role (admin, moderator, or user) and a save button. 
+
+The second form consists of a notice informing Brad that deletion is irreversible, and a checkbox to proceed with deletion, as well as a "delete" button.
+
+**Acceptance Criteria**
+- If Brad has an admin account and Joyce has an existing account, then the admin controls page must load for Joyce in Brad's view.
+- If Brad is no longer an admin, or Joyce's account has been deleted or does not exist, then Brad should be redirected to the dashboard after attempting to access the admin controls
+- If a role change or deletion is done successfuly, then Brad should be redirected to the admin panel with a success message
+- If role change or deletion fails, then Brad should be redirected to the admin panel with an error message
+
+**Post-conditions**
+- If a role change or deletion is done successfuly, then the database record must be modified/deleted accordingly.
+
+**Non-functional requirements**
+- All pages should load in less than one second
+- All notices and error messages should be easy to understand
+
+**Tests**
+- A non-existing user's admin control page access attempt should result in redirection to the dashboard
+- A non-admin user attempting to access an admin controls page should result in a redirection to the dahsboard
+- A role change should result in the database record for the associated user being updated, and redirect the admin to the admin panel with a success message
+- The delete button should not work without the delete confirm checkbox being checked
+- The delete function should remove the database record, and redirect the admin back to the admin panel with an error message
+
+
 ## Case: Profile Scores (2 points)
 **Iteration**
 Completed in Iteration 2.
@@ -527,6 +569,9 @@ Joyce opens the profile page for Mike either through feeds or through a URL sent
 - If Mike has disabled the study-buddies section of his questionnair, then Joyce should not see a study-buddies score in his profile page
 
 ## Case: Sending EOIs (expressions of interest) (2 points)
+**Iteration**
+Completed in Iteration 2.
+
 **Personas/Actors**
 1. Primary actor: Joyce - a second-year SFU student
 2. Secondary actor: Joyce's potential future friend/partner/study buddy, Mike
@@ -554,6 +599,9 @@ Joyce opens the profile page for Mike (through any route), and sees an option to
 - An EOI successfuly sent should create a database record and be visible in the other user's EOIs page
 
 ## Case: Viewing EOIs (3 points)
+**Iteration**
+Completed in Iteration 2.
+
 **Personas/Actors**
 1. Primary actor: Mike - a second-year SFU student
 2. Secondary actor: Joyce - a second-year SFU student
@@ -579,6 +627,9 @@ Mike should see a list of outstanding EOIs, including Joyce's EOI. He should als
 - An EOI which has been opened should no longer be visible in Mike's EOIs page
 
 ## Case: Using Feeds (3 points)
+**Iteration**
+Completed in Iteration 2.
+
 **Personas/Actors**
 1. Primary actor: Mike - a second-year SFU student
 2. Secondary actors: Other users of the app
@@ -603,4 +654,40 @@ Mike clicks on "Feeds" in the menu from any page in the app, and chooses the str
 **Tests**
 - If Mike has completed and enabled the relationships section in his questionnair, then he should see a list of potential matches when he opens his relationships feed.
 - If Mike has disabled his studdy-buddies section in his questionnair, then he should see an error message when he opens his study-buddies feed.
+
+## Case: Chat (5 points)
+**Iteration**
+Completed in Iteration 2.
+
+**Personas/Actors**
+1. Primary actor: Mike - a second-year SFU student
+2. Secondary actors: People who have chatted with Mike
+
+**Pre-conditions**
+- All parties must have active accounts
+- Mike must be logged in
+
+**Actions/Triggers**
+Mike clicks on "Chat" in the menu from any page in the app, and is redirected to the chat page.
+
+**Acceptance Criteria**
+- Mike should see a card, with a list of contacts on the left and a chat window on the right. Clicking each contact must load the chat history with that contact.
+- If any contact has sent unviewed new messages, a circular blue badge must be displayed next to their name. Opening the chat should clear this badge.
+- The chat window should contain a textbox for sending messages as well as a button for blocking a user.
+- There shall not be duplicate chats with the same user. Only one chat is permitted to exist for any pair of users
+- Sending and receiving messages should not require refreshing the page (AJAX)
+- Mike should NOT be able to start chats with users he has not chatted with previously (this will happen through EOIs)
+
+**Post-conditions**
+- All newly sent or received messages should be recorded in the database
+- Blocking actions should be applied to database records for chats
+- No duplicate chats must be created in the database
+
+**Non-functional requirements**
+- All pages should load in less than one second
+
+**Tests**
+- If Mike has chatted with a user, that user's name should be in his contacts list
+- Clicking a contact should load their chat history in the chat window
+- If Mike has blocked a user, that user should not be able to send messages to Mike
 </div>

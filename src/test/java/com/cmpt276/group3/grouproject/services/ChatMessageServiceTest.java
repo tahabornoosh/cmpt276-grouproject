@@ -163,7 +163,8 @@ public class ChatMessageServiceTest {
             new ChatMessage(
                 currentUser,
                 otherUser,
-                "Hello"
+                "Hello",
+                false
             );
 
         firstMessage.setId(101L);
@@ -172,7 +173,8 @@ public class ChatMessageServiceTest {
             new ChatMessage(
                 otherUser,
                 currentUser,
-                "Hi"
+                "Hi",
+                false
             );
 
         secondMessage.setId(102L);
@@ -273,21 +275,24 @@ public class ChatMessageServiceTest {
             new ChatMessage(
                 currentUser,
                 alice,
-                "Newest Alice message"
+                "Newest Alice message",
+                false
             );
 
         ChatMessage newestBobMessage =
             new ChatMessage(
                 bob,
                 currentUser,
-                "Newest Bob message"
+                "Newest Bob message",
+                false
             );
 
         ChatMessage olderAliceMessage =
             new ChatMessage(
                 alice,
                 currentUser,
-                "Older Alice message"
+                "Older Alice message",
+                false
             );
 
         when(

@@ -134,6 +134,15 @@
         padding: 0.75rem;
         border-top: 1px solid #dee2e6;
       }
+
+      .unread-badge {
+        width: 9px;
+        height: 9px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: #007bff;
+        margin-left: 0.5rem;
+      }
     </style>
 
 <main class="content-wrapper">
@@ -160,7 +169,7 @@
       <div 
       class="card card-primary card-outline chat-app"
       id="chat-app"
-      th:attr="data-current-user-id=${currentUser.id}"
+      th:attr="data-current-user-id=${currentUser.id}, data-requested-user-id=${requestedUserId}"
       >
         <!-- Contacts -->
         <aside class="chat-contacts">
@@ -172,7 +181,7 @@
               <!--Search feature-->
               <input type="search" class="form-control" placeholder="Search contacts…" id="contact-search" aria-label="Search contacts">
               <!--New chat-->
-              <button
+              <button hidden
                 type="button"
                 class="btn btn-primary btn-sm btn-block mt-2"
                 id="new-chat-button"
@@ -210,7 +219,7 @@
                 <div class="flex-grow-1 overflow-hidden">
                   <div class="d-flex align-items-center w-100">
                     <p
-                      class="mb-0 text-truncate font-weight-bold flex-grow-1"
+                      class="mb-0 text-truncate flex-grow-1"
                       th:text="${contact.firstName + ' ' + contact.lastName}"
                       >
                         First Last
@@ -220,6 +229,13 @@
                       class="text-muted flex-shrink-0 ml-2 chat-contact-time"
                       th:attr="data-sent-at=${contact.lastMessageAt}"
                       ></small>
+
+                    <span
+                      class="unread-badge"
+                      th:if="${contact.unread}"
+                      title="Unread message"
+                      aria-label="Unread message"
+                    ></span>
                   </div>
 
                   <small
@@ -355,7 +371,7 @@
         }
 
         if (!response.ok) {
-          throw new Error("Could not load users: ${response.status}");
+          throw new Error(`Could not load users: ${response.status}`);
         }
 
         const users = await response.json();
@@ -399,7 +415,7 @@
 
       messageContainer.replaceChildren();
 
-      const emptyMessage = dfocument.createElement("p");
+      const emptyMessage = document.createElement("p");
       emptyMessage.className = "text-center text-muted";
       emptyMessage.textContent = `Start a conversation with ${fullName}!`;
 
@@ -477,6 +493,88 @@
       60_000
     );
 
+    function getContactByUserId(userId) {
+      const numericUserId = Number(userId);
+      if (!Number.isFinite(numericUserId)) {
+        return null;
+      }
+
+      return document.querySelector(
+        `.chat-contact[data-user-id="${numericUserId}"]`
+      );
+    }
+
+    function setUnreadBadge(contact, unread) {
+      if (!contact) {
+        return;
+      }
+
+      let badge = contact.querySelector(".unread-badge");
+
+      if (unread && !badge) {
+        badge = document.createElement("span");
+        badge.className = "unread-badge";
+        badge.title = "Unread message";
+        badge.setAttribute("aria-label", "Unread message");
+
+        const topRow = contact.querySelector(".d-flex.align-items-center.w-100");
+        if (topRow) {
+          topRow.appendChild(badge);
+        }
+      } else if (!unread && badge) {
+        badge.remove();
+      }
+    }
+
+    function openContact(contact) {
+      if (!contact) {
+        return false;
+      }
+
+      document
+        .querySelectorAll(".chat-contact")
+        .forEach(item => item.classList.remove("active"));
+
+      contact.classList.add("active");
+
+      selectedRecipientId = Number(contact.dataset.userId);
+      selectedUserName.textContent = contact.dataset.userName;
+      selectedUserAvatar.textContent = contact.dataset.userInitials;
+
+      messageInput.disabled = false;
+      sendButton.disabled = false;
+      messageInput.placeholder = "Type a message....";
+      messageInput.focus();
+
+      loadConversation(selectedRecipientId);
+      return true;
+    }
+
+
+    async function markOpenConversationAsRead(otherUserId) {
+      try {
+        const response = await fetch(
+          `/api/chat/messages/read?otherUserId=${otherUserId}`,
+          { method: "POST" }
+        );
+
+        if (response.status === 401) {
+          window.location.href = "/login";
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(
+            `Could not mark conversation as read: ${response.status}`
+          );
+        }
+
+        setUnreadBadge(getContactByUserId(otherUserId), false);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
     function updateContactPreview(message) {
       const senderId = Number(message.senderId);
       const recipientId = Number(message.recipientId);
@@ -485,7 +583,7 @@
 
       const otherUserId = sentByCurrentUser ? recipientId : senderId;
 
-      const contact = document.querySelector(`.chat-contact[data-user-id="${otherUserId}"]`);
+      const contact = getContactByUserId(otherUserId);
 
       if (!contact) {
         window.location.reload();
@@ -594,6 +692,12 @@
 
         const messages = await response.json();
 
+        if (Number(otherUserId) !== selectedRecipientId) {
+          return;
+        }
+
+        setUnreadBadge(getContactByUserId(otherUserId), false);
+
         if (messages.length === 0) {
           const emptyMessage = document.createElement("p");
           emptyMessage.className = "text-center text-muted";
@@ -619,28 +723,14 @@
       .forEach(contact => {
         contact.addEventListener("click", event => {
           event.preventDefault();
-
-          document
-            .querySelectorAll(".chat-contact")
-            .forEach(item => 
-              item.classList.remove("active")
-            );
-
-          contact.classList.add("active");
-
-          selectedRecipientId = Number(contact.dataset.userId);
-
-          selectedUserName.textContent = contact.dataset.userName;
-          selectedUserAvatar.textContent = contact.dataset.userInitials;
-
-          messageInput.disabled = false;
-          sendButton.disabled = false;
-          messageInput.placeholder = "Type a message....";
-          messageInput.focus();
-
-          loadConversation(selectedRecipientId);
+          openContact(contact);
         });
       });
+
+    const requestedUserId = chatApp.dataset.requestedUserId;
+    if (requestedUserId) {
+      openContact(getContactByUserId(requestedUserId));
+    }
 
       const webSocketProtocol = location.protocol === "https:" ? "wss" : "ws";
 
@@ -659,6 +749,16 @@
             const message = JSON.parse(frame.body);
 
             updateContactPreview(message);
+
+            const senderId = Number(message.senderId);
+            const isIncomingMessage = senderId !== currentUserId;
+            const isOpenConversation = senderId === selectedRecipientId;
+
+            if (isIncomingMessage && !isOpenConversation) {
+              setUnreadBadge(getContactByUserId(senderId), true);
+            } else if (isIncomingMessage && isOpenConversation) {
+              markOpenConversationAsRead(senderId);
+            }
 
             if (selectedRecipientId === null) {
             return;

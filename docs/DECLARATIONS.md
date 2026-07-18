@@ -2,7 +2,7 @@
 ## Resources used
 - Course Material on Canvas
 - [AdminLTE](https://github.com/ColorlibHQ/AdminLTE) - Template and Docs
-- 
+  
 ## AI Tools used
 - ChatGPT used to find Dockerfile issue (initial deployment)
 - AI used to adapt AdminLTE to Thymeleaf (including menu, header, and footer as fragments)
@@ -16,3 +16,4 @@
 - AI used to help refactor and improve the questionnair/profile and their model, and to improve matching functions
 - AI used to help make an AdminLTE4 page (chat) compatible with AdminLTE3.2
 - AI used to help generate chat tests
+- AI used to help implement chat unread badge functionality

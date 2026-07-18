@@ -2,6 +2,7 @@ package com.cmpt276.group3.grouproject.models;
 
 import java.time.Instant;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 @Entity
@@ -25,15 +26,20 @@ public class ChatMessage {
     @Column(nullable = false, updatable = false)
     private Instant sentAt;
 
+    @Nullable
+    @Column(nullable = true)
+    private Boolean unread;
+
     public ChatMessage() {
 
     }
     
-    public ChatMessage(User sender, User recipient, String content) {
+    public ChatMessage(User sender, User recipient, String content, Boolean unread) {
         this.sender = sender;
         this.recipient = recipient;
         this.content = content;
         this.sentAt = Instant.now();
+        this.unread = unread;
     }
 
     public Long getId() {
@@ -78,4 +84,14 @@ public class ChatMessage {
             sentAt = Instant.now();
         }
     }
+
+    public boolean isUnread() {
+        if (this.unread==null) return false;
+        return this.unread;
+    }
+
+    public void setUnread(Boolean unread) {
+        this.unread = unread;
+    }
 }
+

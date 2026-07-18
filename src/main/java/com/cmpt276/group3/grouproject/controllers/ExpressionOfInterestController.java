@@ -9,6 +9,7 @@ import com.cmpt276.group3.grouproject.models.MatchingProfile;
 import com.cmpt276.group3.grouproject.models.MatchingProfileRepository;
 import com.cmpt276.group3.grouproject.models.User;
 import com.cmpt276.group3.grouproject.models.UsersRepository;
+import com.cmpt276.group3.grouproject.services.ChatMessageService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -30,17 +31,20 @@ public class ExpressionOfInterestController {
     private final ExpressionOfInterestRepository expressionOfInterestRepository;
     private final UsersRepository usersRepository;
     private final MatchingProfileRepository matchingProfileRepository;
+    private final ChatMessageService chatMessageService;
 
     public ExpressionOfInterestController(
             Auth auth,
             ExpressionOfInterestRepository expressionOfInterestRepository,
             UsersRepository usersRepository,
-            MatchingProfileRepository matchingProfileRepository
+            MatchingProfileRepository matchingProfileRepository,
+            ChatMessageService chatMessageService
             ) {
         this.auth = auth;
         this.expressionOfInterestRepository = expressionOfInterestRepository;
         this.usersRepository = usersRepository;
         this.matchingProfileRepository = matchingProfileRepository;
+        this.chatMessageService = chatMessageService;
     }
 
     @GetMapping("/eois")
@@ -125,6 +129,35 @@ public class ExpressionOfInterestController {
         expressionOfInterestRepository.save(_eoi);
 
         return "redirect:/eois?success=hide";
+    }
+
+    @PostMapping("/eois/{id}/accept")
+    public String acceptEOI(
+            @PathVariable("id") Long id,
+            HttpSession session) {
+
+        if (!auth.isLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+        User currentUser = auth.getUser(session);
+
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        Optional<ExpressionOfInterest> eoi =
+                expressionOfInterestRepository.findByIdAndReceiver(id, currentUser);
+
+        if (eoi.isEmpty()) {
+            return "redirect:/eois?error=not-found";
+        }
+        ExpressionOfInterest _eoi = eoi.get();
+        expressionOfInterestRepository.delete(_eoi); // accept - remove
+
+        chatMessageService.createMessage(currentUser, _eoi.getSender().getId(), "(Automated Message) Your EOI Was Accepted!");
+
+        return "redirect:/chat?userId="+String.valueOf(_eoi.getSender().getId());
     }
 
     @PostMapping("/eoi/send/{id}")

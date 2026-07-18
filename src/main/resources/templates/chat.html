@@ -169,7 +169,7 @@
               <span class="input-group-text bg-white">
                 <i class="fas fa-search" aria-hidden="true"></i>
               </span>
-              <input type="search" class="form-control" placeholder="Search contacts…" aria-label="Search contacts">
+              <input type="search" class="form-control" placeholder="Search contacts…" id="contact-search" aria-label="Search contacts">
             </div>
           </div>
           <div class="flex-grow-1 overflow-auto" id="chat-contacts">
@@ -208,7 +208,7 @@
               class="p-3 text-muted"
               th:if="${#lists.isEmpty(contacts)}"
               >
-              No users are available
+              No conversations yet.
             </p>
           </div>
         </aside>
@@ -293,7 +293,42 @@
       document.getElementById("selected-user-avatar");
     const connectionStatus = 
       document.getElementById("connection-status");
+    const contactSearch = 
+      document.getElementById("contact-search")
+    const contactsContainer = 
+      document.getElementById("chat-contacts")
 
+    const contactElements =
+      Array.from(document.querySelectorAll(".chat-contact"));
+
+    const noSearchResults = document.createElement("p");
+    noSearchResults.className = "p-3 text-muted text-center";
+    noSearchResults.textContent = "No matching conversations.";
+    noSearchResults.hidden = true;
+
+    contactsContainer.appendChild(noSearchResults);
+
+    contactSearch.addEventListener("input", () => {
+      const searchText =
+        contactSearch.value.trim().toLowerCase();
+
+      let visibleContacts = 0;
+
+      contactElements.forEach(contact => {
+        const contactName = 
+          (contact.dataset.userName || "")
+            .toLowerCase();
+
+        const matchesSearch = contactName.includes(searchText);
+        contact.hidden = !matchesSearch;
+
+        if (matchesSearch) {
+          visibleContacts++;
+        }
+      });
+
+      noSearchResults.hidden = searchText === "" || visibleContacts > 0;
+    })
     const currentUserId = Number(chatApp.dataset.currentUserId);
 
     let selectedRecipientId = null;

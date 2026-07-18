@@ -1,6 +1,5 @@
 package com.cmpt276.group3.grouproject.controllers;
 
-import com.cmpt276.group3.grouproject.models.ChatMessageRepository;
 import java.security.Principal;
 import java.time.Instant;
 import java.util.List;
@@ -30,18 +29,16 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 public class ChatController {
-    private final UsersRepository usersRepository;
     private final Auth auth;
     private final UserService userService;
     private final ChatMessageService chatMessageService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public ChatController(Auth auth, UserService userService, ChatMessageService chatMessageService, SimpMessagingTemplate messagingTemplate, UsersRepository usersRepository) {
+    public ChatController(Auth auth, UserService userService, ChatMessageService chatMessageService, SimpMessagingTemplate messagingTemplate) {
         this.auth = auth;
         this.userService = userService;
         this.chatMessageService = chatMessageService;
         this.messagingTemplate = messagingTemplate;
-        this.usersRepository = usersRepository;
     }
 
 
@@ -57,10 +54,7 @@ public class ChatController {
             return "redirect:/login";
         }
 
-        var contacts = usersRepository.findAll()
-                .stream()
-                .filter(user -> user.getId() != currentUser.getId())
-                .toList();
+        var contacts = chatMessageService.getExistingConversations(currentUser);
 
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("contacts", contacts);

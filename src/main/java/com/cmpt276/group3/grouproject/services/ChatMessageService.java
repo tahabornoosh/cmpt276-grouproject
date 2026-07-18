@@ -1,9 +1,13 @@
 package com.cmpt276.group3.grouproject.services;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.cmpt276.group3.grouproject.models.ChatMessage;
 import com.cmpt276.group3.grouproject.models.ChatMessageRepository;
@@ -22,6 +26,34 @@ public class ChatMessageService {
     ) {
         this.chatMessageRepository = chatMessageRepository;
         this.userService = userService;
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> getExistingConversations(User currentUser) {
+        if (currentUser == null) {
+            throw new IllegalArgumentException(
+                "Current user is required"
+            );
+        }
+
+        List <ChatMessage> messages = 
+                chatMessageRepository.findMessagesForUser(currentUser.getId());
+        
+        Map<Long, User> uniqueContacts = 
+                new LinkedHashMap<>();
+
+        for (ChatMessage message : messages) {
+            User otherUser;
+
+            if (message.getSender().getId() == currentUser.getId()) {
+                otherUser = message.getRecipient();
+            } else {
+                otherUser = message.getSender();
+            }
+
+            uniqueContacts.putIfAbsent(otherUser.getId(), otherUser);
+        }
+        return new ArrayList<>(uniqueContacts.values());
     }
 
     public ChatMessage createMessage(

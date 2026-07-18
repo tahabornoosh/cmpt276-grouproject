@@ -15,6 +15,7 @@ A friend-finding (and more!) app dedicated to the SFU community. CMPT 276 group 
 - Citations and Acknowledgements
 - Iteration 1 Notes
 - **User Stories and Use Cases**
+- **User Interface Requirements**
 
 ## Abstract
 
@@ -73,14 +74,12 @@ Additionally, our app provides a host of features such as deterministic (score b
 
 ## List of Epics/Features 
 
-- Profiles and Questionnair (Completed Iteration 1): Three-part interleaved profile built using a comprehensive questionnair, divided into general questions and three specialized parts (dating, friendship, study buddies) with the possibility of disabling each part. Includes questions about interests, preferences, and academic experiences.
-- Score/Match function: used to establish a partial order on users given their profile properties set (e.g., interests, preferences, skills (for study buddies), etc.) to facilitate match-making and suggestions.  
-- Feeds: Allow users to see profiles matched to their profile and send expressions of interest.  
+- Profiles and Questionnair: Three-part interleaved profile built using a comprehensive questionnair, divided into general questions and three specialized parts (dating, friendship, study buddies) with the possibility of disabling each part. Includes questions about interests, preferences, and academic experiences.
+- Feeds: Allow users to see profiles matched to their profile and send expressions of interest. Suggestions in feeds will be given based on matching score calculation algorithms dedicated to each profile/stream.
 - Chat and virtual meeting features: Individual chats with security features (e.g., blocking, no media/photo sharing) and voice/video calls (outsourced \- using **APIs** of either Zoom, BigBlueButton, or similar solution)  
   - APIs will be used to obtain meeting join links once a user initiates or joins a call, and involve sending the user's display name to the API.
-- Login (Completed Iteration 1) and CAS Integration: app allows logging in with a CAS server (with the ultimate goal being the SFU CAS server), using a username and password, or both.  
-- Administration (minimal): panel that allows admins to view and suspend/edit/delete users.
-- Profile (global) optimization: Users can edit their profile adding pictures, biography, and description \- not directly used for matching (with some automated moderation)
+- Login and CAS Integration: app allows logging in with a CAS server (with the ultimate goal being the SFU CAS server), using a username and password, or both.  
+- Profile optimization: Users can edit their profile by adding their picture, biography, and life updates (posts). Includes some basic automated moderation.
 
 
 ## Group Members and Expertise

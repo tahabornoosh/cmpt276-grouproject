@@ -178,29 +178,42 @@
               class="chat-contact"
               th:each="contact : ${contacts}"
               th:attr="
-              data-user-id=${contact.id},
-              data-user-name=${contact.getFirst_name + ' ' + contact.getLast_name},
-              data-user-initials=${#strings.substring(contact.getFirst_name, 0 , 1) + #strings.substring(contact.getLast_name, 0, 1)}
-              "
+                data-user-id=${contact.userId},
+                data-user-name=${contact.firstName + ' ' + contact.lastName},
+                data-user-initials=${#strings.substring(contact.firstName, 0 , 1) + #strings.substring(contact.lastName, 0, 1)}
+                "
               >
                 <span
                   class="chat-avatar bg-primary text-white"
-                  th:text="${#strings.substring(contact.getFirst_name, 0, 1) + #strings.substring(contact.getLast_name, 0, 1)}"
+                  th:text="${#strings.substring(contact.firstName, 0, 1) + #strings.substring(contact.lastName, 0, 1)}"
                   >
                   AB
                 </span>
 
                 <div class="flex-grow-1 overflow-hidden">
-                  <p
-                    class="mb-0 text-truncate font-weight-bold"
-                    th:text="${contact.getFirst_name + ' ' + contact.getLast_name}"
-                    >
-                  First Last
-                </p>
+                  <div class="d-flex align-items-center w-100">
+                    <p
+                      class="mb-0 text-truncate font-weight-bold flex-grow-1"
+                      th:text="${contact.firstName + ' ' + contact.lastName}"
+                      >
+                        First Last
+                    </p>
 
-                <small class="text-truncate text-muted">
-                  Click to open conversation
-                </small>
+                    <small
+                      class="text-muted flex-shrink-0 ml-2 chat-contact-time"
+                      th:attr="data-sent-at=${contact.lastMessageAt}"
+                      ></small>
+                  </div>
+
+                  <small
+                    class="text-truncate text-muted d-block chat-contact-preview"
+                    >
+                      <span
+                        th:if="${contact.lastMessageSentByCurrentUser}"
+                        >You: </span><span
+                        th:text="${contact.lastMessage}"
+                        >Latest message</span>
+                  </small>
                 </div>
             </a>
 
@@ -278,6 +291,97 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
+    const relativeTimeFormatter = 
+        new Intl.RelativeTimeFormat("en", {
+          numeric: "always"
+        });
+      
+    function formatRelativeTime(timestamp) {
+      if (!timestamp) {
+        return "";
+      }
+
+      const messageTime = 
+        new Date(timestamp).getTime();
+
+      if (Number.isNaN(messageTime)) {
+        return "";
+      }
+
+      const differenceInSeconds = 
+        Math.round(
+          (messageTime - Date.now()) / 1000);
+
+      const absoluteSeconds = 
+        Math.abs(differenceInSeconds);
+
+      if (absoluteSeconds < 60) {
+        return "just now";
+      }
+
+      if (absoluteSeconds < 3600) {
+        return relativeTimeFormatter.format(
+          Math.round(differenceInSeconds / 60),
+          "minute"
+        )
+      };
+
+      if (absoluteSeconds < 86400) {
+        return relativeTimeFormatter.format(
+          Math.round(differenceInSeconds / 3600),
+          "hour"
+        );
+      }
+
+      if (absoluteSeconds < 604800) {
+        return relativeTimeFormatter.format(
+          Math.round(differenceInSeconds / 86400),
+          "day"
+        );
+      }
+
+      return new Date(timestamp).toLocaleDateString();
+    }
+
+    function updateConversationTimes() {
+      document.querySelectorAll(".chat-contact-time")
+      .forEach(timeElement => {
+        timeElement.textContent = 
+          formatRelativeTime(
+            timeElement.dataset.sentAt
+          );
+      });
+    }
+
+    updateConversationTimes();
+    setInterval(
+      updateConversationTimes,
+      60_000
+    );
+
+    function updateContactPreview(message) {
+      const senderId = Number(message.senderId);
+      const recipientId = Number(message.recipientId);
+
+      const sentByCurrentUser = senderId === currentUserId;
+
+      const otherUserId = sentByCurrentUser ? recipientId : senderId;
+
+      const contact = document.querySelector(`.chat-contact[data-user-id="${otherUserId}"]`);
+
+      if (!contact) {
+        return;
+      }
+
+      const preview = contact.querySelector(".chat-contact-preview");
+      const time = contact.querySelector(".chat-contact-time");
+
+      preview.textContent = `${sentByCurrentUser ? "You: " : ""}${message.content}`;
+      time.dataset.sentAt = message.sentAt;
+      time.textContent = formatRelativeTime(message.sentAt);
+
+      document.getElementById("chat-contacts").prepend(contact);
+    }
     const chatApp = document.getElementById("chat-app");
     const messageContainer =
       document.getElementById("chat-messages");
@@ -456,6 +560,8 @@
           "/user/queue/messages",
           frame => {
             const message = JSON.parse(frame.body);
+
+            updateContactPreview(message);
 
             if (selectedRecipientId === null) {
             return;

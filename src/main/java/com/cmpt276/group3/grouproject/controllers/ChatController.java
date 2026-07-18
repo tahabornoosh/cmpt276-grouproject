@@ -16,6 +16,7 @@ import com.cmpt276.group3.grouproject.models.User;
 import com.cmpt276.group3.grouproject.models.UsersRepository;
 import com.cmpt276.group3.grouproject.services.ChatMessageService;
 import com.cmpt276.group3.grouproject.services.UserService;
+import com.cmpt276.group3.grouproject.util.ContactResponse;
 import com.cmpt276.group3.grouproject.util.MessageResponse;
 import com.cmpt276.group3.grouproject.util.SendMessageRequest;
 
@@ -54,7 +55,7 @@ public class ChatController {
             return "redirect:/login";
         }
 
-        var contacts = chatMessageService.getExistingConversations(currentUser);
+        List<ContactResponse> contacts = chatMessageService.getExistingConversations(currentUser);
 
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("contacts", contacts);

@@ -22,7 +22,7 @@ public class ChatMessage {
     @Column(nullable = false, length = 1000)
     private String content;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private Instant sentAt;
 
     public ChatMessage() {
@@ -72,7 +72,10 @@ public class ChatMessage {
         return sentAt;
     }
 
-    public void setSentAt(Instant sentAt) {
-        this.sentAt = sentAt;
+    @PrePersist
+    private void assignSentAt() {
+        if (sentAt == null) {
+            sentAt = Instant.now();
+        }
     }
 }

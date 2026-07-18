@@ -8,7 +8,6 @@ import java.util.List;
 
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
-    
     @Query("""
             SELECT message
             FROM ChatMessage message

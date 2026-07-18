@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.cmpt276.group3.grouproject.models.ChatMessage;
 import com.cmpt276.group3.grouproject.models.ChatMessageRepository;
 import com.cmpt276.group3.grouproject.models.User;
+import com.cmpt276.group3.grouproject.util.ContactResponse;
 import com.cmpt276.group3.grouproject.util.MessageResponse;
 
 @Service
@@ -29,7 +30,7 @@ public class ChatMessageService {
     }
 
     @Transactional(readOnly = true)
-    public List<User> getExistingConversations(User currentUser) {
+    public List<ContactResponse> getExistingConversations(User currentUser) {
         if (currentUser == null) {
             throw new IllegalArgumentException(
                 "Current user is required"
@@ -39,19 +40,24 @@ public class ChatMessageService {
         List <ChatMessage> messages = 
                 chatMessageRepository.findMessagesForUser(currentUser.getId());
         
-        Map<Long, User> uniqueContacts = 
+        Map<Long, ContactResponse> uniqueContacts = 
                 new LinkedHashMap<>();
 
         for (ChatMessage message : messages) {
-            User otherUser;
+            boolean sentByCurrentUser = message.getSender().getId() == currentUser.getId();
 
-            if (message.getSender().getId() == currentUser.getId()) {
-                otherUser = message.getRecipient();
-            } else {
-                otherUser = message.getSender();
-            }
+            User otherUser = sentByCurrentUser ? message.getRecipient() : message.getSender();
 
-            uniqueContacts.putIfAbsent(otherUser.getId(), otherUser);
+            ContactResponse contact = 
+                    new ContactResponse(
+                        otherUser.getId(),
+                        otherUser.getFirst_name(),
+                        otherUser.getLast_name(),
+                        message.getContent(),
+                        message.getSentAt(),
+                        sentByCurrentUser
+                    );
+            uniqueContacts.putIfAbsent(otherUser.getId(), contact);
         }
         return new ArrayList<>(uniqueContacts.values());
     }
@@ -102,7 +108,6 @@ public class ChatMessageService {
         message.setSender(sender);
         message.setRecipient(recipient);
         message.setContent(cleanedContent);
-        message.setSentAt(Instant.now());
 
         return chatMessageRepository.save(message);
     }

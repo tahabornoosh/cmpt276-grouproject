@@ -1,6 +1,6 @@
 <th:block th:replace="~{fragments/layout :: head('Profile')}"></th:block>
 <th:block th:replace="~{fragments/layout :: bodyStart}"></th:block>
-<input type="hidden" id="activeMenuItem" name="activeMenuItem" value="menu-profile" />
+<input th:if="${isOwnProfile}" type="hidden" id="activeMenuItem" name="activeMenuItem" value="menu-profile" />
 
 <main class="content-wrapper">
   <section class="content-header">
@@ -21,17 +21,17 @@
 
   <section class="content">
     <div class="container-fluid">
+      <div hidden id="error" class="alert alert-danger">Error Occured</div>
+      <div hidden id="success" class="alert alert-success">Success</div>
       <div class="row">
         <div class="col-md-4">
           <div class="card card-primary card-outline">
             <div class="card-body box-profile text-center">
-              <img class="profile-user-img img-fluid img-circle"
-                   src="/user.png"
-                   alt="Profile picture">
+              <img class="profile-user-img img-fluid img-circle" src="/user.png" alt="Profile picture">
               <h3 class="profile-username text-center"
-                  th:text="${profileUser.first_name + ' ' + profileUser.last_name}"></h3>
+                th:text="${profileUser.first_name + ' ' + profileUser.last_name}"></h3>
               <p class="text-muted text-center text-capitalize"
-                 th:text="${#strings.replace(#strings.toLowerCase(profileUser.gender.name()),'_',' ')}"></p>
+                th:text="${#strings.replace(#strings.toLowerCase(profileUser.gender.name()),'_',' ')}"></p>
 
               <!-- Compatibility scores are shown only when both profiles enable the corresponding stream. -->
               <div th:if="${friendshipMatchScore != null}" class="mb-3 text-left">
@@ -48,7 +48,8 @@
                   <span class="badge badge-danger" style="font-size: 0.9rem;">
                     <i class="fas fa-heart mr-1"></i>Relationship
                   </span>
-                  <strong th:if="${relationshipMatchScore!=-1}"><span th:text="${relationshipMatchScore}"></span>%</strong>
+                  <strong th:if="${relationshipMatchScore!=-1}"><span
+                      th:text="${relationshipMatchScore}"></span>%</strong>
                   <strong th:if="${relationshipMatchScore==-1}">Incompatible</strong>
                 </div>
               </div>
@@ -59,11 +60,31 @@
                     <i class="fas fa-book-reader mr-1"></i>Study Buddy
                   </span>
                   <strong th:if="${studyBuddyMatchScore!=-1}"><span th:text="${studyBuddyMatchScore}"></span>%</strong>
-                   <strong th:if="${studyBuddyMatchScore==-1}">Incompatible</strong>
+                  <strong th:if="${studyBuddyMatchScore==-1}">Incompatible</strong>
                 </div>
               </div>
 
               <span th:if="${isOwnProfile}" class="badge badge-info d-block mb-2">This is your profile</span>
+
+              <div th:if="${!isOwnProfile}">
+                <hr>
+                <form th:action="@{/eoi/send/{id}(id=${profileUser.id})}" method="post">
+                  <h5>Send <span th:text="${profileUser.first_name}"></span> <span
+                      th:text="${profileUser.last_name}"></span> an EOI</h5>
+                  <div class="card-body">
+                    <div class="mb-3">
+                      <label for="type" class="form-label">Expression of Interest Type</label>
+                      <select required name="stream" id="type" class="form-control">
+                        <option value="FRIENDSHIP">Friendship EOI</option>
+                        <option value="RELATIONSHIP">Relationship EOI</option>
+                        <option value="STUDY_BUDDY">Study-Buddies EOI</option>
+                      </select>
+                    </div>
+                    <button style="width:100%" type="submit" class="btn btn-primary">Send Expression of
+                      Interest</button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         </div>
@@ -79,7 +100,8 @@
             <div class="card-body">
               <div th:if="${!hasQuestionnaire}">
                 <p class="text-muted mb-3">
-                  You have not completed your questionnaire yet. Complete it so FriendFinderSFU can show your friendship, relationship, and study buddy preferences.
+                  You have not completed your questionnaire yet. Complete it so FriendFinderSFU can show your
+                  friendship, relationship, and study buddy preferences.
                 </p>
                 <a th:href="@{/questionnaire}" class="btn btn-primary">
                   <i class="fas fa-edit mr-1"></i> Do Questionnaire Now
@@ -93,10 +115,15 @@
 
                 <p class="text-muted mb-3">
                   Completed sections:
-                  <span th:if="${matchingProfile.display_friendship_profile}" class="badge badge-info mr-1">Friendship</span>
-                  <span th:if="${matchingProfile.display_dating_profile}" class="badge badge-danger mr-1">Relationship</span>
-                  <span th:if="${matchingProfile.display_study_buddy_profile}" class="badge badge-success mr-1">Study Buddy</span>
-                  <span th:if="${!matchingProfile.display_friendship_profile and !matchingProfile.display_dating_profile and !matchingProfile.display_study_buddy_profile}" class="badge badge-secondary">No visible sections selected</span>
+                  <span th:if="${matchingProfile.display_friendship_profile}"
+                    class="badge badge-info mr-1">Friendship</span>
+                  <span th:if="${matchingProfile.display_dating_profile}"
+                    class="badge badge-danger mr-1">Relationship</span>
+                  <span th:if="${matchingProfile.display_study_buddy_profile}" class="badge badge-success mr-1">Study
+                    Buddy</span>
+                  <span
+                    th:if="${!matchingProfile.display_friendship_profile and !matchingProfile.display_dating_profile and !matchingProfile.display_study_buddy_profile}"
+                    class="badge badge-secondary">No visible sections selected</span>
                 </p>
 
                 <a th:href="@{/questionnaire(edit=1)}" class="btn btn-danger">
@@ -109,10 +136,14 @@
           <div class="card card-primary card-outline">
             <div class="card-header p-2">
               <ul class="nav nav-pills" role="tablist">
-                <li class="nav-item"><a class="nav-link active" href="#basics" data-profile-tab="basics" role="tab" aria-controls="basics" aria-selected="true">Basics</a></li>
-                <li class="nav-item"><a class="nav-link" href="#friendship" data-profile-tab="friendship" role="tab" aria-controls="friendship" aria-selected="false">Friendship</a></li>
-                <li class="nav-item"><a class="nav-link" href="#relationship" data-profile-tab="relationship" role="tab" aria-controls="relationship" aria-selected="false">Relationship</a></li>
-                <li class="nav-item"><a class="nav-link" href="#studyBuddy" data-profile-tab="studyBuddy" role="tab" aria-controls="studyBuddy" aria-selected="false">Study Buddy</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#basics" data-profile-tab="basics" role="tab"
+                    aria-controls="basics" aria-selected="true">Basics</a></li>
+                <li class="nav-item"><a class="nav-link" href="#friendship" data-profile-tab="friendship" role="tab"
+                    aria-controls="friendship" aria-selected="false">Friendship</a></li>
+                <li class="nav-item"><a class="nav-link" href="#relationship" data-profile-tab="relationship" role="tab"
+                    aria-controls="relationship" aria-selected="false">Relationship</a></li>
+                <li class="nav-item"><a class="nav-link" href="#studyBuddy" data-profile-tab="studyBuddy" role="tab"
+                    aria-controls="studyBuddy" aria-selected="false">Study Buddy</a></li>
               </ul>
             </div>
             <div class="card-body">
@@ -126,7 +157,7 @@
                         <tr>
                           <th style="width: 45%;"><i class="fas fa-venus-mars mr-1"></i> Gender</th>
                           <td class="text-muted text-capitalize"
-                              th:text="${#strings.replace(#strings.toLowerCase(profileUser.gender.name()),'_',' ')}"></td>
+                            th:text="${#strings.replace(#strings.toLowerCase(profileUser.gender.name()),'_',' ')}"></td>
                         </tr>
                         <tr th:if="${matchingProfile.age != null}">
                           <th><i class="fas fa-birthday-cake mr-1"></i> Age</th>
@@ -135,7 +166,8 @@
                         <tr th:if="${matchingProfile.study_field != null}">
                           <th><i class="fas fa-graduation-cap mr-1"></i> Study Field</th>
                           <td class="text-muted text-capitalize"
-                              th:text="${#strings.replace(#strings.toLowerCase(matchingProfile.study_field.name()),'_',' ')}"></td>
+                            th:text="${#strings.replace(#strings.toLowerCase(matchingProfile.study_field.name()),'_',' ')}">
+                          </td>
                         </tr>
                         <tr th:if="${matchingProfile.year_of_study != null}">
                           <th><i class="fas fa-user-graduate mr-1"></i> Year of Study</th>
@@ -147,17 +179,22 @@
                         </tr>
                         <tr th:if="${matchingProfile.regularly_goes_to_gym != null}">
                           <th><i class="fas fa-dumbbell mr-1"></i> Goes to the Gym</th>
-                          <td class="text-muted" th:text="${matchingProfile.regularly_goes_to_gym ? 'Regularly' : 'Rarely'}"></td>
+                          <td class="text-muted"
+                            th:text="${matchingProfile.regularly_goes_to_gym ? 'Regularly' : 'Rarely'}"></td>
                         </tr>
-                        <tr th:if="${matchingProfile.favourite_sport != null and matchingProfile.favourite_sport.name() != 'NONE'}">
+                        <tr
+                          th:if="${matchingProfile.favourite_sport != null and matchingProfile.favourite_sport.name() != 'NONE'}">
                           <th><i class="fas fa-futbol mr-1"></i> Favourite Sport</th>
                           <td class="text-muted text-capitalize"
-                              th:text="${#strings.replace(#strings.toLowerCase(matchingProfile.favourite_sport.name()),'_',' ')}"></td>
+                            th:text="${#strings.replace(#strings.toLowerCase(matchingProfile.favourite_sport.name()),'_',' ')}">
+                          </td>
                         </tr>
-                        <tr th:if="${matchingProfile.preferred_venue != null and matchingProfile.preferred_venue.name() != 'NONE'}">
+                        <tr
+                          th:if="${matchingProfile.preferred_venue != null and matchingProfile.preferred_venue.name() != 'NONE'}">
                           <th><i class="fas fa-map-marker-alt mr-1"></i> Preferred Hangout Venue</th>
                           <td class="text-muted text-capitalize"
-                              th:text="${#strings.replace(#strings.toLowerCase(matchingProfile.preferred_venue.name()),'_',' ')}"></td>
+                            th:text="${#strings.replace(#strings.toLowerCase(matchingProfile.preferred_venue.name()),'_',' ')}">
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -165,16 +202,17 @@
                     <strong><i class="far fa-address-card mr-1"></i> Interests &amp; Hobbies</strong>
                     <div class="mt-2 mb-1">
                       <span th:each="hobby : ${matchingProfile.hobbies}"
-                            class="badge badge-secondary text-capitalize mr-1 mb-1"
-                            th:text="${#strings.replace(#strings.toLowerCase(hobby.name()),'_',' ')}"></span>
-                      <p th:if="${#lists.isEmpty(matchingProfile.hobbies)}" class="text-muted mb-0">No hobbies listed yet.</p>
+                        class="badge badge-secondary text-capitalize mr-1 mb-1"
+                        th:text="${#strings.replace(#strings.toLowerCase(hobby.name()),'_',' ')}"></span>
+                      <p th:if="${#lists.isEmpty(matchingProfile.hobbies)}" class="text-muted mb-0">No hobbies listed
+                        yet.</p>
                     </div>
                   </div>
 
                   <div th:unless="${hasQuestionnaire}">
                     <strong><i class="fas fa-venus-mars mr-1"></i> Gender</strong>
                     <p class="text-muted text-capitalize"
-                       th:text="${#strings.replace(#strings.toLowerCase(profileUser.gender.name()),'_',' ')}"></p>
+                      th:text="${#strings.replace(#strings.toLowerCase(profileUser.gender.name()),'_',' ')}"></p>
                     <hr>
                     <strong><i class="far fa-address-card mr-1"></i> Bio &amp; Interests</strong>
                     <p class="text-muted">
@@ -245,7 +283,8 @@
                     This user hasn't filled out a questionnaire yet. Once they do, their friendship
                     preferences will show up here.
                   </p>
-                  <p th:if="${hasQuestionnaire and !matchingProfile.display_friendship_profile}" class="text-muted mb-0">
+                  <p th:if="${hasQuestionnaire and !matchingProfile.display_friendship_profile}"
+                    class="text-muted mb-0">
                     This user hasn't made their friendship profile visible.
                   </p>
                 </div>
@@ -255,29 +294,96 @@
                   <div th:if="${hasQuestionnaire and matchingProfile.display_dating_profile}">
                     <table class="table table-sm table-borderless mb-0">
                       <tbody>
-                        <tr th:if="${matchingProfile.relationship_goal != null}"><th style="width:45%;">Relationship Goal</th><td class="text-muted" th:text="${matchingProfile.relationship_goal.displayName}"></td></tr>
-                        <tr th:if="${matchingProfile.relationship_personality != null}"><th>Personality</th><td class="text-muted" th:text="${matchingProfile.relationship_personality.displayName}"></td></tr>
-                        <tr th:if="${matchingProfile.relationship_communication_style != null}"><th>Communication Style</th><td class="text-muted" th:text="${matchingProfile.relationship_communication_style.displayName}"></td></tr>
-                        <tr th:if="${matchingProfile.relationship_texting_style != null}"><th>Texting Style</th><td class="text-muted" th:text="${matchingProfile.relationship_texting_style.displayName}"></td></tr>
-                        <tr th:if="${matchingProfile.relationship_free_time != null}"><th>Preferred Free Time</th><td class="text-muted" th:text="${matchingProfile.relationship_free_time.displayName}"></td></tr>
-                        <tr th:if="${matchingProfile.relationship_value != null}"><th>Most Important Value</th><td class="text-muted" th:text="${matchingProfile.relationship_value.displayName}"></td></tr>
-                        <tr th:if="${matchingProfile.relationship_conflict_style != null}"><th>Conflict Style</th><td class="text-muted" th:text="${matchingProfile.relationship_conflict_style.displayName}"></td></tr>
-                        <tr th:if="${matchingProfile.relationship_lifestyle != null}"><th>Lifestyle</th><td class="text-muted" th:text="${matchingProfile.relationship_lifestyle.displayName}"></td></tr>
-                        <tr th:if="${matchingProfile.relationship_ambition_importance != null}"><th>Ambition Importance</th><td class="text-muted" th:text="${matchingProfile.relationship_ambition_importance.displayName}"></td></tr>
-                        <tr th:if="${matchingProfile.relationship_care_style != null}"><th>Shows Care Through</th><td class="text-muted" th:text="${matchingProfile.relationship_care_style.displayName}"></td></tr>
-                        <tr th:if="${matchingProfile.relationship_personal_space != null}"><th>Personal Space</th><td class="text-muted" th:text="${matchingProfile.relationship_personal_space.displayName}"></td></tr>
-                        <tr th:if="${matchingProfile.relationship_date_activity != null}"><th>Preferred Dates/Hangouts</th><td class="text-muted" th:text="${matchingProfile.relationship_date_activity.displayName}"></td></tr>
-                        <tr th:if="${matchingProfile.relationship_social_life != null}"><th>Social Life</th><td class="text-muted" th:text="${matchingProfile.relationship_social_life.displayName}"></td></tr>
-                        <tr th:if="${matchingProfile.relationship_humor_style != null}"><th>Humor Style</th><td class="text-muted" th:text="${matchingProfile.relationship_humor_style.displayName}"></td></tr>
-                        <tr th:if="${matchingProfile.relationship_strength != null}"><th>Relationship Strength</th><td class="text-muted" th:text="${matchingProfile.relationship_strength.displayName}"></td></tr>
-                        <tr th:if="${matchingProfile.partner_gender != null}"><th>Preferred Partner Gender</th><td class="text-muted text-capitalize" th:text="${#strings.replace(#strings.toLowerCase(matchingProfile.partner_gender.name()),'_',' ')}"></td></tr>
-                        <tr th:if="${matchingProfile.min_partner_age != null and matchingProfile.max_partner_age != null}"><th>Preferred Partner Age</th><td class="text-muted" th:text="${matchingProfile.min_partner_age + '–' + matchingProfile.max_partner_age}"></td></tr>
-                        <tr th:if="${matchingProfile.looking_for_short_term_relationship != null}"><th>Open to Short-Term</th><td class="text-muted" th:text="${matchingProfile.looking_for_short_term_relationship ? 'Yes' : 'No'}"></td></tr>
+                        <tr th:if="${matchingProfile.relationship_goal != null}">
+                          <th style="width:45%;">Relationship Goal</th>
+                          <td class="text-muted" th:text="${matchingProfile.relationship_goal.displayName}"></td>
+                        </tr>
+                        <tr th:if="${matchingProfile.relationship_personality != null}">
+                          <th>Personality</th>
+                          <td class="text-muted" th:text="${matchingProfile.relationship_personality.displayName}"></td>
+                        </tr>
+                        <tr th:if="${matchingProfile.relationship_communication_style != null}">
+                          <th>Communication Style</th>
+                          <td class="text-muted"
+                            th:text="${matchingProfile.relationship_communication_style.displayName}"></td>
+                        </tr>
+                        <tr th:if="${matchingProfile.relationship_texting_style != null}">
+                          <th>Texting Style</th>
+                          <td class="text-muted" th:text="${matchingProfile.relationship_texting_style.displayName}">
+                          </td>
+                        </tr>
+                        <tr th:if="${matchingProfile.relationship_free_time != null}">
+                          <th>Preferred Free Time</th>
+                          <td class="text-muted" th:text="${matchingProfile.relationship_free_time.displayName}"></td>
+                        </tr>
+                        <tr th:if="${matchingProfile.relationship_value != null}">
+                          <th>Most Important Value</th>
+                          <td class="text-muted" th:text="${matchingProfile.relationship_value.displayName}"></td>
+                        </tr>
+                        <tr th:if="${matchingProfile.relationship_conflict_style != null}">
+                          <th>Conflict Style</th>
+                          <td class="text-muted" th:text="${matchingProfile.relationship_conflict_style.displayName}">
+                          </td>
+                        </tr>
+                        <tr th:if="${matchingProfile.relationship_lifestyle != null}">
+                          <th>Lifestyle</th>
+                          <td class="text-muted" th:text="${matchingProfile.relationship_lifestyle.displayName}"></td>
+                        </tr>
+                        <tr th:if="${matchingProfile.relationship_ambition_importance != null}">
+                          <th>Ambition Importance</th>
+                          <td class="text-muted"
+                            th:text="${matchingProfile.relationship_ambition_importance.displayName}"></td>
+                        </tr>
+                        <tr th:if="${matchingProfile.relationship_care_style != null}">
+                          <th>Shows Care Through</th>
+                          <td class="text-muted" th:text="${matchingProfile.relationship_care_style.displayName}"></td>
+                        </tr>
+                        <tr th:if="${matchingProfile.relationship_personal_space != null}">
+                          <th>Personal Space</th>
+                          <td class="text-muted" th:text="${matchingProfile.relationship_personal_space.displayName}">
+                          </td>
+                        </tr>
+                        <tr th:if="${matchingProfile.relationship_date_activity != null}">
+                          <th>Preferred Dates/Hangouts</th>
+                          <td class="text-muted" th:text="${matchingProfile.relationship_date_activity.displayName}">
+                          </td>
+                        </tr>
+                        <tr th:if="${matchingProfile.relationship_social_life != null}">
+                          <th>Social Life</th>
+                          <td class="text-muted" th:text="${matchingProfile.relationship_social_life.displayName}"></td>
+                        </tr>
+                        <tr th:if="${matchingProfile.relationship_humor_style != null}">
+                          <th>Humor Style</th>
+                          <td class="text-muted" th:text="${matchingProfile.relationship_humor_style.displayName}"></td>
+                        </tr>
+                        <tr th:if="${matchingProfile.relationship_strength != null}">
+                          <th>Relationship Strength</th>
+                          <td class="text-muted" th:text="${matchingProfile.relationship_strength.displayName}"></td>
+                        </tr>
+                        <tr th:if="${matchingProfile.partner_gender != null}">
+                          <th>Preferred Partner Gender</th>
+                          <td class="text-muted text-capitalize"
+                            th:text="${#strings.replace(#strings.toLowerCase(matchingProfile.partner_gender.name()),'_',' ')}">
+                          </td>
+                        </tr>
+                        <tr
+                          th:if="${matchingProfile.min_partner_age != null and matchingProfile.max_partner_age != null}">
+                          <th>Preferred Partner Age</th>
+                          <td class="text-muted"
+                            th:text="${matchingProfile.min_partner_age + '–' + matchingProfile.max_partner_age}"></td>
+                        </tr>
+                        <tr th:if="${matchingProfile.looking_for_short_term_relationship != null}">
+                          <th>Open to Short-Term</th>
+                          <td class="text-muted"
+                            th:text="${matchingProfile.looking_for_short_term_relationship ? 'Yes' : 'No'}"></td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
-                  <p th:if="${!hasQuestionnaire}" class="text-muted mb-0">This user hasn't filled out a questionnaire yet. Once they do, their relationship preferences will show up here.</p>
-                  <p th:if="${hasQuestionnaire and !matchingProfile.display_dating_profile}" class="text-muted mb-0">This user hasn't made their relationship profile visible.</p>
+                  <p th:if="${!hasQuestionnaire}" class="text-muted mb-0">This user hasn't filled out a questionnaire
+                    yet. Once they do, their relationship preferences will show up here.</p>
+                  <p th:if="${hasQuestionnaire and !matchingProfile.display_dating_profile}" class="text-muted mb-0">
+                    This user hasn't made their relationship profile visible.</p>
                 </div>
 
                 <!-- Study Buddy tab -->
@@ -285,20 +391,42 @@
                   <div th:if="${hasQuestionnaire and matchingProfile.display_study_buddy_profile}">
                     <table class="table table-sm table-borderless mb-3">
                       <tbody>
-                        <tr th:if="${matchingProfile.study_buddy_program != null}"><th style="width:45%;">Program</th><td class="text-muted" th:text="${matchingProfile.study_buddy_program}"></td></tr>
-                        <tr th:if="${matchingProfile.buddy_area_of_study != null}"><th>Preferred Study Field</th><td class="text-muted text-capitalize" th:text="${#strings.replace(#strings.toLowerCase(matchingProfile.buddy_area_of_study.name()),'_',' ')}"></td></tr>
-                        <tr th:if="${matchingProfile.buddy_min_year_of_study != null and matchingProfile.buddy_max_year_of_study != null}"><th>Preferred Year Range</th><td class="text-muted" th:text="${matchingProfile.buddy_min_year_of_study + '–' + matchingProfile.buddy_max_year_of_study}"></td></tr>
-                        <tr th:if="${matchingProfile.study_buddy_gender_preference != null}"><th>Preferred Gender</th><td class="text-muted text-capitalize" th:text="${#strings.replace(#strings.toLowerCase(matchingProfile.study_buddy_gender_preference.name()),'_',' ')}"></td></tr>
+                        <tr th:if="${matchingProfile.study_buddy_program != null}">
+                          <th style="width:45%;">Program</th>
+                          <td class="text-muted" th:text="${matchingProfile.study_buddy_program}"></td>
+                        </tr>
+                        <tr th:if="${matchingProfile.buddy_area_of_study != null}">
+                          <th>Preferred Study Field</th>
+                          <td class="text-muted text-capitalize"
+                            th:text="${#strings.replace(#strings.toLowerCase(matchingProfile.buddy_area_of_study.name()),'_',' ')}">
+                          </td>
+                        </tr>
+                        <tr
+                          th:if="${matchingProfile.buddy_min_year_of_study != null and matchingProfile.buddy_max_year_of_study != null}">
+                          <th>Preferred Year Range</th>
+                          <td class="text-muted"
+                            th:text="${matchingProfile.buddy_min_year_of_study + '–' + matchingProfile.buddy_max_year_of_study}">
+                          </td>
+                        </tr>
+                        <tr th:if="${matchingProfile.study_buddy_gender_preference != null}">
+                          <th>Preferred Gender</th>
+                          <td class="text-muted text-capitalize"
+                            th:text="${#strings.replace(#strings.toLowerCase(matchingProfile.study_buddy_gender_preference.name()),'_',' ')}">
+                          </td>
+                        </tr>
                       </tbody>
                     </table>
                     <strong><i class="fas fa-book mr-1"></i> Current Courses</strong>
                     <div class="mt-2">
-                      <span th:each="course : ${studyBuddyCourses}" class="badge badge-success mr-1 mb-1" th:text="${course}"></span>
+                      <span th:each="course : ${studyBuddyCourses}" class="badge badge-success mr-1 mb-1"
+                        th:text="${course}"></span>
                       <p th:if="${#lists.isEmpty(studyBuddyCourses)}" class="text-muted mb-0">No courses listed.</p>
                     </div>
                   </div>
-                  <p th:if="${!hasQuestionnaire}" class="text-muted mb-0">This user hasn't filled out a questionnaire yet. Once they do, their study-buddy preferences will show up here.</p>
-                  <p th:if="${hasQuestionnaire and !matchingProfile.display_study_buddy_profile}" class="text-muted mb-0">This user hasn't made their study-buddy profile visible.</p>
+                  <p th:if="${!hasQuestionnaire}" class="text-muted mb-0">This user hasn't filled out a questionnaire
+                    yet. Once they do, their study-buddy preferences will show up here.</p>
+                  <p th:if="${hasQuestionnaire and !matchingProfile.display_study_buddy_profile}"
+                    class="text-muted mb-0">This user hasn't made their study-buddy profile visible.</p>
                 </div>
 
 
@@ -312,35 +440,29 @@
 </main>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const links = document.querySelectorAll('[data-profile-tab]');
-    const panes = document.querySelectorAll('.tab-content > .tab-pane');
+  const urlParams = new URLSearchParams(window.location.search);
 
-    links.forEach(function (link) {
-      link.addEventListener('click', function (event) {
-        event.preventDefault();
+  const err = urlParams.get('error');
+  const succ = urlParams.get('success');
 
-        const targetId = link.getAttribute('data-profile-tab');
-
-        links.forEach(function (item) {
-          item.classList.remove('active');
-          item.setAttribute('aria-selected', 'false');
-        });
-
-        panes.forEach(function (pane) {
-          pane.classList.remove('active', 'show');
-        });
-
-        const targetPane = document.getElementById(targetId);
-        if (targetPane) {
-          link.classList.add('active');
-          link.setAttribute('aria-selected', 'true');
-          targetPane.classList.add('active', 'show');
-        }
-      });
-    });
-  });
+  if (err == "1") {
+    document.getElementById("error").hidden = false;
+    history.replaceState({}, "", window.location.pathname);
+  } 
+  if (err == "2") {
+    document.getElementById("error").hidden = false;
+    document.getElementById("error").innerHTML = "You have already sent a pending EOI to this user. Please wait for a response.";
+    history.replaceState({}, "", window.location.pathname);
+  }
+  if (err == "3") {
+    document.getElementById("error").hidden = false;
+    document.getElementById("error").innerHTML = "Your Profiles are Incomplete or Incompatibe for the chosen stream.";
+    history.replaceState({}, "", window.location.pathname);
+  }
+  if (succ == "1") {
+    document.getElementById("success").hidden = false;
+    history.replaceState({}, "", window.location.pathname);
+  }
 </script>
 
 <th:block th:replace="~{fragments/layout :: bodyEnd}"></th:block>
-

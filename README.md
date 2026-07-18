@@ -342,7 +342,7 @@ Albert, when logged into the app, presses the Log out link on the App's top menu
 **Iteration**
 
 - Primairly completed in Iteration 1 (4 points)
-- <span style='color:LightGreen'>Some more questions added in Iteration 2 (1 point)</span>
+- Some more questions added in Iteration 2 (1 point)
 
 **Personas/Actors**
 1. Primary actor: Ryan - a second-year SFU student looking to make friends
@@ -492,6 +492,8 @@ Joyce opens the profile page for a user by opening a URL sent to them by a frien
 - The profile URL for a non-existing user must result in a 404 error.
 - An existing user's profile URL should not return a 404 error, even if the questionnair is not completed
 - An existing user's profile should display their 5 selected hobbies if they have completed the questionnair
+
+
 <div>
 <div style='color:LightGreen'>
 

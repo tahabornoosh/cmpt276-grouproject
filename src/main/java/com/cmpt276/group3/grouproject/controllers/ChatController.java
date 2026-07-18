@@ -3,6 +3,8 @@ package com.cmpt276.group3.grouproject.controllers;
 import java.security.Principal;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -16,6 +18,7 @@ import com.cmpt276.group3.grouproject.models.User;
 import com.cmpt276.group3.grouproject.models.UsersRepository;
 import com.cmpt276.group3.grouproject.services.ChatMessageService;
 import com.cmpt276.group3.grouproject.services.UserService;
+import com.cmpt276.group3.grouproject.util.ChatUserResponse;
 import com.cmpt276.group3.grouproject.util.ContactResponse;
 import com.cmpt276.group3.grouproject.util.MessageResponse;
 import com.cmpt276.group3.grouproject.util.SendMessageRequest;
@@ -34,14 +37,53 @@ public class ChatController {
     private final UserService userService;
     private final ChatMessageService chatMessageService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final UsersRepository usersRepository;
 
-    public ChatController(Auth auth, UserService userService, ChatMessageService chatMessageService, SimpMessagingTemplate messagingTemplate) {
+    public ChatController(Auth auth, UserService userService, ChatMessageService chatMessageService, SimpMessagingTemplate messagingTemplate, UsersRepository usersRepository) {
         this.auth = auth;
         this.userService = userService;
         this.chatMessageService = chatMessageService;
         this.messagingTemplate = messagingTemplate;
+        this.usersRepository = usersRepository;
     }
 
+    @GetMapping("/api/chat/users")
+    @ResponseBody
+    public List<ChatUserResponse> getAvailableChatUsers(HttpSession session) {
+        if (!auth.isLoggedIn(session)) {
+            throw new ResponseStatusException(
+                HttpStatus.UNAUTHORIZED,
+                "You must be logged in"
+            );
+        }
+
+        User currentUser = auth.getUser(session);
+
+        if (currentUser == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "The current user could not be found");
+        }
+
+        Set<Long> existingConversationIds = chatMessageService.getExistingConversations(currentUser)
+                                            .stream()
+                                            .map(ContactResponse::userId)
+                                            .collect(Collectors.toSet());
+        return usersRepository.findAll()
+                .stream()
+                .filter(user -> 
+                    user.getId() != currentUser.getId()
+                )
+                .filter(user ->
+                    !existingConversationIds.contains(user.getId())
+                )
+                .map(user ->
+                    new ChatUserResponse(
+                        user.getId(),
+                        user.getFirst_name(),
+                        user.getLast_name()
+                    )
+                )
+                .toList();
+    }
 
      @GetMapping("/chat")
     public String loadChat(HttpSession session, Model model) {

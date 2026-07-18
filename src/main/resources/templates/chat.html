@@ -169,7 +169,24 @@
               <span class="input-group-text bg-white">
                 <i class="fas fa-search" aria-hidden="true"></i>
               </span>
+              <!--Search feature-->
               <input type="search" class="form-control" placeholder="Search contacts…" id="contact-search" aria-label="Search contacts">
+              <!--New chat-->
+              <button
+                type="button"
+                class="btn btn-primary btn-sm btn-block mt-2"
+                id="new-chat-button"
+                >
+                  <i class="fas fa-plus mr-l"></i>
+                New Chat
+              </button>
+
+              <div
+                id="new-chat-users"
+                class="border-bottom overflow-auto mx-auto my-2"
+                style="width: 90%;"
+                hidden>
+              </div>
             </div>
           </div>
           <div class="flex-grow-1 overflow-auto" id="chat-contacts">
@@ -291,6 +308,107 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
+    const chatApp = document.getElementById("chat-app");
+    const messageContainer =
+      document.getElementById("chat-messages");
+    const messageForm =
+      document.getElementById("chat-composer");
+    const messageInput =
+      document.getElementById("chat-input");
+    const sendButton = 
+      document.getElementById("send-message-button");
+    const selectedUserName =
+      document.getElementById("selected-user-name");
+    const selectedUserAvatar =
+      document.getElementById("selected-user-avatar");
+    const connectionStatus = 
+      document.getElementById("connection-status");
+    const contactSearch = 
+      document.getElementById("contact-search")
+    const contactsContainer = 
+      document.getElementById("chat-contacts")
+
+    const contactElements =
+      Array.from(document.querySelectorAll(".chat-contact"));
+    
+    const newChatButton = 
+      document.getElementById("new-chat-button");
+    const newChatUsers =
+      document.getElementById("new-chat-users");
+
+    let availableChatUsersLoaded = false;
+
+    newChatButton.addEventListener("click", async () => {
+      newChatUsers.hidden = !newChatUsers.hidden;
+
+      if (newChatUsers.hidden || availableChatUsersLoaded) 
+      {
+        return
+      };
+
+      try {
+        const response = await fetch("/api/chat/users");
+
+        if (response.status === 401) {
+          window.location.href = "/login";
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error("Could not load users: ${response.status}");
+        }
+
+        const users = await response.json();
+
+        newChatUsers.replaceChildren();
+
+        users.forEach(user => {
+          const button = document.createElement("button");
+
+          button.type = "button";
+          button.className = "btn btn-light btn-block text-center rounded-0";
+
+          button.textContent = `${user.firstName} ${user.lastName}`;
+
+          button.addEventListener("click", () => {
+            startConversationWith(user);
+          });
+
+          newChatUsers.appendChild(button);
+        });
+
+        availableChatUsersLoaded = true;
+      } catch (error) {
+        console.error(error);
+
+        newChatUsers.textContent = "Users could not be loaded";
+      }
+    })
+
+    function startConversationWith(user) {
+      selectedRecipientId = Number(user.userId);
+      const fullName = `${user.firstName} ${user.lastName}`;
+      const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
+
+      selectedUserName.textContent = fullName;
+      selectedUserAvatar.textContent = initials.toUpperCase();
+
+      messageInput.disabled = false;
+      sendButton.disabled = false;
+      messageInput.placeholder = "Type a message...";
+
+      messageContainer.replaceChildren();
+
+      const emptyMessage = dfocument.createElement("p");
+      emptyMessage.className = "text-center text-muted";
+      emptyMessage.textContent = `Start a conversation with ${fullName}!`;
+
+      messageContainer.appendChild(emptyMessage);
+
+      newChatUsers.hidden = true;
+      messageInput.focus();
+    }
+
     const relativeTimeFormatter = 
         new Intl.RelativeTimeFormat("en", {
           numeric: "always"
@@ -370,6 +488,7 @@
       const contact = document.querySelector(`.chat-contact[data-user-id="${otherUserId}"]`);
 
       if (!contact) {
+        window.location.reload();
         return;
       }
 
@@ -382,28 +501,6 @@
 
       document.getElementById("chat-contacts").prepend(contact);
     }
-    const chatApp = document.getElementById("chat-app");
-    const messageContainer =
-      document.getElementById("chat-messages");
-    const messageForm =
-      document.getElementById("chat-composer");
-    const messageInput =
-      document.getElementById("chat-input");
-    const sendButton = 
-      document.getElementById("send-message-button");
-    const selectedUserName =
-      document.getElementById("selected-user-name");
-    const selectedUserAvatar =
-      document.getElementById("selected-user-avatar");
-    const connectionStatus = 
-      document.getElementById("connection-status");
-    const contactSearch = 
-      document.getElementById("contact-search")
-    const contactsContainer = 
-      document.getElementById("chat-contacts")
-
-    const contactElements =
-      Array.from(document.querySelectorAll(".chat-contact"));
 
     const noSearchResults = document.createElement("p");
     noSearchResults.className = "p-3 text-muted text-center";

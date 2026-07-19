@@ -1,6 +1,8 @@
 package com.cmpt276.group3.grouproject.models;
 
 import com.cmpt276.group3.grouproject.enums.EOIStream;
+
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -35,6 +37,9 @@ public class ExpressionOfInterest {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EOIStream stream;
+
+    @Nullable
+    private Boolean hidden;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -90,5 +95,14 @@ public class ExpressionOfInterest {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public boolean isHidden() {
+        if (this.hidden==null) return false;
+        return this.hidden;
+    }
+
+    public void setHidden(Boolean hidden) {
+        this.hidden = hidden;
     }
 }

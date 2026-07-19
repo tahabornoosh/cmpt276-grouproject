@@ -8,5 +8,6 @@ public record ContactResponse (
             String lastName,
             String lastMessage,
             Instant lastMessageAt,
-            boolean lastMessageSentByCurrentUser
+            boolean lastMessageSentByCurrentUser,
+            boolean unread
 ) { }    

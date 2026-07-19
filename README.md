@@ -711,7 +711,7 @@ Mike clicks on "Chat" in the menu from any page in the app, and is redirected to
 **Acceptance Criteria**
 - Mike should see a card, with a list of contacts on the left and a chat window on the right. Clicking each contact must load the chat history with that contact.
 - If any contact has sent unviewed new messages, a circular blue badge must be displayed next to their name. Opening the chat should clear this badge.
-- The chat window should contain a textbox for sending messages as well as a button for blocking a user.
+- The chat window should contain a textbox for sending messages
 - There shall not be duplicate chats with the same user. Only one chat is permitted to exist for any pair of users
 - Sending and receiving messages should not require refreshing the page (AJAX)
 - Mike should NOT be able to start chats with users he has not chatted with previously (this will happen through EOIs)
@@ -723,7 +723,6 @@ Mike clicks on "Chat" in the menu from any page in the app, and is redirected to
 
 **Post-conditions**
 - All newly sent or received messages should be recorded in the database
-- Blocking actions should be applied to database records for chats
 - No duplicate chats must be created in the database
 
 **Non-functional requirements**
@@ -734,3 +733,5 @@ Mike clicks on "Chat" in the menu from any page in the app, and is redirected to
 - Clicking a contact should load their chat history in the chat window
 - If Mike has blocked a user, that user should not be able to send messages to Mike
 </div>
+
+# User Interface Requirements

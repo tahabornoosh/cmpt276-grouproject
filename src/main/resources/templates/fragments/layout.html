@@ -79,8 +79,22 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <li class="nav-item"><a id="menu-dashboard" href="/" class="nav-link"><i class="nav-icon fas fa-th"></i><p>Dashboard</p></a></li>
           <li class="nav-item"><a id="menu-profile" th:href="@{/profile/{id}(id=${currentUser.id})}" class="nav-link"><i class="nav-icon fas fa-user-alt"></i><p>Your Profile</p></a></li>
+          <li class="nav-item">
+            <a id="menu-feeds" href="#" class="nav-link">
+              <i class="nav-icon fas fa-stream"></i>
+              <p>
+                Feeds
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item"><a id="menu-feeds-friendship" href="/feeds/friendship" class="nav-link"><i class="far fa-circle nav-icon"></i><p>Friendship</p></a></li>
+              <li class="nav-item"><a id="menu-feeds-relationship" href="/feeds/relationship" class="nav-link"><i class="far fa-circle nav-icon"></i><p>Relationship</p></a></li>
+              <li class="nav-item"><a id="menu-feeds-study-buddy" href="/feeds/study-buddy" class="nav-link"><i class="far fa-circle nav-icon"></i><p>Study Buddy</p></a></li>
+            </ul>
+          </li>
           <li class="nav-item"><a id="menu-eois" href="/eois" class="nav-link"><i class="nav-icon fas fa-heart"></i><p>EOIs</p></a></li>
-          <li class="nav-item"><a id="menu-chat" href="/chat" class="nav-link"><i class="nav-icon fas fa-comment"></i><p>Your Chats</p></a></li>
+          <li hidden class="nav-item"><a id="menu-chat" href="/chat" class="nav-link"><i class="nav-icon fas fa-comment"></i><p>Your Chats</p></a></li>
           <li th:if="${currentUser.isAdmin() || currentUser.isMod()}" class="nav-item"><a id="menu-admin" href="/admin" class="nav-link"><i class="nav-icon fas fa-cogs"></i><p>Administration<span th:if="${currentUser.isMod()}" class="right badge badge-danger">Read-only</span></p></a></li>
         </ul>
       </nav>

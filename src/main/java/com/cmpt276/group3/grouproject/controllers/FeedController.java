@@ -94,16 +94,15 @@ public class FeedController {
     }
 
     private List<MatchingProfile> candidatesForStream(EOIStream stream) {
-        switch (stream) {
-            case FRIENDSHIP:
-                return matchingProfileRepository.findByDisplay_friendship_profile(true);
-            case RELATIONSHIP:
-                return matchingProfileRepository.findByDisplay_dating_profile(true);
-            case STUDY_BUDDY:
-                return matchingProfileRepository.findByDisplay_study_buddy_profile(true);
-            default:
-                return new ArrayList<>();
+        List<MatchingProfile> candidates = new ArrayList<>();
+
+        for (MatchingProfile profile : matchingProfileRepository.findAll()) {
+            if (streamEnabled(profile, stream)) {
+                candidates.add(profile);
+            }
         }
+
+        return candidates;
     }
 
     private Integer scoreFor(EOIStream stream, MatchingProfile viewerProfile, MatchingProfile candidate) {

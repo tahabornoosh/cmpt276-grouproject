@@ -183,6 +183,13 @@ Mike opens the app URL and must be redirected to the login page. Then, he clicks
 
 Mike then enters his information and clicks Submit to create his account.
 
+**UI Mockups**
+![alt text](UIMockups/signup.png)
+*Figure 1: Empty sign up page
+
+![alt text](UIMockups/signupfail.png)
+*Figure 2: Invalid information submitted
+
 **Acceptance Criteria**
 - If Mike enters any string as their first and last name, a valid and not previously used valid email address, matching passwords in the two password fields, a valid dropdown item for gender, and accepts the terms of use by checking the applicable checkbox, then his account must be registered and he must be redirected to the login page with a success message.
 - If any of the fields are left empty once the form is submitted, mike should be redirected back to the signup page with an error message
@@ -223,6 +230,14 @@ He then enters his username and password and clicks on the Log in button.
 - If John enters the wrong password, he should be redirected back to the login page with an error message
 - If John enters the wrong email address, or both a wrong email address and the wrong password, then he should be redirected back to the login page with an error message.
 
+**UI Mockups**
+
+![alt text](UIMockups/login.png)
+*Figure 1: John attempts to login
+
+![alt text](UIMockups/loginfail.png)
+*Figure 2: Invalid information submitted, either email or password
+
 **Post-conditions**
 - If John logs in successfully, his session variables must reflect his user ID.
 - If John's login attempt is unsuccessful, then his session variables should not be modified.
@@ -252,6 +267,14 @@ John logs into the app and is redirected to the dashboard page, or clicks on the
 - If John is not signed in, then he should be redirected to the login page
 - If John is signed in and is a regular user, then he should see a dashboard consisting of his basic user information and options to view his profile or change his account details
 - If John is a moderator or an admin, then he should see a dashboard which, in addition to the above, contains a banner stating his role at the top of the page as well as a menu item for the admin panel.
+
+**Ui Mockups**
+
+![alt text](UIMockups/landingpage.png)
+*Figure 1: John logged in as a regular user
+
+![alt text](UIMockups/adminlandingpage.png)
+*Figure 2: John logged in as an admin
 
 **Post-conditions**
 - None
@@ -289,6 +312,14 @@ Completed in Iteration 1.
 - If Alice is logged in, she should be able to view and access moderator features of admin controls
 - If John is logged in, the admin page should redirect him back to dashboard
 - If an unauthorized user attempts to access page they should be redirected to login page
+
+**Ui Mockups**
+
+![alt text](UIMockups/adminpanel.png)
+*Figure 1: Jason's view as an admin
+
+![alt text](UIMockups/modpanel.png)
+*Figure 2: Alice's view as an moderator
 
 **Post-conditions**
 - Admin-only actions should only be accessed and completed by admins
@@ -356,6 +387,12 @@ Ryan fills out the required fields, selects what specific sections (friendship, 
 **Acceptance Criteria**
 - If all required fields, including those in the user-specified sections, have been filled, the form must be submitted and Ryan should be redirected to his profile page
 - If there are missing fields, Ryan should be redirected back to the questionnair with an error message
+
+**UI Mockups**
+
+![alt text](UIMockups/questionnairecompletion.png)
+*Figure 1: Ryan's profile after completing questionnaire
+
 **Post-conditions**
 - If there are no missing fields, the matching profile for Ryan must be created or updated
 - A successful questionnair saves and displays profile on page should it be active
@@ -679,6 +716,11 @@ Mike clicks on "Chat" in the menu from any page in the app, and is redirected to
 - Sending and receiving messages should not require refreshing the page (AJAX)
 - Mike should NOT be able to start chats with users he has not chatted with previously (this will happen through EOIs)
 
+**UI Mockups**
+
+![alt text](UIMockups/mikechat.png)
+*Figure 1: Mike's view of the chat page
+
 **Post-conditions**
 - All newly sent or received messages should be recorded in the database
 - No duplicate chats must be created in the database
@@ -693,3 +735,25 @@ Mike clicks on "Chat" in the menu from any page in the app, and is redirected to
 </div>
 
 # User Interface Requirements
+
+**Signup Mockups**
+![alt text](UIMockups/signup.png)
+![alt text](UIMockups/signupfail.png)
+
+**Login Mockups**
+![alt text](UIMockups/login.png)
+![alt text](UIMockups/loginfail.png)
+
+**Landing Page Mockups**
+![alt text](UIMockups/landingpage.png)
+![alt text](UIMockups/adminlandingpage.png)
+
+**Admin Panel Mockups**
+![alt text](UIMockups/adminpanel.png)
+![alt text](UIMockups/modpanel.png)
+
+**Questionnaire Mockups**
+![alt text](UIMockups/questionnairecompletion.png)
+
+**Chat Mockups**
+![alt text](UIMockups/mikechat.png)

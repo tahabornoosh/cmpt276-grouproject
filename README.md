@@ -183,7 +183,7 @@ Mike opens the app URL and must be redirected to the login page. Then, he clicks
 
 Mike then enters his information and clicks Submit to create his account.
 
-**Ui Mockups**
+**UI Mockups**
 ![alt text](UIMockups/signup.png)
 *Figure 1: Empty sign up page
 
@@ -230,7 +230,7 @@ He then enters his username and password and clicks on the Log in button.
 - If John enters the wrong password, he should be redirected back to the login page with an error message
 - If John enters the wrong email address, or both a wrong email address and the wrong password, then he should be redirected back to the login page with an error message.
 
-**Ui Mockups**
+**UI Mockups**
 
 ![alt text](UIMockups/login.png)
 *Figure 1: John attempts to login
@@ -388,7 +388,7 @@ Ryan fills out the required fields, selects what specific sections (friendship, 
 - If all required fields, including those in the user-specified sections, have been filled, the form must be submitted and Ryan should be redirected to his profile page
 - If there are missing fields, Ryan should be redirected back to the questionnair with an error message
 
-**Ui Mockups**
+**UI Mockups**
 
 ![alt text](UIMockups/questionnairecompletion.png)
 *Figure 1: Ryan's profile after completing questionnaire
@@ -716,7 +716,7 @@ Mike clicks on "Chat" in the menu from any page in the app, and is redirected to
 - Sending and receiving messages should not require refreshing the page (AJAX)
 - Mike should NOT be able to start chats with users he has not chatted with previously (this will happen through EOIs)
 
-**Ui Mockups**
+**UI Mockups**
 
 ![alt text](UIMockups/mikechat.png)
 *Figure 1: Mike's view of the chat page
@@ -736,24 +736,24 @@ Mike clicks on "Chat" in the menu from any page in the app, and is redirected to
 
 # User Interface Requirements
 
-Signup Mockups
+**Signup Mockups**
 ![alt text](UIMockups/signup.png)
 ![alt text](UIMockups/signupfail.png)
 
-Login Mockups
+**Login Mockups**
 ![alt text](UIMockups/login.png)
 ![alt text](UIMockups/loginfail.png)
 
-Landing Page Mockups
+**Landing Page Mockups**
 ![alt text](UIMockups/landingpage.png)
 ![alt text](UIMockups/adminlandingpage.png)
 
-Admin Panel Mockups
+**Admin Panel Mockups**
 ![alt text](UIMockups/adminpanel.png)
 ![alt text](UIMockups/modpanel.png)
 
-Questionnaire Mockups
+**Questionnaire Mockups**
 ![alt text](UIMockups/questionnairecompletion.png)
 
-Chat Mockups
+**Chat Mockups**
 ![alt text](UIMockups/mikechat.png)

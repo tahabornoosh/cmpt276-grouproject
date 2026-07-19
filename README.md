@@ -184,10 +184,10 @@ Mike opens the app URL and must be redirected to the login page. Then, he clicks
 Mike then enters his information and clicks Submit to create his account.
 
 **Ui Mockups**
-![alt text](UiMockups/signup.png)
+![alt text](UIMockups/signup.png)
 *Figure 1: Empty sign up page
 
-![alt text](UiMockups/signupfail.png)
+![alt text](UIMockups/signupfail.png)
 *Figure 2: Invalid information submitted
 
 **Acceptance Criteria**
@@ -232,10 +232,10 @@ He then enters his username and password and clicks on the Log in button.
 
 **Ui Mockups**
 
-![alt text](UiMockups/login.png)
+![alt text](UIMockups/login.png)
 *Figure 1: John attempts to login
 
-![alt text](UiMockups/loginfail.png)
+![alt text](UIMockups/loginfail.png)
 *Figure 2: Invalid information submitted, either email or password
 
 **Post-conditions**
@@ -270,10 +270,10 @@ John logs into the app and is redirected to the dashboard page, or clicks on the
 
 **Ui Mockups**
 
-![alt text](UiMockups/landingpage.png)
+![alt text](UIMockups/landingpage.png)
 *Figure 1: John logged in as a regular user
 
-![alt text](UiMockups/adminlandingpage.png)
+![alt text](UIMockups/adminlandingpage.png)
 *Figure 2: John logged in as an admin
 
 **Post-conditions**
@@ -315,10 +315,10 @@ Completed in Iteration 1.
 
 **Ui Mockups**
 
-![alt text](UiMockups/adminpanel.png)
+![alt text](UIMockups/adminpanel.png)
 *Figure 1: Jason's view as an admin
 
-![alt text](UiMockups/modpanel.png)
+![alt text](UIMockups/modpanel.png)
 *Figure 2: Alice's view as an moderator
 
 **Post-conditions**
@@ -390,7 +390,7 @@ Ryan fills out the required fields, selects what specific sections (friendship, 
 
 **Ui Mockups**
 
-![alt text](UiMockups/questionnairecompletion.png)
+![alt text](UIMockups/questionnairecompletion.png)
 *Figure 1: Ryan's profile after completing questionnaire
 
 **Post-conditions**
@@ -718,7 +718,7 @@ Mike clicks on "Chat" in the menu from any page in the app, and is redirected to
 
 **Ui Mockups**
 
-![alt text](UiMockups/mikechat.png)
+![alt text](UIMockups/mikechat.png)
 *Figure 1: Mike's view of the chat page
 
 **Post-conditions**

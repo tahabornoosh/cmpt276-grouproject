@@ -147,7 +147,7 @@ public class FeedControllerTest {
         when(auth.getUser(session)).thenReturn(mike);
         when(matchingProfileService.getProfileByUser(mike)).thenReturn(mikeProfile);
         // Repository returns Mike's own profile too - the controller must filter it out.
-        when(matchingProfileRepository.findByDisplay_friendship_profile(true))
+        when(matchingProfileRepository.findAll())
                 .thenReturn(List.of(mikeProfile, closeMatchProfile, farMatchProfile));
 
         var result = mockMvc.perform(get("/feeds/friendship").session(session))

@@ -1,0 +1,81 @@
+<th:block th:replace="~{fragments/layout :: head('Feed')}"></th:block>
+<th:block th:replace="~{fragments/layout :: bodyStart}"></th:block>
+
+<input type="hidden" id="activeMenuItem" th:value="'menu-feeds-' + ${streamSlug}" />
+
+<main class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1><i th:class="'fas ' + ${streamIcon} + ' mr-2'"></i><span th:text="${stream.displayName} + ' Feed'">Feed</span></h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item active">Feeds</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+
+      <!-- Acceptance criteria: informative error + link to the questionnaire when the
+           stream hasn't been completed/enabled yet -->
+      <div th:if="${streamIncomplete}" class="alert alert-warning">
+        <h5><i class="icon fas fa-exclamation-triangle"></i> This feed isn't set up yet</h5>
+        <span th:text="'You need to complete and enable the ' + ${stream.displayName} + ' section of your questionnaire before you can see matches here.'"></span>
+        <a th:href="@{/questionnaire(edit=1)}" class="alert-link">Complete your questionnaire</a> to get started.
+      </div>
+
+      <div th:unless="${streamIncomplete}" class="card">
+        <div class="card-header">
+          <h3 class="card-title" th:text="${stream.displayName} + ' Matches'">Matches</h3>
+        </div>
+
+        <div class="card-body">
+          <div th:if="${#lists.isEmpty(matches)}" class="alert alert-info mb-0">
+            No matches yet for this feed. Check back once more students complete their questionnaire.
+          </div>
+
+          <div th:unless="${#lists.isEmpty(matches)}" class="table-responsive">
+            <table class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Match Score</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="entry : ${matches}">
+                  <td>
+                    <img th:src="${entry.user.avatar != null && !entry.user.avatar.isEmpty()}
+                                  ? ${entry.user.avatar}
+                                  : @{/user.png}" src="/user.png" alt="User avatar" class="img-circle mr-2" width="40"
+                      height="40">
+                    <span th:text="${entry.user.first_name + ' ' + entry.user.last_name}"></span>
+                  </td>
+                  <td>
+                    <span th:class="'badge ' + ${badgeClass}" th:text="${entry.score} + '%'"></span>
+                  </td>
+                  <td>
+                    <a th:href="@{/profile/{id}(id=${entry.user.id})}" class="btn btn-primary btn-sm">
+                      <i class="fas fa-user"></i> View Profile
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<th:block th:replace="~{fragments/layout :: bodyEnd}"></th:block>

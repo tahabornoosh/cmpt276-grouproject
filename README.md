@@ -735,3 +735,25 @@ Mike clicks on "Chat" in the menu from any page in the app, and is redirected to
 </div>
 
 # User Interface Requirements
+
+Signup Mockups
+![alt text](UIMockups/signup.png)
+![alt text](UIMockups/signupfail.png)
+
+Login Mockups
+![alt text](UIMockups/login.png)
+![alt text](UIMockups/loginfail.png)
+
+Landing Page Mockups
+![alt text](UIMockups/landingpage.png)
+![alt text](UIMockups/adminlandingpage.png)
+
+Admin Panel Mockups
+![alt text](UIMockups/adminpanel.png)
+![alt text](UIMockups/modpanel.png)
+
+Questionnaire Mockups
+![alt text](UIMockups/questionnairecompletion.png)
+
+Chat Mockups
+![alt text](UIMockups/mikechat.png)

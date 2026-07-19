@@ -164,7 +164,7 @@ Mike then enters his information and clicks Submit to create his account.
 **Acceptance Criteria**
 - If Mike enters any string as their first and last name, a valid and not previously used valid email address, matching passwords in the two password fields, a valid dropdown item for gender, and accepts the terms of use by checking the applicable checkbox, then his account must be registered and he must be redirected to the login page with a success message.
 - If any of the fields are left empty once the form is submitted, mike should be redirected back to the signup page with an error message
-- If Mike enters an invalid email, or enters Jane's email (or any already registered user's email), then he should be redirected back to the signup page with an error message
+- If Mike enters an invalid email, or enters Jane's email (or any already registered user's email), then he should be redirected back to the signup page with an error message![alt text](UIMockups/signup.png)
 
 **Post-conditions**
 - If Mike's input is accepted, then a database record of his new account must be created.
@@ -371,7 +371,7 @@ Joyce either clicks on the associated button on her landing page, or clicks "edi
 - If the user is not Joyce, the user exists, and Joyce is an admin, then she should see a form pre-filled with the user's first name, last name, and gender, and an empty field for password.
 - If the user does not exist and Joyce is an admin, then a 404 error page should be displayed
 
-**Post-conditions**
+**Post-conditions**!
 - None
 
 **Non-functional requirements**

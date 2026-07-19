@@ -2,9 +2,8 @@ package com.cmpt276.group3.grouproject.controllers;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -20,10 +19,10 @@ import org.springframework.web.server.ResponseStatusException;
 import com.cmpt276.group3.grouproject.auth.Auth;
 import com.cmpt276.group3.grouproject.models.ChatMessage;
 import com.cmpt276.group3.grouproject.models.User;
-import com.cmpt276.group3.grouproject.models.UsersRepository;
+import com.cmpt276.group3.grouproject.models.UserBlock;
+import com.cmpt276.group3.grouproject.models.UserBlockRepository;
 import com.cmpt276.group3.grouproject.services.ChatMessageService;
 import com.cmpt276.group3.grouproject.services.UserService;
-import com.cmpt276.group3.grouproject.util.ChatUserResponse;
 import com.cmpt276.group3.grouproject.util.ContactResponse;
 import com.cmpt276.group3.grouproject.util.MessageResponse;
 import com.cmpt276.group3.grouproject.util.SendMessageRequest;
@@ -37,49 +36,20 @@ public class ChatController {
     private final UserService userService;
     private final ChatMessageService chatMessageService;
     private final SimpMessagingTemplate messagingTemplate;
-    private final UsersRepository usersRepository;
+    private final UserBlockRepository userBlockRepository;
 
     public ChatController(
         Auth auth,
         UserService userService,
         ChatMessageService chatMessageService,
         SimpMessagingTemplate messagingTemplate,
-        UsersRepository usersRepository
+        UserBlockRepository userBlockRepository
     ) {
         this.auth = auth;
         this.userService = userService;
         this.chatMessageService = chatMessageService;
         this.messagingTemplate = messagingTemplate;
-        this.usersRepository = usersRepository;
-    }
-
-    @GetMapping("/api/chat/users")
-    @ResponseBody
-    public List<ChatUserResponse> getAvailableChatUsers(HttpSession session) {
-        User currentUser = requireLoggedInUser(session);
-
-        Set<Long> existingConversationIds =
-            chatMessageService.getExistingConversations(currentUser)
-                .stream()
-                .map(ContactResponse::userId)
-                .collect(Collectors.toSet());
-
-        return usersRepository.findAll()
-            .stream()
-            .filter(user ->
-                !Objects.equals(user.getId(), currentUser.getId())
-            )
-            .filter(user ->
-                !existingConversationIds.contains(user.getId())
-            )
-            .map(user ->
-                new ChatUserResponse(
-                    user.getId(),
-                    user.getFirst_name(),
-                    user.getLast_name()
-                )
-            )
-            .toList();
+        this.userBlockRepository = userBlockRepository;
     }
 
     @GetMapping("/chat")
@@ -100,7 +70,6 @@ public class ChatController {
         List<ContactResponse> contacts =
             chatMessageService.getExistingConversations(currentUser);
 
-        // The template opens this user only when the ID exists in contacts.
         model.addAttribute("requestedUserId", userId);
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("contacts", contacts);
@@ -121,30 +90,41 @@ public class ChatController {
 
         User sender = getCurrentWebSocketUser(principal);
 
-        ChatMessage savedMessage =
-            chatMessageService.createMessage(
-                sender,
-                request.recipientId(),
-                request.content()
+        try {
+            ChatMessage savedMessage =
+                chatMessageService.createMessage(
+                    sender,
+                    request.recipientId(),
+                    request.content()
+                );
+
+            MessageResponse response = MessageResponse.from(savedMessage);
+
+            String recipientId =
+                String.valueOf(savedMessage.getRecipient().getId());
+            String senderId =
+                String.valueOf(savedMessage.getSender().getId());
+
+            messagingTemplate.convertAndSendToUser(
+                recipientId,
+                "/queue/messages",
+                response
             );
-
-        MessageResponse response = MessageResponse.from(savedMessage);
-
-        String recipientId =
-            String.valueOf(savedMessage.getRecipient().getId());
-        String senderId =
-            String.valueOf(savedMessage.getSender().getId());
-
-        messagingTemplate.convertAndSendToUser(
-            recipientId,
-            "/queue/messages",
-            response
-        );
-        messagingTemplate.convertAndSendToUser(
-            senderId,
-            "/queue/messages",
-            response
-        );
+            messagingTemplate.convertAndSendToUser(
+                senderId,
+                "/queue/messages",
+                response
+            );
+        } catch (IllegalStateException exception) {
+            messagingTemplate.convertAndSendToUser(
+                principal.getName(),
+                "/queue/chat-errors",
+                Map.of(
+                    "code", "CHAT_BLOCKED",
+                    "message", exception.getMessage()
+                )
+            );
+        }
     }
 
     @GetMapping("/api/chat/messages")
@@ -154,8 +134,6 @@ public class ChatController {
         HttpSession session
     ) {
         User currentUser = requireLoggedInUser(session);
-
-        // Reading this endpoint means the user actually opened the chat.
         return chatMessageService.getConversation(currentUser, otherUserId);
     }
 
@@ -167,6 +145,94 @@ public class ChatController {
     ) {
         User currentUser = requireLoggedInUser(session);
         chatMessageService.markConversationAsRead(currentUser, otherUserId);
+    }
+
+    @GetMapping("/api/chat/block-status")
+    @ResponseBody
+    public Map<String, Object> getBlockStatus(
+        @RequestParam long otherUserId,
+        HttpSession session
+    ) {
+        User currentUser = requireLoggedInUser(session);
+        User otherUser = requireOtherUser(currentUser, otherUserId);
+        return blockStatusFor(currentUser, otherUser);
+    }
+
+    @PostMapping("/api/chat/block")
+    @ResponseBody
+    public Map<String, Object> blockUser(
+        @RequestParam long otherUserId,
+        HttpSession session
+    ) {
+        User currentUser = requireLoggedInUser(session);
+        User otherUser = requireOtherUser(currentUser, otherUserId);
+
+        if (!userBlockRepository.existsByBlockerIdAndBlockedId(
+            currentUser.getId(),
+            otherUser.getId()
+        )) {
+            userBlockRepository.save(new UserBlock(currentUser, otherUser));
+        }
+
+        notifyBlockStatus(currentUser, otherUser);
+        return blockStatusFor(currentUser, otherUser);
+    }
+
+    @PostMapping("/api/chat/unblock")
+    @ResponseBody
+    public Map<String, Object> unblockUser(
+        @RequestParam long otherUserId,
+        HttpSession session
+    ) {
+        User currentUser = requireLoggedInUser(session);
+        User otherUser = requireOtherUser(currentUser, otherUserId);
+
+        userBlockRepository
+            .findByBlockerIdAndBlockedId(
+                currentUser.getId(),
+                otherUser.getId()
+            )
+            .ifPresent(userBlockRepository::delete);
+
+        notifyBlockStatus(currentUser, otherUser);
+        return blockStatusFor(currentUser, otherUser);
+    }
+
+    private Map<String, Object> blockStatusFor(
+        User currentUser,
+        User otherUser
+    ) {
+        boolean blockedByCurrentUser =
+            userBlockRepository.existsByBlockerIdAndBlockedId(
+                currentUser.getId(),
+                otherUser.getId()
+            );
+        boolean blockedByOtherUser =
+            userBlockRepository.existsByBlockerIdAndBlockedId(
+                otherUser.getId(),
+                currentUser.getId()
+            );
+
+        return Map.of(
+            "otherUserId", otherUser.getId(),
+            "blockedByCurrentUser", blockedByCurrentUser,
+            "blockedByOtherUser", blockedByOtherUser,
+            "communicationBlocked",
+                blockedByCurrentUser || blockedByOtherUser
+        );
+    }
+
+    private void notifyBlockStatus(User firstUser, User secondUser) {
+        messagingTemplate.convertAndSendToUser(
+            String.valueOf(firstUser.getId()),
+            "/queue/block-status",
+            blockStatusFor(firstUser, secondUser)
+        );
+        messagingTemplate.convertAndSendToUser(
+            String.valueOf(secondUser.getId()),
+            "/queue/block-status",
+            blockStatusFor(secondUser, firstUser)
+        );
     }
 
     private User requireLoggedInUser(HttpSession session) {
@@ -186,6 +252,25 @@ public class ChatController {
         }
 
         return currentUser;
+    }
+
+    private User requireOtherUser(User currentUser, long otherUserId) {
+        if (Objects.equals(currentUser.getId(), otherUserId)) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "You cannot block yourself"
+            );
+        }
+
+        User otherUser = userService.findUserById(otherUserId);
+        if (otherUser == null) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "The other user was not found"
+            );
+        }
+
+        return otherUser;
     }
 
     private User getCurrentWebSocketUser(Principal principal) {

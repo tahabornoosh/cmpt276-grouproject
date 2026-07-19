@@ -180,23 +180,7 @@
               </span>
               <!--Search feature-->
               <input type="search" class="form-control" placeholder="Search contacts…" id="contact-search" aria-label="Search contacts">
-              <!--New chat-->
-              <button hidden
-                type="button"
-                class="btn btn-primary btn-sm btn-block mt-2"
-                id="new-chat-button"
-                >
-                  <i class="fas fa-plus mr-l"></i>
-                New Chat
-              </button>
-
-              <div
-                id="new-chat-users"
-                class="border-bottom overflow-auto mx-auto my-2"
-                style="width: 90%;"
-                hidden>
-              </div>
-            </div>
+</div>
           </div>
           <div class="flex-grow-1 overflow-auto" id="chat-contacts">
             <a
@@ -262,6 +246,29 @@
         <!-- Conversation -->
         <section class="chat-conversation">
           <header class="chat-header">
+            <div class="dropdown" id="chat-actions" hidden>
+              <button
+                class="btn btn-light btn-sm"
+                type="button"
+                id="chat-actions-button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                aria-label="Conversation actions"
+              >
+                <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+              </button>
+              <div class="dropdown-menu dropdown-menu-left">
+                <button
+                  class="dropdown-item text-danger"
+                  type="button"
+                  id="toggle-block-button"
+                >
+                  Block user
+                </button>
+              </div>
+            </div>
+
             <span
               class="chat-avatar bg-primary text-white"
               id="selected-user-avatar"
@@ -276,6 +283,12 @@
                 >
                 Select a conversation
               </p>
+
+              <small
+                class="text-danger d-block"
+                id="block-status-message"
+                hidden
+              ></small>
 
               <small hidden class="text-muted" id="connection-status">
                 Connecting...
@@ -337,8 +350,14 @@
       document.getElementById("selected-user-name");
     const selectedUserAvatar =
       document.getElementById("selected-user-avatar");
-    const connectionStatus = 
+    const connectionStatus =
       document.getElementById("connection-status");
+    const chatActions =
+      document.getElementById("chat-actions");
+    const toggleBlockButton =
+      document.getElementById("toggle-block-button");
+    const blockStatusMessage =
+      document.getElementById("block-status-message");
     const contactSearch = 
       document.getElementById("contact-search")
     const contactsContainer = 
@@ -346,84 +365,6 @@
 
     const contactElements =
       Array.from(document.querySelectorAll(".chat-contact"));
-    
-    const newChatButton = 
-      document.getElementById("new-chat-button");
-    const newChatUsers =
-      document.getElementById("new-chat-users");
-
-    let availableChatUsersLoaded = false;
-
-    newChatButton.addEventListener("click", async () => {
-      newChatUsers.hidden = !newChatUsers.hidden;
-
-      if (newChatUsers.hidden || availableChatUsersLoaded) 
-      {
-        return
-      };
-
-      try {
-        const response = await fetch("/api/chat/users");
-
-        if (response.status === 401) {
-          window.location.href = "/login";
-          return;
-        }
-
-        if (!response.ok) {
-          throw new Error(`Could not load users: ${response.status}`);
-        }
-
-        const users = await response.json();
-
-        newChatUsers.replaceChildren();
-
-        users.forEach(user => {
-          const button = document.createElement("button");
-
-          button.type = "button";
-          button.className = "btn btn-light btn-block text-center rounded-0";
-
-          button.textContent = `${user.firstName} ${user.lastName}`;
-
-          button.addEventListener("click", () => {
-            startConversationWith(user);
-          });
-
-          newChatUsers.appendChild(button);
-        });
-
-        availableChatUsersLoaded = true;
-      } catch (error) {
-        console.error(error);
-
-        newChatUsers.textContent = "Users could not be loaded";
-      }
-    })
-
-    function startConversationWith(user) {
-      selectedRecipientId = Number(user.userId);
-      const fullName = `${user.firstName} ${user.lastName}`;
-      const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
-
-      selectedUserName.textContent = fullName;
-      selectedUserAvatar.textContent = initials.toUpperCase();
-
-      messageInput.disabled = false;
-      sendButton.disabled = false;
-      messageInput.placeholder = "Type a message...";
-
-      messageContainer.replaceChildren();
-
-      const emptyMessage = document.createElement("p");
-      emptyMessage.className = "text-center text-muted";
-      emptyMessage.textContent = `Start a conversation with ${fullName}!`;
-
-      messageContainer.appendChild(emptyMessage);
-
-      newChatUsers.hidden = true;
-      messageInput.focus();
-    }
 
     const relativeTimeFormatter = 
         new Intl.RelativeTimeFormat("en", {
@@ -526,6 +467,116 @@
       }
     }
 
+    function setComposerEnabled(enabled, placeholder) {
+      messageInput.disabled = !enabled;
+      sendButton.disabled = !enabled;
+      messageInput.placeholder = placeholder;
+    }
+
+    function applyBlockStatus(status) {
+      if (!status || Number(status.otherUserId) !== selectedRecipientId) {
+        return;
+      }
+
+      selectedBlockStatus = status;
+      chatActions.hidden = false;
+      toggleBlockButton.disabled = false;
+
+      if (status.blockedByCurrentUser) {
+        toggleBlockButton.textContent = "Unblock user";
+        toggleBlockButton.classList.remove("text-danger");
+        blockStatusMessage.textContent =
+          "You blocked this user. Unblock them to send messages.";
+      } else {
+        toggleBlockButton.textContent = "Block user";
+        toggleBlockButton.classList.add("text-danger");
+        blockStatusMessage.textContent = status.blockedByOtherUser
+          ? "Messaging is unavailable for this conversation."
+          : "";
+      }
+
+      blockStatusMessage.hidden = !status.communicationBlocked;
+
+      if (status.communicationBlocked) {
+        setComposerEnabled(
+          false,
+          status.blockedByCurrentUser
+            ? "You blocked this user."
+            : "Messaging is unavailable."
+        );
+      } else {
+        setComposerEnabled(true, "Type a message...");
+        messageInput.focus();
+      }
+    }
+
+    async function loadBlockStatus(otherUserId) {
+      selectedBlockStatus = null;
+      toggleBlockButton.disabled = true;
+      blockStatusMessage.hidden = true;
+
+      try {
+        const response = await fetch(
+          `/api/chat/block-status?otherUserId=${otherUserId}`
+        );
+
+        if (response.status === 401) {
+          window.location.href = "/login";
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(
+            `Could not load block status: ${response.status}`
+          );
+        }
+
+        const status = await response.json();
+        applyBlockStatus(status);
+      } catch (error) {
+        console.error(error);
+        if (Number(otherUserId) === selectedRecipientId) {
+          setComposerEnabled(false, "Messaging status could not be loaded.");
+        }
+      }
+    }
+
+    async function changeBlockState() {
+      if (!selectedRecipientId || !selectedBlockStatus) {
+        return;
+      }
+
+      toggleBlockButton.disabled = true;
+
+      const endpoint = selectedBlockStatus.blockedByCurrentUser
+        ? "/api/chat/unblock"
+        : "/api/chat/block";
+
+      try {
+        const response = await fetch(
+          `${endpoint}?otherUserId=${selectedRecipientId}`,
+          { method: "POST" }
+        );
+
+        if (response.status === 401) {
+          window.location.href = "/login";
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(
+            `Could not change block status: ${response.status}`
+          );
+        }
+
+        applyBlockStatus(await response.json());
+      } catch (error) {
+        console.error(error);
+        toggleBlockButton.disabled = false;
+        alert("The block status could not be changed.");
+      }
+    }
+
     function openContact(contact) {
       if (!contact) {
         return false;
@@ -541,12 +592,10 @@
       selectedUserName.textContent = contact.dataset.userName;
       selectedUserAvatar.textContent = contact.dataset.userInitials;
 
-      messageInput.disabled = false;
-      sendButton.disabled = false;
-      messageInput.placeholder = "Type a message....";
-      messageInput.focus();
-
+      chatActions.hidden = false;
+      setComposerEnabled(false, "Loading conversation...");
       loadConversation(selectedRecipientId);
+      loadBlockStatus(selectedRecipientId);
       return true;
     }
 
@@ -631,6 +680,7 @@
     const currentUserId = Number(chatApp.dataset.currentUserId);
 
     let selectedRecipientId = null;
+    let selectedBlockStatus = null;
     let stompClient = null;
 
     function formatMessageTime(sentAt) {
@@ -718,6 +768,8 @@
       }
     }
 
+    toggleBlockButton.addEventListener("click", changeBlockState);
+
     document
       .querySelectorAll(".chat-contact")
       .forEach(contact => {
@@ -783,6 +835,28 @@
             }
           }
           );
+
+          stompClient.subscribe(
+            "/user/queue/block-status",
+            frame => {
+              const status = JSON.parse(frame.body);
+              applyBlockStatus(status);
+            }
+          );
+
+          stompClient.subscribe(
+            "/user/queue/chat-errors",
+            frame => {
+              const error = JSON.parse(frame.body);
+
+              if (error.code === "CHAT_BLOCKED") {
+                if (selectedRecipientId !== null) {
+                  loadBlockStatus(selectedRecipientId);
+                }
+                alert(error.message);
+              }
+            }
+          );
         },
 
         onWebSocketClose: () => {
@@ -805,7 +879,13 @@
 
         const content = messageInput.value.trim();
 
-        if (!selectedRecipientId || content === "") {
+        if (
+          !selectedRecipientId
+          || content === ""
+          || messageInput.disabled
+          || (selectedBlockStatus
+              && selectedBlockStatus.communicationBlocked)
+        ) {
           return;
         }
 

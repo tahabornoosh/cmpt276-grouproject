@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.cmpt276.group3.grouproject.models.ChatMessage;
 import com.cmpt276.group3.grouproject.models.ChatMessageRepository;
 import com.cmpt276.group3.grouproject.models.User;
+import com.cmpt276.group3.grouproject.models.UserBlockRepository;
 import com.cmpt276.group3.grouproject.util.ContactResponse;
 import com.cmpt276.group3.grouproject.util.MessageResponse;
 
@@ -23,21 +24,18 @@ public class ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
     private final UserService userService;
+    private final UserBlockRepository userBlockRepository;
 
     public ChatMessageService(
         ChatMessageRepository chatMessageRepository,
-        UserService userService
+        UserService userService,
+        UserBlockRepository userBlockRepository
     ) {
         this.chatMessageRepository = chatMessageRepository;
         this.userService = userService;
+        this.userBlockRepository = userBlockRepository;
     }
 
-    /**
-     * Returns one contact per existing conversation.
-     *
-     * This method only reads unread state. Merely loading the contacts list must
-     * never mark messages as read.
-     */
     @Transactional(readOnly = true)
     public List<ContactResponse> getExistingConversations(User currentUser) {
         requireCurrentUser(currentUser);
@@ -67,8 +65,6 @@ public class ChatMessageService {
                 latestMessageByContact.put(otherUserId, message);
             }
 
-            // A conversation is unread only when the current user is the
-            // recipient of at least one unread message in that conversation.
             boolean unreadForCurrentUser =
                 Objects.equals(message.getRecipient().getId(), currentUserId)
                     && message.isUnread();
@@ -148,21 +144,32 @@ public class ChatMessageService {
             throw new IllegalArgumentException("You cannot message yourself");
         }
 
+        boolean blockedBySender =
+            userBlockRepository.existsByBlockerIdAndBlockedId(
+                sender.getId(),
+                recipient.getId()
+            );
+        boolean blockedByRecipient =
+            userBlockRepository.existsByBlockerIdAndBlockedId(
+                recipient.getId(),
+                sender.getId()
+            );
+
+        if (blockedBySender || blockedByRecipient) {
+            throw new IllegalStateException(
+                "Messaging is unavailable for this conversation."
+            );
+        }
+
         ChatMessage message = new ChatMessage();
         message.setSender(sender);
         message.setRecipient(recipient);
         message.setContent(cleanedContent);
-
-        // "Unread" means unread by the recipient.
         message.setUnread(true);
 
         return chatMessageRepository.save(message);
     }
 
-    /**
-     * Opening a conversation marks only messages received by currentUser from
-     * otherUser as read. Sent messages are not changed.
-     */
     @Transactional
     public List<MessageResponse> getConversation(
         User currentUser,
@@ -184,10 +191,6 @@ public class ChatMessageService {
             .toList();
     }
 
-    /**
-     * Used when a WebSocket message arrives while this conversation is already
-     * open. It keeps the database unread state synchronized with the UI.
-     */
     @Transactional
     public void markConversationAsRead(User currentUser, long otherUserId) {
         requireCurrentUser(currentUser);

@@ -24,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.cmpt276.group3.grouproject.models.ChatMessage;
 import com.cmpt276.group3.grouproject.models.ChatMessageRepository;
 import com.cmpt276.group3.grouproject.models.User;
+import com.cmpt276.group3.grouproject.models.UserBlockRepository;
 import com.cmpt276.group3.grouproject.util.ContactResponse;
 import com.cmpt276.group3.grouproject.util.MessageResponse;
 
@@ -35,6 +36,9 @@ public class ChatMessageServiceTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private UserBlockRepository userBlockRepository;
 
     @InjectMocks
     private ChatMessageService chatMessageService;

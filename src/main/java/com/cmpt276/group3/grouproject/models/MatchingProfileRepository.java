@@ -10,4 +10,9 @@ public interface MatchingProfileRepository extends JpaRepository<MatchingProfile
     public Optional<MatchingProfile> findByUser_Id(long user_Id);
     boolean existsByUser(User user);
     boolean existsByUser_Id(Long id);
+
+    // Candidates for the Feeds page: everyone who has completed and enabled a given stream.
+    List<MatchingProfile> findByDisplay_friendship_profile(boolean value);
+    List<MatchingProfile> findByDisplay_dating_profile(boolean value);
+    List<MatchingProfile> findByDisplay_study_buddy_profile(boolean value);
 }

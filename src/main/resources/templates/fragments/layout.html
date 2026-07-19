@@ -94,7 +94,7 @@
             </ul>
           </li>
           <li class="nav-item"><a id="menu-eois" href="/eois" class="nav-link"><i class="nav-icon fas fa-heart"></i><p>EOIs</p></a></li>
-          <li hidden class="nav-item"><a id="menu-chat" href="/chat" class="nav-link"><i class="nav-icon fas fa-comment"></i><p>Your Chats</p></a></li>
+          <li class="nav-item"><a id="menu-chat" href="/chat" class="nav-link"><i class="nav-icon fas fa-comment"></i><p>Your Chats</p></a></li>
           <li th:if="${currentUser.isAdmin() || currentUser.isMod()}" class="nav-item"><a id="menu-admin" href="/admin" class="nav-link"><i class="nav-icon fas fa-cogs"></i><p>Administration<span th:if="${currentUser.isMod()}" class="right badge badge-danger">Read-only</span></p></a></li>
         </ul>
       </nav>

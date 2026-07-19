@@ -136,14 +136,33 @@
           <div class="card card-primary card-outline">
             <div class="card-header p-2">
               <ul class="nav nav-pills" role="tablist">
-                <li class="nav-item"><a class="nav-link active" href="#basics" data-profile-tab="basics" role="tab"
-                    aria-controls="basics" aria-selected="true">Basics</a></li>
-                <li class="nav-item"><a class="nav-link" href="#friendship" data-profile-tab="friendship" role="tab"
-                    aria-controls="friendship" aria-selected="false">Friendship</a></li>
-                <li class="nav-item"><a class="nav-link" href="#relationship" data-profile-tab="relationship" role="tab"
-                    aria-controls="relationship" aria-selected="false">Relationship</a></li>
-                <li class="nav-item"><a class="nav-link" href="#studyBuddy" data-profile-tab="studyBuddy" role="tab"
-                    aria-controls="studyBuddy" aria-selected="false">Study Buddy</a></li>
+                <li class="nav-item">
+                  <a class="nav-link active" href="#basics" data-toggle="pill" role="tab" aria-controls="basics"
+                    aria-selected="true">
+                    Basics
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link" href="#friendship" data-toggle="pill" role="tab" aria-controls="friendship"
+                    aria-selected="false">
+                    Friendship
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link" href="#relationship" data-toggle="pill" role="tab" aria-controls="relationship"
+                    aria-selected="false">
+                    Relationship
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link" href="#studyBuddy" data-toggle="pill" role="tab" aria-controls="studyBuddy"
+                    aria-selected="false">
+                    Study Buddy
+                  </a>
+                </li>
               </ul>
             </div>
             <div class="card-body">
@@ -448,7 +467,7 @@
   if (err == "1") {
     document.getElementById("error").hidden = false;
     history.replaceState({}, "", window.location.pathname);
-  } 
+  }
   if (err == "2") {
     document.getElementById("error").hidden = false;
     document.getElementById("error").innerHTML = "You have already sent a pending EOI to this user. Please wait for a response.";

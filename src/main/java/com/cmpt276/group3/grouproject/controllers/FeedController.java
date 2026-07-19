@@ -78,10 +78,11 @@ public class FeedController {
             }
 
             Integer score = scoreFor(stream, viewerProfile, candidate);
-            if (score == null || score == -1) {
+            if (score == null || score < 60) {
                 // -1 means an exclusionary question failed (e.g. incompatible relationship goals,
                 // age range, or gender preference) - null means the algorithm couldn't be run at
                 // all (e.g. a required field was left blank). Either way, leave it out of the feed.
+                // scores less than 60 excluded
                 continue;
             }
 

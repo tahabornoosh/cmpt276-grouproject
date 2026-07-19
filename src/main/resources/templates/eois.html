@@ -62,7 +62,7 @@
                                   : @{/user.png}" src="/user.png" alt="User avatar" class="img-circle mr-2" width="40"
                       height="40">
 
-                    <a th:href="@{/profile/{id}(id=${eoi.sender.id})}"
+                    <a target="_blank" th:href="@{/profile/{id}(id=${eoi.sender.id})}"
                       th:text="${eoi.sender.first_name + ' ' + eoi.sender.last_name}">
                       Sender Name
                     </a>
@@ -77,10 +77,12 @@
                   </td>
 
                   <td>
-                    <a hidden th:href="@{/chat(userId=${eoi.sender.id})}" class="btn btn-primary btn-sm">
-                      <i class="fas fa-comment"></i>
-                      Start Chat
-                    </a>
+                      <form th:action="@{/eois/{id}/accept(id=${eoi.id})}" method="post" class="d-inline">
+                      <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="fas fa-comment"></i>
+                        Accept/Start Chat
+                      </button>
+                    </form>
 
                     <form th:action="@{/eois/{id}/hide(id=${eoi.id})}" method="post" class="d-inline">
                       <button type="submit" class="btn btn-warning btn-sm">

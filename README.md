@@ -129,10 +129,22 @@ See `docs/meeting-notes` in project repository
 - Week 1 velocity: 0 points/week (spent setting up templates, models, etc)
 - Week 2 velocity: 21 points/week
 
+
 **Process Improvement**
 - We did too much of the work in the second half of the iteration, which led to a high workload towards the end.
 - Having different people do different parts of the same feature (e.g., template and controller) led to inconsistencies and issues and was avoided in iteration 2.
 - We did not review PRs very thoroughly (primairly because of the first point) which led to errors being pushed to main in two occasions. This was avoided in iteration 2.
+
+## Iteration 2
+
+- Total story points completed: 20
+- Average Velocity: 10 points/week
+
+**Improvements:**
+- We did not divide controllers and templates for features between more than 1 person, and our development went a lot more smootly.
+- Our pace was a bit better (still with room for improvement)
+- No considerable bugs or errors made it to `main` in this iteration (unlike iteration 1)
+  
 
 # User Stories
 
@@ -183,12 +195,6 @@ Mike opens the app URL and must be redirected to the login page. Then, he clicks
 
 Mike then enters his information and clicks Submit to create his account.
 
-**UI Mockups**
-![alt text](UIMockups/signup.png)
-*Figure 1: Empty sign up page
-
-![alt text](UIMockups/signupfail.png)
-*Figure 2: Invalid information submitted
 
 **Acceptance Criteria**
 - If Mike enters any string as their first and last name, a valid and not previously used valid email address, matching passwords in the two password fields, a valid dropdown item for gender, and accepts the terms of use by checking the applicable checkbox, then his account must be registered and he must be redirected to the login page with a success message.
@@ -230,13 +236,6 @@ He then enters his username and password and clicks on the Log in button.
 - If John enters the wrong password, he should be redirected back to the login page with an error message
 - If John enters the wrong email address, or both a wrong email address and the wrong password, then he should be redirected back to the login page with an error message.
 
-**UI Mockups**
-
-![alt text](UIMockups/login.png)
-*Figure 1: John attempts to login
-
-![alt text](UIMockups/loginfail.png)
-*Figure 2: Invalid information submitted, either email or password
 
 **Post-conditions**
 - If John logs in successfully, his session variables must reflect his user ID.
@@ -268,13 +267,6 @@ John logs into the app and is redirected to the dashboard page, or clicks on the
 - If John is signed in and is a regular user, then he should see a dashboard consisting of his basic user information and options to view his profile or change his account details
 - If John is a moderator or an admin, then he should see a dashboard which, in addition to the above, contains a banner stating his role at the top of the page as well as a menu item for the admin panel.
 
-**Ui Mockups**
-
-![alt text](UIMockups/landingpage.png)
-*Figure 1: John logged in as a regular user
-
-![alt text](UIMockups/adminlandingpage.png)
-*Figure 2: John logged in as an admin
 
 **Post-conditions**
 - None
@@ -313,13 +305,6 @@ Completed in Iteration 1.
 - If John is logged in, the admin page should redirect him back to dashboard
 - If an unauthorized user attempts to access page they should be redirected to login page
 
-**Ui Mockups**
-
-![alt text](UIMockups/adminpanel.png)
-*Figure 1: Jason's view as an admin
-
-![alt text](UIMockups/modpanel.png)
-*Figure 2: Alice's view as an moderator
 
 **Post-conditions**
 - Admin-only actions should only be accessed and completed by admins
@@ -388,10 +373,6 @@ Ryan fills out the required fields, selects what specific sections (friendship, 
 - If all required fields, including those in the user-specified sections, have been filled, the form must be submitted and Ryan should be redirected to his profile page
 - If there are missing fields, Ryan should be redirected back to the questionnair with an error message
 
-**UI Mockups**
-
-![alt text](UIMockups/questionnairecompletion.png)
-*Figure 1: Ryan's profile after completing questionnaire
 
 **Post-conditions**
 - If there are no missing fields, the matching profile for Ryan must be created or updated
@@ -575,7 +556,7 @@ The second form consists of a notice informing Brad that deletion is irreversibl
 - The delete function should remove the database record, and redirect the admin back to the admin panel with an error message
 
 
-## Case: Profile Scores (2 points)
+## Case: Profile Scores (3 points)
 **Iteration**
 Completed in Iteration 2.
 
@@ -716,44 +697,190 @@ Mike clicks on "Chat" in the menu from any page in the app, and is redirected to
 - Sending and receiving messages should not require refreshing the page (AJAX)
 - Mike should NOT be able to start chats with users he has not chatted with previously (this will happen through EOIs)
 
-**UI Mockups**
+## Case: Chat Blocking (3 points)
+**Iteration**
+Completed in Iteration 2.
 
-![alt text](UIMockups/mikechat.png)
-*Figure 1: Mike's view of the chat page
+**Personas/Actors**
+1. Primary actor: Mike - a second-year SFU student
+2. Secondary actors: Janice - a second-year SFU student
+
+**Pre-conditions**
+- All parties must have active accounts
+- Mike must be logged in
+- Mike and Janice should have an existing chat thread
+
+**Actions/Triggers**
+Mike clicks on the three-dot icon next to Janice's name in the top bar of the chat window, and clicks on "Block User/Unblock User" (as the case may be)
+
+**Acceptance Criteria**
+- If Mike has previously blocked Janice but Janice has not blocked Mike, this should undo the block and allow both Mike and Janice to freely send messages to each other
+- If Mike and Janice have not previously blocked each other, then this should disable the message input and send button for both Mike and Janice, and prevent them from sending messages to each other
+- If Janice has previously blocked Mike but Mike has not blocked her, then the message input and send button should remain disabled, but Janice should no longer be able to send messages to Mike after unblocking him unless Mike also unblocks her
+- If they have both previously blocked each other, then the message input and send button should remain disabled, but an unblock action from Janice should allow Mike and Janice to message freely after.
+- All block/unblock actions should take effect in AJAX (should not require refreshing)
 
 **Post-conditions**
-- All newly sent or received messages should be recorded in the database
-- No duplicate chats must be created in the database
+- All block/unblock actions should be recorded in the database using AJAX
 
 **Non-functional requirements**
 - All pages should load in less than one second
 
 **Tests**
-- If Mike has chatted with a user, that user's name should be in his contacts list
-- Clicking a contact should load their chat history in the chat window
-- If Mike has blocked a user, that user should not be able to send messages to Mike
+- If Mike has blocked Janice but Janice has not blocked Mike, then an unblock action from Mike should allow them both to send messages
+- If Mike has not previously blocked Janice, then a block action from him should render Janice unable to send him messages, regardless of any block/unblock action done by her.
+
+</div>
+<div style="color:red">
+
+## Case: Calling (3 points)
+**Iteration**
+To be completed in Iteration 3.
+
+**Personas/Actors**
+1. Primary actor: Mike - a second-year SFU student
+2. Secondary actors: Janice - a second-year SFU student
+
+**Pre-conditions**
+- All parties must have active accounts
+- Mike must be logged in
+- Mike and Janice should have an existing chat thread
+
+**Actions/Triggers**
+Mike clicks on the phone icon next to Janice's name in the chat window, and is redirected to a page in an external video conferencing application. At the same time, a link is sent to Janice in the chat to join the call.
+
+**Acceptance Criteria**
+- If neither party have blocked each other, the call should go through and obtain a meeting link via API
+- If either (or both) parties have blocked each other, the call should not succeed.
+
+**Post-conditions**
+- None
+
+**Non-functional requirements**
+- All pages should load in less than one second
+- The automated message for the meeting link should be clear and concise
+
+**Tests**
+- All created meeting links should work without errors
+- Blocked users may not initiate calls
+- Open chats should allow for video calling by either party
+
+## Case: Profile Updates (2 points)
+**Iteration**
+To be completed in Iteration 3.
+
+**Personas/Actors**
+1. Primary actor: Mike - a second-year SFU student
+
+**Pre-conditions**
+- Mike must be logged in and be in his profile page
+
+**Actions/Triggers**
+Mike goes to the "Updates" tab in his profile, where he will see a text box and a "Post" button below his previous updates. He writes an update in the textbox, and clicks "Post"
+
+**Acceptance Criteria**
+- If the post does not contain any banned words, then it should be immediately be added to the top of Mike's "updates" profile section
+- If Mike is not logged in, or the post contains banned words, then the update should not be posted and an error message should be displayed
+
+**Post-conditions**
+- Successful updates posted should be added to the database
+
+**Non-functional requirements**
+- All pages should load in less than one second
+- The errors should be clear and specific
+
+**Tests**
+- The update "Celebrating my graduation today!" should successfuly go through for a logged-in user.
+- A logged-out user should not be able to submit an update
+- An update containing a common curse word should not be accepted
+
 </div>
 
 # User Interface Requirements
 
-**Signup Mockups**
+## Signup/Login pages
+
+**Requirements:**
+- A page with a card in the middle
+- Card containing a title at the top, a single column of inputs in the middle, and buttons and links on the bottom
+
+**Digital Design Mockup**
+![alt text](UIMockups/mockup_login_signup.webp)
+
+**Screenshots**
 ![alt text](UIMockups/signup.png)
 ![alt text](UIMockups/signupfail.png)
 
-**Login Mockups**
+
 ![alt text](UIMockups/login.png)
 ![alt text](UIMockups/loginfail.png)
 
-**Landing Page Mockups**
+## Dashboard/Landing Page
+
+**Requirements:**
+- A menu on the left, displaying navigation items and the user's name
+- A menu on the top, displaying a link for logout
+- (Admins/Mods only) a notification on the top of the page signifying the user's role and access to the admin panel
+- A card (below the item above) containing the user's basic information in a list format and buttons to view their profile or edit their account
+
+**Digital Design Mockup**
+![alt text](UIMockups/mockup_dashboard.jpg)
+
+**Screenshots**
 ![alt text](UIMockups/landingpage.png)
 ![alt text](UIMockups/adminlandingpage.png)
 
-**Admin Panel Mockups**
+## Tables (Admin Panel/Feeds)
+
+**Requirements**
+- A menu on the left, displaying navigation items and the user's name
+- A menu on the top, displaying a link for logout
+- A card containing a title, a headings row, and the table contents in rows
+
+**Digital Design Mockup**
+![alt text](UIMockups/mockup_tables.png)
+
+**Screenshots**
 ![alt text](UIMockups/adminpanel.png)
 ![alt text](UIMockups/modpanel.png)
 
-**Questionnaire Mockups**
+
+## In-app Forms (questionnair, edit, admin controls)
+
+**Requirements**
+- A menu on the left, displaying navigation items and the user's name
+- A menu on the top, displaying a link for logout
+- One or more cards in one full-width column, containing a title at the top, a single column of inputs, and buttons/links at the bottom
+
+**Digital Design Mockup**
+![alt text](UIMockups/mockup_forms.png)
+
+**Screenshots**
 ![alt text](UIMockups/questionnairecompletion.png)
 
-**Chat Mockups**
+## Chat Page
+
+**Requirements**
+- A menu on the left, displaying navigation items and the user's name
+- A menu on the top, displaying a link for logout
+- A two-column card:
+  -  The left column must contain a list of contacts, their avatars (or typography), and their most recent message
+  -  The right column must contain a header with the selected contact's name, avatar/typography, a list of messages (with color or position distinctions between messages sent by the user and by the contact), and an input and button for sending new messages at the bottom.
+
+**Digital Design Mockup**
+![alt text](UIMockups/mockup_chat.png)
+
+**Screenshots**
 ![alt text](UIMockups/mikechat.png)
+
+## Profile Page
+
+**Requirements**
+- A menu on the left, displaying navigation items and the user's name
+- A menu on the top, displaying a link for logout
+- A card on the right (width ~1/3), containing the user's name, avatar, gender, match scores to the current user (if applicable), and a dropdown menu and button for sending EOIs
+- A card on the left (width ~2/3), containing the user's answers to the questionnair in a list format, in tabs
+- (Only if viewing own profile) A card on top of the above card, displaying the user's questionnair status and a button to complete or update their questionnair
+
+**Digital Design Mockups**
+![alt text](UIMockups/mockup_profile.jpg)

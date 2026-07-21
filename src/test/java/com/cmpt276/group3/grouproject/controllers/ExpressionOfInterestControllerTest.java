@@ -1,6 +1,9 @@
 package com.cmpt276.group3.grouproject.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -161,4 +164,140 @@ class ExpressionOfInterestControllerTest {
         verify(expressionOfInterestRepository, never())
             .delete(any(ExpressionOfInterest.class));
     }
+
+    @Test
+    void eoisPage_separatesVisibleAndHiddenEOIs() throws Exception {
+        ExpressionOfInterest hiddenEOI = new ExpressionOfInterest(
+            sender,
+            receiver,
+            EOIStream.STUDY_BUDDY
+        );
+        hiddenEOI.setId(11L);
+        hiddenEOI.setHidden(true);
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(receiver);
+        when(
+            expressionOfInterestRepository
+                .findByReceiverOrderByCreatedAtDesc(receiver)
+        ).thenReturn(List.of(eoi, hiddenEOI));
+
+        mockMvc.perform(
+                get("/eois").session(session)
+            )
+            .andExpect(status().isOk())
+            .andExpect(view().name("eois"))
+            .andExpect(model().attribute("eois", List.of(eoi)))
+            .andExpect(model().attribute(
+                "eois_hidden",
+                List.of(hiddenEOI)
+            ));
+    }
+
+    @Test
+    void hideEOI_togglesHiddenStatusAndSaves() throws Exception {
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(receiver);
+        when(
+            expressionOfInterestRepository
+                .findByIdAndReceiver(10L, receiver)
+        ).thenReturn(Optional.of(eoi));
+
+        mockMvc.perform(
+                post("/eois/10/hide").session(session)
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/eois?success=hide"));
+
+        assertTrue(eoi.isHidden());
+        verify(expressionOfInterestRepository).save(eoi);
+    }
+
+    @Test
+    void hideEOI_doesNotModifyAnotherUsersEOI() throws Exception {
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(receiver);
+        when(
+            expressionOfInterestRepository
+                .findByIdAndReceiver(10L, receiver)
+        ).thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                post("/eois/10/hide").session(session)
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/eois?error=not-found"));
+
+        verify(expressionOfInterestRepository, never())
+            .save(any(ExpressionOfInterest.class));
+    }
+
+    @Test
+    void acceptEOI_deletesEOIAndCreatesAutomatedMessage()
+            throws Exception {
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(receiver);
+        when(
+            expressionOfInterestRepository
+                .findByIdAndReceiver(10L, receiver)
+        ).thenReturn(Optional.of(eoi));
+
+        mockMvc.perform(
+                post("/eois/10/accept").session(session)
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/chat?userId=2"));
+
+        verify(expressionOfInterestRepository).delete(eoi);
+        verify(chatMessageService).createMessage(
+            receiver,
+            2L,
+            "(Automated Message) Your EOI Was Accepted!"
+        );
+    }
+
+    @Test
+    void acceptEOI_doesNotAcceptAnotherUsersEOI()
+            throws Exception {
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(receiver);
+        when(
+            expressionOfInterestRepository
+                .findByIdAndReceiver(10L, receiver)
+        ).thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                post("/eois/10/accept").session(session)
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/eois?error=not-found"));
+
+        verify(expressionOfInterestRepository, never())
+            .delete(any(ExpressionOfInterest.class));
+
+        verify(chatMessageService, never()).createMessage(
+            any(User.class),
+            anyLong(),
+            anyString()
+        );
+    }
+
+    @Test
+    void eoiAction_redirectsToLoginWhenNotAuthenticated()
+            throws Exception {
+
+        when(auth.isLoggedIn(session)).thenReturn(false);
+
+        mockMvc.perform(
+                post("/eois/10/accept").session(session)
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/login"));
+
+        verify(expressionOfInterestRepository, never())
+            .findByIdAndReceiver(anyLong(), any(User.class));
+    }
+
 }

@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 import java.security.Principal;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,7 +25,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.ui.Model;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.cmpt276.group3.grouproject.auth.Auth;
 import com.cmpt276.group3.grouproject.models.ChatMessage;
@@ -34,6 +38,7 @@ import com.cmpt276.group3.grouproject.models.UserBlockRepository;
 import com.cmpt276.group3.grouproject.models.UsersRepository;
 import com.cmpt276.group3.grouproject.services.ChatMessageService;
 import com.cmpt276.group3.grouproject.services.UserService;
+import com.cmpt276.group3.grouproject.util.ContactResponse;
 import com.cmpt276.group3.grouproject.util.MessageResponse;
 import com.cmpt276.group3.grouproject.util.SendMessageRequest;
 
@@ -280,4 +285,245 @@ class ChatMessageControllerTest {
                 )
             );
     }
+
+    @Test
+    void loadChat_loadsCurrentUsersConversations() {
+        HttpSession session = Mockito.mock(HttpSession.class);
+        Model model = Mockito.mock(Model.class);
+        User currentUser = Mockito.mock(User.class);
+        ContactResponse contact = Mockito.mock(ContactResponse.class);
+        List<ContactResponse> contacts = List.of(contact);
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(currentUser);
+        when(
+            chatMessageService.getExistingConversations(currentUser)
+        ).thenReturn(contacts);
+
+        String view = chatController.loadChat(2L, session, model);
+
+        assertEquals("chat", view);
+
+        verify(model).addAttribute("requestedUserId", 2L);
+        verify(model).addAttribute("currentUser", currentUser);
+        verify(model).addAttribute("contacts", contacts);
+    }
+
+    @Test
+    void loadChat_redirectsToLoginWhenNotAuthenticated() {
+        HttpSession session = Mockito.mock(HttpSession.class);
+        Model model = Mockito.mock(Model.class);
+
+        when(auth.isLoggedIn(session)).thenReturn(false);
+
+        String view = chatController.loadChat(null, session, model);
+
+        assertEquals("redirect:/login", view);
+        verifyNoInteractions(chatMessageService);
+    }
+
+    @Test
+    void getConversation_returnsMessagesFromService() {
+        HttpSession session = Mockito.mock(HttpSession.class);
+        User currentUser = Mockito.mock(User.class);
+        MessageResponse message = Mockito.mock(MessageResponse.class);
+        List<MessageResponse> expectedMessages = List.of(message);
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(currentUser);
+        when(
+            chatMessageService.getConversation(currentUser, 2L)
+        ).thenReturn(expectedMessages);
+
+        List<MessageResponse> actualMessages =
+            chatController.getConversation(2L, session);
+
+        assertSame(expectedMessages, actualMessages);
+
+        verify(chatMessageService)
+            .getConversation(currentUser, 2L);
+    }
+
+    @Test
+    void markConversationAsRead_delegatesToService() {
+        HttpSession session = Mockito.mock(HttpSession.class);
+        User currentUser = Mockito.mock(User.class);
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(currentUser);
+
+        chatController.markConversationAsRead(2L, session);
+
+        verify(chatMessageService)
+            .markConversationAsRead(currentUser, 2L);
+    }
+
+    @Test
+    void getBlockStatus_returnsBothBlockDirections() {
+        HttpSession session = Mockito.mock(HttpSession.class);
+        User currentUser = Mockito.mock(User.class);
+        User otherUser = Mockito.mock(User.class);
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(currentUser);
+        when(currentUser.getId()).thenReturn(1L);
+        when(otherUser.getId()).thenReturn(2L);
+        when(userService.findUserById(2L)).thenReturn(otherUser);
+
+        when(
+            userBlockRepository.existsByBlockerIdAndBlockedId(1L, 2L)
+        ).thenReturn(true);
+
+        when(
+            userBlockRepository.existsByBlockerIdAndBlockedId(2L, 1L)
+        ).thenReturn(false);
+
+        Map<String, Object> status =
+            chatController.getBlockStatus(2L, session);
+
+        assertAll(
+            () -> assertEquals(2L, status.get("otherUserId")),
+            () -> assertTrue(
+                (Boolean) status.get("blockedByCurrentUser")
+            ),
+            () -> assertFalse(
+                (Boolean) status.get("blockedByOtherUser")
+            ),
+            () -> assertTrue(
+                (Boolean) status.get("communicationBlocked")
+            )
+        );
+    }
+
+    @Test
+    void chatApi_rejectsUnauthenticatedUser() {
+        HttpSession session = Mockito.mock(HttpSession.class);
+
+        when(auth.isLoggedIn(session)).thenReturn(false);
+
+        ResponseStatusException exception = assertThrows(
+            ResponseStatusException.class,
+            () -> chatController.getConversation(2L, session)
+        );
+
+        assertEquals(
+            HttpStatus.UNAUTHORIZED,
+            exception.getStatusCode()
+        );
+
+        verifyNoInteractions(chatMessageService);
+    }
+
+    @Test
+    void blockUser_rejectsBlockingSelf() {
+        HttpSession session = Mockito.mock(HttpSession.class);
+        User currentUser = Mockito.mock(User.class);
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(currentUser);
+        when(currentUser.getId()).thenReturn(1L);
+
+        ResponseStatusException exception = assertThrows(
+            ResponseStatusException.class,
+            () -> chatController.blockUser(1L, session)
+        );
+
+        assertEquals(
+            HttpStatus.BAD_REQUEST,
+            exception.getStatusCode()
+        );
+
+        verifyNoInteractions(
+            userService,
+            userBlockRepository,
+            messagingTemplate
+        );
+    }
+
+    @Test
+    void blockUser_rejectsUnknownOtherUser() {
+        HttpSession session = Mockito.mock(HttpSession.class);
+        User currentUser = Mockito.mock(User.class);
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(currentUser);
+        when(currentUser.getId()).thenReturn(1L);
+        when(userService.findUserById(999L)).thenReturn(null);
+
+        ResponseStatusException exception = assertThrows(
+            ResponseStatusException.class,
+            () -> chatController.blockUser(999L, session)
+        );
+
+        assertEquals(
+            HttpStatus.NOT_FOUND,
+            exception.getStatusCode()
+        );
+
+        verifyNoInteractions(
+            userBlockRepository,
+            messagingTemplate
+        );
+    }
+
+    @Test
+    void blockUser_doesNotSaveDuplicateBlock() {
+        HttpSession session = Mockito.mock(HttpSession.class);
+        User currentUser = Mockito.mock(User.class);
+        User otherUser = Mockito.mock(User.class);
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(currentUser);
+        when(currentUser.getId()).thenReturn(1L);
+        when(otherUser.getId()).thenReturn(2L);
+        when(userService.findUserById(2L)).thenReturn(otherUser);
+
+        when(
+            userBlockRepository.existsByBlockerIdAndBlockedId(1L, 2L)
+        ).thenReturn(true, true, true, true);
+
+        when(
+            userBlockRepository.existsByBlockerIdAndBlockedId(2L, 1L)
+        ).thenReturn(false, false, false);
+
+        Map<String, Object> status =
+            chatController.blockUser(2L, session);
+
+        verify(userBlockRepository, never())
+            .save(Mockito.any(UserBlock.class));
+
+        assertTrue(
+            (Boolean) status.get("blockedByCurrentUser")
+        );
+    }
+
+    @Test
+    void sendMessage_whenCommunicationBlocked_sendsErrorToSender() {
+        User sender = Mockito.mock(User.class);
+        Principal principal = () -> "1";
+        SendMessageRequest request =
+            new SendMessageRequest(2L, "Hello");
+
+        when(userService.findUserById(1L)).thenReturn(sender);
+        when(
+            chatMessageService.createMessage(sender, 2L, "Hello")
+        ).thenThrow(
+            new IllegalStateException("Communication is blocked")
+        );
+
+        chatController.sendMessage(request, principal);
+
+        verify(messagingTemplate)
+            .convertAndSendToUser(
+                eq("1"),
+                eq("/queue/chat-errors"),
+                Mockito.<Map<String, Object>>argThat(error ->
+                    "CHAT_BLOCKED".equals(error.get("code"))
+                        && "Communication is blocked".equals(
+                            error.get("message")
+                        )
+                )
+            );
+    }
+
 }

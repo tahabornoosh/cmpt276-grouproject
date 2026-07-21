@@ -2,6 +2,10 @@ package com.cmpt276.group3.grouproject.controllers;
 
 import com.cmpt276.group3.grouproject.auth.Auth;
 import com.cmpt276.group3.grouproject.enums.Gender;
+import com.cmpt276.group3.grouproject.enums.Hobby;
+import com.cmpt276.group3.grouproject.enums.Sport;
+import com.cmpt276.group3.grouproject.enums.StudyField;
+import com.cmpt276.group3.grouproject.enums.Venue;
 import com.cmpt276.group3.grouproject.enums.Role;
 import com.cmpt276.group3.grouproject.models.MatchingProfile;
 import com.cmpt276.group3.grouproject.models.User;
@@ -16,11 +20,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest(ProfileController.class)
@@ -54,6 +62,24 @@ public class ProfileControllerTest {
 
         targetUser = new User("Taha", "Bornoosh", "taha@sfu.ca", "pw", Role.USER, Gender.MALE, "");
         targetUser.setId(2L);
+    }
+
+
+    private MockHttpServletRequestBuilder validBasicQuestionnairePost() {
+        return post("/questionnaire")
+                .session(session)
+                .param("age", "21")
+                .param("year_of_study", "2")
+                .param("study_field", StudyField.values()[0].name())
+                .param("has_job", "false")
+                .param("regularly_goes_to_gym", "false")
+                .param("favourite_sport", Sport.values()[0].name())
+                .param("preferred_venue", Venue.values()[0].name())
+                .param("hobby1", Hobby.values()[0].name())
+                .param("hobby2", Hobby.values()[0].name())
+                .param("hobby3", Hobby.values()[0].name())
+                .param("hobby4", Hobby.values()[0].name())
+                .param("hobby5", Hobby.values()[0].name());
     }
 
     // --- Task 3: Profile must load correctly for an existing user ---
@@ -135,4 +161,146 @@ public class ProfileControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/login"));
     }
+
+    @Test
+    void questionnaire_redirectsToLoginWhenNotAuthenticated()
+            throws Exception {
+
+        when(auth.isLoggedIn(session)).thenReturn(false);
+
+        mockMvc.perform(get("/questionnaire").session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/login"));
+    }
+
+    @Test
+    void questionnaire_redirectsToProfileWhenAlreadyCompleted()
+            throws Exception {
+
+        MatchingProfile profile = new MatchingProfile();
+        profile.setUser(loggedInUser);
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(loggedInUser);
+        when(matchingProfileService.getProfileByUser(loggedInUser))
+                .thenReturn(profile);
+
+        mockMvc.perform(get("/questionnaire").session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/profile/1"));
+    }
+
+    @Test
+    void questionnaire_editLoadsExistingProfile()
+            throws Exception {
+
+        MatchingProfile profile = new MatchingProfile();
+        profile.setUser(loggedInUser);
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(loggedInUser);
+        when(matchingProfileService.getProfileByUser(loggedInUser))
+                .thenReturn(profile);
+
+        mockMvc.perform(
+                get("/questionnaire")
+                        .session(session)
+                        .param("edit", "1")
+            )
+            .andExpect(status().isOk())
+            .andExpect(view().name("questionnaire"))
+            .andExpect(model().attribute("currentUser", loggedInUser))
+            .andExpect(model().attribute("matchingProfile", profile))
+            .andExpect(model().attribute("hasQuestionnaire", true));
+    }
+
+    @Test
+    void saveQuestionnaire_rejectsIncompleteBasicProfile()
+            throws Exception {
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(loggedInUser);
+
+        mockMvc.perform(
+                post("/questionnaire")
+                        .session(session)
+                        .param("age", "21")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl(
+                "/questionnaire?edit=1&basicIncomplete=1"
+            ));
+    }
+
+    @Test
+    void saveQuestionnaire_rejectsIncompleteFriendshipSection()
+            throws Exception {
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(loggedInUser);
+
+        mockMvc.perform(
+                validBasicQuestionnairePost()
+                        .param("display_friendship_profile", "on")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl(
+                "/questionnaire?edit=1&friendshipIncomplete=1"
+            ));
+    }
+
+    @Test
+    void saveQuestionnaire_rejectsIncompleteRelationshipSection()
+            throws Exception {
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(loggedInUser);
+
+        mockMvc.perform(
+                validBasicQuestionnairePost()
+                        .param("display_dating_profile", "on")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl(
+                "/questionnaire?edit=1&relationshipIncomplete=1"
+            ));
+    }
+
+    @Test
+    void saveQuestionnaire_rejectsIncompleteStudyBuddySection()
+            throws Exception {
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(loggedInUser);
+
+        mockMvc.perform(
+                validBasicQuestionnairePost()
+                        .param("display_study_buddy_profile", "on")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl(
+                "/questionnaire?edit=1&studyBuddyIncomplete=1"
+            ));
+    }
+
+    @Test
+    void saveQuestionnaire_registersValidBasicProfile()
+            throws Exception {
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(loggedInUser);
+        when(
+            matchingProfileService.profileForUserExists(loggedInUser)
+        ).thenReturn(false);
+
+        mockMvc.perform(validBasicQuestionnairePost())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(
+                    "/profile/1?questionnaireSaved=1"
+                ));
+
+        verify(matchingProfileService)
+                .registerProfile(any(MatchingProfile.class));
+    }
+
 }

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.cmpt276.group3.grouproject.models.ChatMessage;
 import com.cmpt276.group3.grouproject.models.ChatMessageRepository;
@@ -298,6 +300,24 @@ public class ChatMessageServiceTest {
                 "Older Alice message",
                 false
             );
+
+        ReflectionTestUtils.setField(
+            newestAliceMessage,
+            "sentAt",
+            Instant.parse("2026-07-20T12:00:00Z")
+        );
+
+        ReflectionTestUtils.setField(
+            newestBobMessage,
+            "sentAt",
+            Instant.parse("2026-07-20T11:00:00Z")
+        );
+
+        ReflectionTestUtils.setField(
+            olderAliceMessage,
+            "sentAt",
+            Instant.parse("2026-07-20T10:00:00Z")
+        );
 
         when(
             chatMessageRepository.findMessagesForUser(1L)

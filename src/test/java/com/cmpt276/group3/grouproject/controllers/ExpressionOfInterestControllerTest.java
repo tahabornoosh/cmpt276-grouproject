@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.MockedStatic;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -25,6 +27,7 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.cmpt276.group3.grouproject.algorithms.MatchingAlgorithm;
 import com.cmpt276.group3.grouproject.auth.Auth;
 import com.cmpt276.group3.grouproject.enums.EOIStream;
 import com.cmpt276.group3.grouproject.enums.Gender;
@@ -33,6 +36,7 @@ import com.cmpt276.group3.grouproject.models.ExpressionOfInterest;
 import com.cmpt276.group3.grouproject.models.ExpressionOfInterestRepository;
 import com.cmpt276.group3.grouproject.models.User;
 import com.cmpt276.group3.grouproject.models.UsersRepository;
+import com.cmpt276.group3.grouproject.models.MatchingProfile;
 import com.cmpt276.group3.grouproject.models.MatchingProfileRepository;
 import com.cmpt276.group3.grouproject.services.ChatMessageService;
 
@@ -298,6 +302,234 @@ class ExpressionOfInterestControllerTest {
 
         verify(expressionOfInterestRepository, never())
             .findByIdAndReceiver(anyLong(), any(User.class));
+    }
+
+
+    @Test
+    void sendEOI_savesValidFriendshipEOI() throws Exception {
+        MatchingProfile senderProfile = new MatchingProfile();
+        senderProfile.setUser(sender);
+
+        MatchingProfile receiverProfile = new MatchingProfile();
+        receiverProfile.setUser(receiver);
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(sender);
+        when(usersRepository.findById(1L))
+            .thenReturn(Optional.of(receiver));
+        when(matchingProfileRepository.findByUser(sender))
+            .thenReturn(Optional.of(senderProfile));
+        when(matchingProfileRepository.findByUser(receiver))
+            .thenReturn(Optional.of(receiverProfile));
+        when(expressionOfInterestRepository.findAll())
+            .thenReturn(List.of());
+
+        mockMvc.perform(
+                post("/eoi/send/1")
+                    .session(session)
+                    .param("stream", "FRIENDSHIP")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/profile/1?success=1"));
+
+        verify(expressionOfInterestRepository)
+            .save(any(ExpressionOfInterest.class));
+    }
+
+    @Test
+    void sendEOI_rejectsDuplicatePendingEOI() throws Exception {
+        MatchingProfile senderProfile = new MatchingProfile();
+        senderProfile.setUser(sender);
+
+        MatchingProfile receiverProfile = new MatchingProfile();
+        receiverProfile.setUser(receiver);
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(sender);
+        when(usersRepository.findById(1L))
+            .thenReturn(Optional.of(receiver));
+        when(matchingProfileRepository.findByUser(sender))
+            .thenReturn(Optional.of(senderProfile));
+        when(matchingProfileRepository.findByUser(receiver))
+            .thenReturn(Optional.of(receiverProfile));
+        when(expressionOfInterestRepository.findAll())
+            .thenReturn(List.of(eoi));
+
+        mockMvc.perform(
+                post("/eoi/send/1")
+                    .session(session)
+                    .param("stream", "FRIENDSHIP")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/profile/1?error=2"));
+
+        verify(expressionOfInterestRepository, never())
+            .save(any(ExpressionOfInterest.class));
+    }
+
+    @Test
+    void sendEOI_rejectsInvalidStream() throws Exception {
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(sender);
+
+        mockMvc.perform(
+                post("/eoi/send/1")
+                    .session(session)
+                    .param("stream", "INVALID_STREAM")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/profile/1?error=1"));
+
+        verify(usersRepository, never()).findById(anyLong());
+        verify(expressionOfInterestRepository, never())
+            .save(any(ExpressionOfInterest.class));
+    }
+
+    @Test
+    void sendEOI_redirectsWhenTargetUserDoesNotExist() throws Exception {
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(sender);
+        when(usersRepository.findById(999L))
+            .thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                post("/eoi/send/999")
+                    .session(session)
+                    .param("stream", "FRIENDSHIP")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/?error=1"));
+
+        verify(expressionOfInterestRepository, never())
+            .save(any(ExpressionOfInterest.class));
+    }
+
+    @Test
+    void sendEOI_redirectsWhenMatchingProfileIsMissing()
+            throws Exception {
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(sender);
+        when(usersRepository.findById(1L))
+            .thenReturn(Optional.of(receiver));
+        when(matchingProfileRepository.findByUser(sender))
+            .thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                post("/eoi/send/1")
+                    .session(session)
+                    .param("stream", "FRIENDSHIP")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/profile/1?error=3"));
+
+        verify(expressionOfInterestRepository, never())
+            .save(any(ExpressionOfInterest.class));
+    }
+
+    @Test
+    void sendEOI_rejectsIncompatibleRelationshipMatch()
+            throws Exception {
+
+        MatchingProfile senderProfile = new MatchingProfile();
+        senderProfile.setUser(sender);
+
+        MatchingProfile receiverProfile = new MatchingProfile();
+        receiverProfile.setUser(receiver);
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(sender);
+        when(usersRepository.findById(1L))
+            .thenReturn(Optional.of(receiver));
+        when(matchingProfileRepository.findByUser(sender))
+            .thenReturn(Optional.of(senderProfile));
+        when(matchingProfileRepository.findByUser(receiver))
+            .thenReturn(Optional.of(receiverProfile));
+
+        try (
+            MockedStatic<MatchingAlgorithm> algorithm =
+                mockStatic(MatchingAlgorithm.class)
+        ) {
+            algorithm.when(
+                () -> MatchingAlgorithm.relationshipMatch(
+                    senderProfile,
+                    receiverProfile
+                )
+            ).thenReturn(-1);
+
+            mockMvc.perform(
+                    post("/eoi/send/1")
+                        .session(session)
+                        .param("stream", "RELATIONSHIP")
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/profile/1?error=3"));
+        }
+
+        verify(expressionOfInterestRepository, never())
+            .save(any(ExpressionOfInterest.class));
+    }
+
+    @Test
+    void sendEOI_rejectsIncompatibleStudyBuddyMatch()
+            throws Exception {
+
+        MatchingProfile senderProfile = new MatchingProfile();
+        senderProfile.setUser(sender);
+
+        MatchingProfile receiverProfile = new MatchingProfile();
+        receiverProfile.setUser(receiver);
+
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(sender);
+        when(usersRepository.findById(1L))
+            .thenReturn(Optional.of(receiver));
+        when(matchingProfileRepository.findByUser(sender))
+            .thenReturn(Optional.of(senderProfile));
+        when(matchingProfileRepository.findByUser(receiver))
+            .thenReturn(Optional.of(receiverProfile));
+
+        try (
+            MockedStatic<MatchingAlgorithm> algorithm =
+                mockStatic(MatchingAlgorithm.class)
+        ) {
+            algorithm.when(
+                () -> MatchingAlgorithm.studyBuddyMatch(
+                    senderProfile,
+                    receiverProfile
+                )
+            ).thenReturn(-1);
+
+            mockMvc.perform(
+                    post("/eoi/send/1")
+                        .session(session)
+                        .param("stream", "STUDY_BUDDY")
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/profile/1?error=3"));
+        }
+
+        verify(expressionOfInterestRepository, never())
+            .save(any(ExpressionOfInterest.class));
+    }
+
+    @Test
+    void sendEOI_redirectsToLoginWhenNotAuthenticated()
+            throws Exception {
+
+        when(auth.isLoggedIn(session)).thenReturn(false);
+
+        mockMvc.perform(
+                post("/eoi/send/1")
+                    .session(session)
+                    .param("stream", "FRIENDSHIP")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/login"));
+
+        verify(usersRepository, never()).findById(anyLong());
+        verify(expressionOfInterestRepository, never())
+            .save(any(ExpressionOfInterest.class));
     }
 
 }

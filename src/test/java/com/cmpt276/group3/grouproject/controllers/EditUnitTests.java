@@ -1,9 +1,13 @@
 package com.cmpt276.group3.grouproject.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -120,4 +124,104 @@ public class EditUnitTests {
             .param("gender", "MALE")
         ).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/account/edit/1?error=1"));
     }
+
+    @Test
+    void edit_missingUser_returns404View() throws Exception {
+        User admin = new User();
+        admin.setId(1L);
+        admin.setRole(Role.ADMIN);
+
+        when(usersRepository.findById(1L))
+            .thenReturn(Optional.of(admin));
+
+        when(usersRepository.findById(999L))
+            .thenReturn(Optional.empty());
+
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loggedUserId", 1L);
+
+        mockMvc.perform(
+                get("/account/edit/999").session(session)
+            )
+            .andExpect(status().isOk())
+            .andExpect(view().name("errors/404"));
+    }
+
+    @Test
+    void edit_passwordChange_hashesNewPassword() throws Exception {
+        User mockUser = new User();
+        mockUser.setId(1L);
+        mockUser.setFirst_name("Test");
+        mockUser.setLast_name("User");
+        mockUser.setEmail("test@sfu.ca");
+        mockUser.setRole(Role.USER);
+        mockUser.setPassword(
+            BCrypt.hashpw("oldPassword", BCrypt.gensalt())
+        );
+
+        when(usersRepository.findById(1L))
+            .thenReturn(Optional.of(mockUser));
+
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loggedUserId", 1L);
+
+        mockMvc.perform(
+                post("/account/edit/1")
+                    .session(session)
+                    .param("first_name", "Updated")
+                    .param("last_name", "User")
+                    .param("gender", "MALE")
+                    .param("password", "newPassword")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(
+                redirectedUrl("/account/edit/1?success=1")
+            );
+
+        assertTrue(
+            BCrypt.checkpw("newPassword", mockUser.getPassword())
+        );
+
+        verify(usersRepository, times(2)).save(mockUser);
+    }
+
+    @Test
+    void admin_canEditAnotherUsersAccount() throws Exception {
+        User admin = new User();
+        admin.setId(1L);
+        admin.setRole(Role.ADMIN);
+
+        User targetUser = new User();
+        targetUser.setId(2L);
+        targetUser.setFirst_name("Target");
+        targetUser.setLast_name("User");
+        targetUser.setRole(Role.USER);
+
+        when(usersRepository.findById(1L))
+            .thenReturn(Optional.of(admin));
+
+        when(usersRepository.findById(2L))
+            .thenReturn(Optional.of(targetUser));
+
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loggedUserId", 1L);
+
+        mockMvc.perform(
+                post("/account/edit/2")
+                    .session(session)
+                    .param("first_name", "Changed")
+                    .param("last_name", "Name")
+                    .param("gender", "FEMALE")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(
+                redirectedUrl("/account/edit/2?success=1")
+            );
+
+        assertEquals("Changed", targetUser.getFirst_name());
+        assertEquals("Name", targetUser.getLast_name());
+
+        verify(usersRepository).save(targetUser);
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.cmpt276.group3.grouproject.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -21,6 +22,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.View;
@@ -162,4 +164,46 @@ public class LoginUnitTests {
             .param("terms", "agree")
         ).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/signup?passwordMismatch=1"));
     }
+
+    @Test
+    void load_signup_page() throws Exception {
+        mockMvc.perform(get("/signup"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("signup"));
+    }
+
+    @Test
+    void loginPage_redirectsWhenAlreadyLoggedIn() throws Exception {
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loggedUserId", 1L);
+
+        mockMvc.perform(get("/login").session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
+    }
+
+    @Test
+    void signupPage_redirectsWhenAlreadyLoggedIn() throws Exception {
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loggedUserId", 1L);
+
+        mockMvc.perform(get("/signup").session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
+    }
+
+    @Test
+    void logout_invalidatesSessionAndRedirectsToLogin()
+            throws Exception {
+
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loggedUserId", 1L);
+
+        mockMvc.perform(get("/logout").session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/login?success=1"));
+
+        assertTrue(session.isInvalid());
+    }
+
 }

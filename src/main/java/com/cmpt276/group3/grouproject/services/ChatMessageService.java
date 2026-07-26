@@ -205,6 +205,13 @@ public class ChatMessageService {
         markReceivedMessagesAsRead(messages, currentUser.getId(), otherUserId);
     }
 
+    public void deleteByUser(User user) {
+        List<ChatMessage> messages = chatMessageRepository.findAll();
+        for (ChatMessage c:messages) {
+            if (c.getSender()==user || c.getRecipient()==user) chatMessageRepository.delete(c);
+        }
+    }
+
     private void markReceivedMessagesAsRead(
         List<ChatMessage> messages,
         long currentUserId,

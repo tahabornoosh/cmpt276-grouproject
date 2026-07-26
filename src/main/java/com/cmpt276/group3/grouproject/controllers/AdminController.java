@@ -11,10 +11,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.cmpt276.group3.grouproject.auth.Auth;
 import com.cmpt276.group3.grouproject.enums.Role;
+import com.cmpt276.group3.grouproject.models.ChatMessage;
+import com.cmpt276.group3.grouproject.models.ExpressionOfInterest;
+import com.cmpt276.group3.grouproject.models.ExpressionOfInterestRepository;
 import com.cmpt276.group3.grouproject.models.MatchingProfile;
 import com.cmpt276.group3.grouproject.models.MatchingProfileRepository;
 import com.cmpt276.group3.grouproject.models.User;
 import com.cmpt276.group3.grouproject.models.UsersRepository;
+import com.cmpt276.group3.grouproject.services.ChatMessageService;
 import com.cmpt276.group3.grouproject.services.MatchingProfileService;
 
 import jakarta.servlet.http.HttpSession;
@@ -28,11 +32,15 @@ public class AdminController {
     private final Auth auth;
     private final UsersRepository usersRepository;
     private final MatchingProfileRepository matchingProfileRepository;
+    private final ChatMessageService chatMessageService;
+    private final ExpressionOfInterestRepository expressionOfInterestRepository;
 
-    public AdminController(Auth auth, UsersRepository usersRepository, MatchingProfileRepository matchingProfileRepository) {
+    public AdminController(Auth auth, UsersRepository usersRepository, MatchingProfileRepository matchingProfileRepository, ChatMessageService chatMessageService, ExpressionOfInterestRepository expressionOfInterestRepository) {
         this.auth = auth;
         this.usersRepository = usersRepository;
         this.matchingProfileRepository = matchingProfileRepository;
+        this.chatMessageService = chatMessageService;
+        this.expressionOfInterestRepository = expressionOfInterestRepository;
     }
 
     @GetMapping("/admin")
@@ -92,20 +100,28 @@ public class AdminController {
         
         if (formData.containsKey("role")) {
             Role newrole = null;
+            Boolean isCAS = null;
             try {
                 newrole = Role.valueOf(formData.get("role"));
+                isCAS = Boolean.valueOf(formData.get("isCAS"));
             } catch(Exception e) {
                 return "redirect:/admin?error=1";
             }
 
             User us = u.get();
             us.setRole(newrole);
+            us.setCAS(isCAS);
             usersRepository.save(us);
             return "redirect:/admin?success=1";
         } else if (formData.containsKey("delete") && formData.get("delete").equals("1")) {
             Optional<MatchingProfile> profile = matchingProfileRepository.findByUser(u.get());
+            chatMessageService.deleteByUser(u.get());
             if (profile.isPresent()) matchingProfileRepository.delete(profile.get());
             usersRepository.deleteById(id);
+            List<ExpressionOfInterest> eois = expressionOfInterestRepository.findAll();
+            for (ExpressionOfInterest e:eois) {
+                if (e.getSender() == u.get() || e.getReceiver()==u.get()) expressionOfInterestRepository.delete(e);
+            }
             return "redirect:/admin?success=1";
         }
 

@@ -26,6 +26,8 @@ public class User {
     private Gender gender;
     @Nullable
     private String avatar;
+    @Nullable
+    private Boolean isCAS = false;
 
     public User() {
 
@@ -111,5 +113,14 @@ public class User {
 
     public boolean isMod() {
         return role==Role.MOD;
+    }
+
+    public Boolean isCAS() {
+        if (isCAS==null) return false;
+        return isCAS;
+    }
+
+    public void setCAS(boolean isCAS) {
+        this.isCAS = isCAS;
     }
 }

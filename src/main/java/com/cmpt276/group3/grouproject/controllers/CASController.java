@@ -35,13 +35,13 @@ public class CASController {
     private final HttpClient httpClient;
 
     public static final String CAS_VERIFY_ENDPOINT =
-            "http://localhost:8000/validate/";
+            "https://cmpt276-minimal-cas-server.onrender.com/validate/";
 
-    public static final String CAS_SERVICE_URL =
-            "http://localhost:8080/cas/login";
+    // public static final String CAS_SERVICE_URL = "http://localhost:8080/cas/login"; // for local testing
+    public static final String CAS_SERVICE_URL = "https://cmpt276-grouproject-3.onrender.com/cas/login";
 
     public static final String CAS_LOGIN_URL =
-            "http://localhost:8000/login";
+            "https://cmpt276-minimal-cas-server.onrender.com/login";
 
     public CASController(
             UserService userService,

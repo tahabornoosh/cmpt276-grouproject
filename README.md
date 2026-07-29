@@ -72,14 +72,15 @@ Our app provides near equal focus on romantic relationships, friendships, and st
 
 Additionally, our app provides a host of features such as deterministic (score based) matching, text chats, voice and video calls, event/date planning, and more, to meet the needs of all users.
 
-## List of Epics/Features (small changes made in iteration2)
+## List of Epics/Features (small changes made in iteration2/3)
 
 - Profiles and Questionnair: Three-part interleaved profile built using a comprehensive questionnair, divided into general questions and three specialized parts (dating, friendship, study buddies) with the possibility of disabling each part. Includes questions about interests, preferences, and academic experiences.
 - Feeds: Allow users to see profiles matched to their profile and send expressions of interest. Suggestions in feeds will be given based on matching score calculation algorithms dedicated to each profile/stream.
 - Chat and virtual meeting features: Individual chats with security features (e.g., blocking, no media/photo sharing) and voice/video calls (outsourced \- using **APIs** of either Zoom, BigBlueButton, or similar solution)  
   - APIs will be used to obtain meeting join links once a user initiates or joins a call, and involve sending the user's display name to the API.
 - Login and CAS Integration: app allows logging in with a CAS server (with the ultimate goal being the SFU CAS server), using a username and password, or both.  
-- Profile optimization: Users can edit their profile by adding their picture, biography, and life updates (posts). Includes some basic automated moderation.
+- Profile optimization: Users can edit their profile by adding their picture and biography. Includes some basic automated moderation.
+- Groups: Users will be able to form groups, invite new members, and have both a group chat and posts/threads to discuss ideas and activities
 
 
 ## Group Members and Expertise

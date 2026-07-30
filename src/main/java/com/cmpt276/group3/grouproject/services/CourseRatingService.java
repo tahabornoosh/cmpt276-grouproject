@@ -38,6 +38,7 @@ public class CourseRatingService {
     }
 
     private boolean validateCourse(String course) {
-        return Pattern.matches("^[A-Z]{2,4}\s[1-9]{3}$", course);
+        if (Pattern.matches("^[A-Z]{2,4}\s[0-9]{3}$", course)) return true; // regular course
+        else return Pattern.matches("^[A-Z]{2,4}\s[0-9]{3}W$", course);
     }
 }

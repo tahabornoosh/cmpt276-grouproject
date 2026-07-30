@@ -14,7 +14,7 @@ public class CourseRating {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Size(min=6, max=8)
+    @Size(min=6, max=9)
     private String course;
 
     @Min(1)

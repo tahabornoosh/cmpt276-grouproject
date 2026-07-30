@@ -17,3 +17,4 @@
 - AI used to help make an AdminLTE4 page (chat) compatible with AdminLTE3.2
 - AI used to help generate chat tests
 - AI used to help implement chat unread badge functionality and blocking
+- AI used to assist with regex and UI configuration for course ratings feature

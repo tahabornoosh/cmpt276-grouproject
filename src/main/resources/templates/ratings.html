@@ -1,0 +1,136 @@
+<th:block th:replace="~{fragments/layout :: head('Course Ratings')}"></th:block>
+<th:block th:replace="~{fragments/layout :: bodyStart}"></th:block>
+<input type="hidden" id="activeMenuItem" name="activeMenuItem" value="menu-ratings" />
+
+<main class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Course Ratings</h1>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div id="accordion">
+        <div class="card">
+          <div class="card-header" id="headingOne">
+            <h5 class="mb-0">
+              <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false"
+                aria-controls="collapseOne">
+                + Add a Rating
+              </button>
+            </h5>
+          </div>
+
+          <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+            <div class="card-body">
+              <div class="card card-primary">
+                <div class="card-header">
+                  <h3 class="card-title">New Rating</h3>
+                </div>
+                <div class="card-body">
+                  <div class="alert alert-secondary">
+                    Please Enter your course name exactly as it appears in the SFU Calendar, including the space between
+                    the topic code (e.g., CMPT) and the course number (e.g., 276). Valid Examples: CMPT 276, CMPT 295,
+                    BUS 232.
+                    <br>
+                    Note that re-submitting a rating for a course will overwrite your earlier rating
+                  </div>
+                  <div class="row">
+                    <form method="post" action="/course/new_rating" class="row align-items-end w-100">
+                      <div class="col-md-4">
+                        <label for="course" class="form-label">Course Name</label>
+                        <input id="course" type="text" name="course" class="form-control" placeholder="Course Name"
+                          required>
+                      </div>
+
+                      <div class="col-md-4">
+                        <label for="rating" class="form-label">Rating</label>
+                        <input id="rating" name="rating" type="number" min="1" max="5" class="form-control"
+                          placeholder="Your Rating (1–5)" required>
+                      </div>
+
+                      <div class="col-md-4">
+                        <button type="submit" class="btn btn-warning btn-block w-100">
+                          Submit Rating
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <!-- /.card-body -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">View Ratings</h3>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-danger" hidden id="error">An error occured</div>
+          <div class="alert alert-success" hidden id="success">Success</div>
+          <table id="usersTable" class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>Course Name</th>
+                <th>Mean Rating (out of 5)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="r : ${ratings.entrySet()}">
+                <td th:text="${r.getKey()}"></td>
+                <td th:text="${#numbers.formatDecimal(r.getValue(), 1, 1)}"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.jQuery && window.jQuery.fn.DataTable) {
+        $('#usersTable').DataTable({ responsive: true, lengthChange: false, autoWidth: false });
+      }
+    });
+  </script>
+</main>
+
+<th:block th:replace="~{fragments/layout :: bodyEnd}"></th:block>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+
+  const err = urlParams.get('error');
+  const succ = urlParams.get('success');
+
+  const errors = {
+    "1": "Your Rating could not be processed. Please check that you enter a valid course name and a rating between 1 and 5, and try again."
+  }
+
+  const successes = {
+    "1": "Success"
+  }
+
+  let text = errors[err];
+  if (text) {
+    document.getElementById("error").hidden = false;
+    document.getElementById("error").innerHTML = text;
+    history.replaceState({}, "", window.location.pathname);
+  }
+
+  text = successes[succ];
+  if (text) {
+    document.getElementById("success").hidden = false;
+    document.getElementById("success").innerHTML = text;
+    history.replaceState({}, "", window.location.pathname);
+  }
+</script>

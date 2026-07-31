@@ -18,3 +18,6 @@
 - AI used to help generate chat tests
 - AI used to help implement chat unread badge functionality and blocking
 - AI used to assist with regex and UI configuration for course ratings feature
+- AI helped in CAS authentication programming
+- The app uses an AI generated test Django CAS server (identity provider)
+- AI used to help implement Zoom calling

@@ -29,10 +29,11 @@
       <div class="cold" style="width: 100%">
         <div class="card card-warning card-outline mb-4">
           <div class="card-header">
-            <div class="card-title">Role Change</div>
+            <div class="card-title">Role/Authentication Change</div>
           </div>
           <form method="post" th:object="${u}" th:action="@{/account/admincontrols/{id}(id=${u.id})}">
             <div class="card-body">
+              <div class="alert alert-warning">Important: if changing authentication method, be sure to set a password (disabling CAS) or that the user has a CAS account (enabling CAS) for security reasons</div>
               <div class="row mb-3">
                 <label for="role" class="col-sm-2 col-form-label">Role</label>
                 <select class="form-control" id="select-default" th:field="*{role}">
@@ -40,9 +41,13 @@
                   </option>
                 </select>
               </div>
+              <div class="form-check">
+                <input type="checkbox" th:field="*{isCAS}" class="form-check-input" id="cas">
+                <label class="form-check-label" for="cas">Uses CAS Authentication</label>
+              </div>
             </div>
             <div class="card-footer">
-              <button type="submit" class="btn btn-warning">Chang Role</button>
+              <button type="submit" class="btn btn-warning">Apply Changes</button>
             </div>
           </form>
         </div>
@@ -54,17 +59,13 @@
           <form method="post" th:object="${u}" th:action="@{/account/admincontrols/{id}(id=${u.id})}">
             <div class="card-body">
               <div class="alert alert-danger">
-                This will permanently delete <span
-                    th:text="${u.first_name}"></span> <span th:text="${u.last_name}"></span>'s account and their
-                  profile. This is not reversible.
+                This will permanently delete <span th:text="${u.first_name}"></span> <span
+                  th:text="${u.last_name}"></span>'s account, their
+                profile, their EOIs, and all their chats. This is not reversible.
               </div>
-              <div class="row mb-3">
-                <div class="col-sm-10 offset-sm-2">
-                  <div class="form-check">
-                    <input required name="delete" value="1" class="form-check-input" type="checkbox" id="delete">
-                    <label class="form-check-label" for="delete">I understand. Delete the account.</label>
-                  </div>
-                </div>
+              <div class="form-check">
+                <input value="1" type="checkbox" name="delete" class="form-check-input" id="delete" required>
+                <label class="form-check-label" for="delete">I understand. Delete the user</label>
               </div>
             </div>
             <div class="card-footer">

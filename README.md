@@ -72,14 +72,15 @@ Our app provides near equal focus on romantic relationships, friendships, and st
 
 Additionally, our app provides a host of features such as deterministic (score based) matching, text chats, voice and video calls, event/date planning, and more, to meet the needs of all users.
 
-## List of Epics/Features 
+## List of Epics/Features (small changes made in iteration2/3)
 
 - Profiles and Questionnair: Three-part interleaved profile built using a comprehensive questionnair, divided into general questions and three specialized parts (dating, friendship, study buddies) with the possibility of disabling each part. Includes questions about interests, preferences, and academic experiences.
 - Feeds: Allow users to see profiles matched to their profile and send expressions of interest. Suggestions in feeds will be given based on matching score calculation algorithms dedicated to each profile/stream.
 - Chat and virtual meeting features: Individual chats with security features (e.g., blocking, no media/photo sharing) and voice/video calls (outsourced \- using **APIs** of either Zoom, BigBlueButton, or similar solution)  
   - APIs will be used to obtain meeting join links once a user initiates or joins a call, and involve sending the user's display name to the API.
 - Login and CAS Integration: app allows logging in with a CAS server (with the ultimate goal being the SFU CAS server), using a username and password, or both.  
-- Profile optimization: Users can edit their profile by adding their picture, biography, and life updates (posts). Includes some basic automated moderation.
+- Profile optimization: Users can edit their profile by adding their picture and biography. Includes some basic automated moderation.
+- Groups: Users will be able to form groups, invite new members, and have both a group chat and posts/threads to discuss ideas and activities
 
 
 ## Group Members and Expertise
@@ -764,6 +765,37 @@ Mike clicks on the phone icon next to Janice's name in the chat window, and is r
 - All created meeting links should work without errors
 - Blocked users may not initiate calls
 - Open chats should allow for video calling by either party
+
+## Case: CAS Login/Signup (5 points)
+**Iteration**
+To be completed in Iteration 3.
+
+**Personas/Actors**
+1. Primary actor: Mike - a second-year SFU student
+
+**Pre-conditions**
+- Mike should be on the login page
+- Mike should not have an active account
+
+**Actions/Triggers**
+Mike clicks on "Login with CAS server" button at the bottom of the login page, and is then redirected to the configured CAS server. He logs in and is redirected to the app again with a service ticket, which yields his email as username.
+
+**Acceptance Criteria**
+- If Mike does not have an account with his CAS email, then he should be prompted for the rest of his information (first name, last name, and gender) and with valid input, an account should be created for him and he should be redirected to dashboard
+- If Mike's CAS email is associated with an existing CAS-based account, then he should be logged in and redirected to the dashboard page
+- If Mike's CAS email is associated with an existing manual account, then he should be prompted for his password and a confirmation checkbox acknowledging that he is converting his account to a CAS account. After successful verification, he should be logged in and redirected to the dashboard page
+**Post-conditions**
+- Accounts should be created in the database only after all information have been provided by the user
+- CAS users should not be able to log in using email and password, even if they have set a password, unless converted to regular account by an admin
+
+**Non-functional requirements**
+- All pages should load in less than one second
+- All error messages should be clear and understandable
+
+**Tests**
+- A non-existing user using CAS should be asked for their name and gender
+- An existing CAS user using CAS to login should be logged in and redirected to dashboard directly
+- An existing CAS user should not under any circumstances be able to log in using email/password
 
 ## Case: Profile Updates (2 points)
 **Iteration**

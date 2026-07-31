@@ -9,6 +9,7 @@ import com.cmpt276.group3.grouproject.enums.Role;
 
 public interface UsersRepository extends JpaRepository<User, Long> {
     public List<User> findByEmailAndPassword(String email, String password);
+    public Optional<User> findByEmailIgnoreCase(String email);
 
     boolean existsByEmail(String email);
     Optional<User> findByEmail(String email);

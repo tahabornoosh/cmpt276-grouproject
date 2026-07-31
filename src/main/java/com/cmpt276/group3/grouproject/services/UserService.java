@@ -41,6 +41,28 @@ public class UserService {
         return userRepository.save(newUser);
     }
 
+    public User registerCasUser(User newUser) {
+        
+        if (emailExists(newUser.getEmail())) {
+            throw new IllegalArgumentException(
+                "User with this email already exists"
+            );
+        }
+
+        
+        // password should NOT be hashed so it won't match anything
+        newUser.setPassword("unknown");
+        newUser.setCAS(true);
+
+        if (newUser.getEmail() == null || newUser.getEmail().isBlank()) {
+            throw new IllegalArgumentException(
+                "Email cannot be empty"
+            );
+        }
+        
+        return userRepository.save(newUser);
+    }
+
     public User updatePassword(User targetUser, String plainPassword) {
         if (targetUser == null) {
             throw new IllegalArgumentException("User cannot be null");

@@ -45,9 +45,23 @@ public class Auth {
             return false;
         }
 
+        if (user.isCAS()) return false; // CAS user should not be logged in using username/password
+
         boolean passwordMatch = PasswordUtil.checkPassword(password,user.getPassword());
 
         if (!passwordMatch) {
+            return false;
+        }
+
+        session.setAttribute(sessionKey, user.getId());
+
+        return true;
+    }
+
+    public boolean login(HttpSession session, String email) { // passwordless, for CAS
+        User user = userService.findUserByEmail(email);
+
+        if (user == null) {
             return false;
         }
 

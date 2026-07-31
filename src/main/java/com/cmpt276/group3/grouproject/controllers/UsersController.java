@@ -40,6 +40,8 @@ public class UsersController {
     @GetMapping("/login")
     public String login_controller(Model model, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
         if (auth.isLoggedIn(session)) return "redirect:/"; // already logged in
+        String CAS_url = CASController.CAS_LOGIN_URL+"?service="+CASController.CAS_SERVICE_URL;
+        model.addAttribute("CAS_URL", CAS_url);
         return "login";
     }
 

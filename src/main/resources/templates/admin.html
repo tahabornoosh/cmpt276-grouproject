@@ -30,6 +30,7 @@
                 <th>Email</th>
                 <th>Gender</th>
                 <th>Role</th>
+                <th>Authentication Method</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -39,12 +40,14 @@
                 <td th:text="${u.email}"></td>
                 <td th:text="${u.gender}"></td>
                 <td th:text="${u.role}"></td>
+                <td th:if="${u.isCAS}">CAS</td>
+                <td th:if="${!u.isCAS}">Password</td>
                 <td>
                   <a th:href="@{'/profile/' + ${u.id}}" class="btn btn-info btn-sm">View Profile</a>
                   <a th:if="${currentUser.isAdmin()}" th:href="@{'/account/edit/' + ${u.id}}"
                     class="btn btn-warning btn-sm">Edit</a>
                   <a th:if="${currentUser.isAdmin()}" th:href="@{'/account/admincontrols/' + ${u.id}}"
-                    class="btn btn-danger btn-sm">Delete/Role change</a>
+                    class="btn btn-danger btn-sm">Admin Controls</a>
                 </td>
               </tr>
             </tbody>

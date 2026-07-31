@@ -1,7 +1,9 @@
 package com.cmpt276.group3.grouproject.util.zoom;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ZoomApiMeetingResponse {
     
     private Long id;

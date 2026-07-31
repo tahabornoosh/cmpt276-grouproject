@@ -284,6 +284,17 @@
                 Select a conversation
               </p>
 
+              <button
+                class="btn btn-primary btn-sm"
+                type="button"
+                id="start-zoom-call-button"
+                title="Start Zoom call"
+                aria-label="Start Zoom call"
+                disabled
+                >
+                <i class="fas fa-video" aria-hidden="true"></i>
+                <span class="m1-1">Call</span>
+              </button>
               <small
                 class="text-danger d-block"
                 id="block-status-message"
@@ -338,6 +349,8 @@
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const chatApp = document.getElementById("chat-app");
+    const startZoomCallButton =
+      document.getElementById("start-zoom-call-button");
     const messageContainer =
       document.getElementById("chat-messages");
     const messageForm =
@@ -445,6 +458,98 @@
       );
     }
 
+    async function startZoomCall() {
+      if (
+        !selectedRecipientId
+        || startZoomCallButton.disabled
+        || (
+          selectedBlockStatus
+          && selectedBlockStatus.communicationBlocked
+        )
+      ) {
+        return;
+      }
+
+      if (!stompClient || !stompClient.connected) {
+        alert("The chat connection is not ready");
+        return;
+      }
+
+      startZoomCallButton.disabled = true;
+
+      const originalButtonHtml =
+        startZoomCallButton.innerHTML;
+
+      startZoomCallButton.innerHTML = 
+        '<span class ="spinner-border spinner-border-sm" ' +
+        'aria-hidden="true"></span>' +
+        '<span class="m1-1">Starting...</span>';
+
+      try {
+        const response = await fetch("/api/zoom/meetings", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            recipientId: selectedRecipientId
+          })
+        });
+
+        if (response.status === 401) {
+          window.location.href = "/login";
+          return;
+        }
+
+        if (!response.ok) {
+          const errorBody = await response.text();
+
+          throw new Error(
+            `Could not create Zoom Meeting: ` +
+            `${response.status} ${errorBody}`
+          );
+        }
+
+        const meeting = await response.json();
+
+        if (!meeting.joinUrl || !meeting.hostUrl) {
+          throw new Error(
+            "The server returned incomplete Zoom meeting data."
+          );
+        }
+
+        stompClient.publish({
+          destination: "/app/chat.send",
+          body: JSON.stringify({
+            recipientId: selectedRecipientId,
+            content: `Join my Zoom call: ${meeting.joinUrl}`
+          })
+        });
+
+        setTimeout(() => {
+          window.location.assign(meeting.hostUrl);
+        }, 250);
+      } catch (error) {
+        console.error(error);
+        alert("The zoom meeting could not be created.");
+
+        startZoomCallButton.innerHTML = 
+          originalButtomHtml;
+
+        startZoomCallButton.disabled = 
+          !selectedRecipientId
+          || Boolean(
+            selectedBlockStatus
+            && selectedBlockStatus.communicationBlocked
+          )
+      }
+    }
+
+    startZoomCallButton.addEventListener(
+      "click",
+      startZoomCall
+    );
+
     function setUnreadBadge(contact, unread) {
       if (!contact) {
         return;
@@ -470,6 +575,8 @@
     function setComposerEnabled(enabled, placeholder) {
       messageInput.disabled = !enabled;
       sendButton.disabled = !enabled;
+      startZoomCallButton.disabled = 
+        !enabled || !selectedRecipientId;
       messageInput.placeholder = placeholder;
     }
 

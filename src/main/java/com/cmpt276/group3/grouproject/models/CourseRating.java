@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 @Entity
+@Table(name="course_ratings")
 public class CourseRating {
 
     @Id
@@ -14,8 +15,9 @@ public class CourseRating {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Size(min=6, max=9)
-    private String course;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "course_id", nullable = false)
+    private Course course;
 
     @Min(1)
     @Max(5)
@@ -23,7 +25,7 @@ public class CourseRating {
 
     public CourseRating() {}
 
-    public CourseRating(User user, @Size(min = 6, max = 8) String course, @Min(1) @Max(5) Integer rating) {
+    public CourseRating(User user, Course course, @Min(1) @Max(5) Integer rating) {
         this.user = user;
         this.course = course;
         this.rating = rating;
@@ -45,11 +47,11 @@ public class CourseRating {
         this.user = user;
     }
 
-    public String getCourse() {
+    public Course getCourse() {
         return course;
     }
 
-    public void setCourse(String course) {
+    public void setCourse(Course course) {
         this.course = course;
     }
 

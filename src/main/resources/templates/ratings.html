@@ -35,7 +35,8 @@
                 </div>
                 <div class="card-body">
                   <div class="alert alert-secondary">
-                    Please Enter your course name <b>exactly as it appears in the SFU Calendar</b>, including the space between
+                    <strong>Important: Only courses offered at least once either this year or last year can be rated here.</strong>
+                    <br>Please Enter your course name <b>exactly as it appears in the SFU Calendar</b>, including the space between
                     the topic code (e.g., CMPT) and the course number (e.g., 276). Valid Examples: CMPT 276, CMPT 295,
                     BUS 232. 
                     <br>
@@ -79,13 +80,13 @@
           <table id="usersTable" class="table table-bordered table-striped">
             <thead>
               <tr>
-                <th>Course Name</th>
+                <th>Course Name/Description</th>
                 <th>Mean Rating (out of 5)</th>
               </tr>
             </thead>
             <tbody>
               <tr th:each="r : ${ratings.entrySet()}">
-                <td th:text="${r.getKey()}"></td>
+                <td th:text="${r.getKey().getDisplayName()}"></td>
                 <td th:text="${#numbers.formatDecimal(r.getValue(), 1, 1)}"></td>
               </tr>
             </tbody>
@@ -113,7 +114,7 @@
   const succ = urlParams.get('success');
 
   const errors = {
-    "1": "Your Rating could not be processed. Please check that you enter a valid course name and a rating between 1 and 5, and try again."
+    "1": "Your Rating could not be processed. Please check that you enter a valid course name (must exist in the SFU calendar) and a rating between 1 and 5, and try again."
   }
 
   const successes = {

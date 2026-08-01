@@ -9,7 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
 import com.cmpt276.group3.grouproject.auth.Auth;
+import com.cmpt276.group3.grouproject.models.Course;
 import com.cmpt276.group3.grouproject.models.CourseRating;
+import com.cmpt276.group3.grouproject.models.CourseRepository;
 import com.cmpt276.group3.grouproject.services.CourseRatingService;
 
 import jakarta.servlet.http.HttpSession;
@@ -24,11 +26,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Controller
 public class CourseRatingController {
     private final CourseRatingService CRS;
+    private final CourseRepository CR;
     private final Auth auth;
 
-    public CourseRatingController(CourseRatingService CRS, Auth auth) {
+    public CourseRatingController(CourseRatingService CRS, Auth auth, CourseRepository CR) {
         this.CRS=CRS;
         this.auth=auth;
+        this.CR = CR;
     }
 
     @GetMapping("/course/ratings")
@@ -37,32 +41,23 @@ public class CourseRatingController {
             return "redirect:/login";
         }
 
-        List<CourseRating> ratings = CRS.findAll();
-        Map<String, ArrayList<CourseRating>> categorized = new HashMap<String, ArrayList<CourseRating>>();
-        // List<String> courses = new ArrayList<String>();
-        // List<Double> ratingSum = new ArrayList<Double>();
-        // List<Integer> ratingCount = new ArrayList<Integer>();
+        Map<Course, Double> ratings = new HashMap<Course, Double>();
 
-        for (CourseRating rating:ratings) {
-            if (categorized.containsKey(rating.getCourse())) categorized.get(rating.getCourse()).add(rating);
-            else {
-                categorized.put(rating.getCourse(), new ArrayList<CourseRating>());
-                categorized.get(rating.getCourse()).add(rating);
+        List<Course> courses = CR.findAll();
+        for (Course course: courses) {
+            List<CourseRating> course_ratings = CRS.findByCourse(course);
+            int count = 0;
+            int sum = 0;
+            for (CourseRating r:course_ratings) {
+                sum+=r.getRating();
+                count++;
+            } if (count!=0) {
+                ratings.put(course, (double) sum/count);
             }
         }
 
-        Map<String, Double> numericalRatings = new HashMap<String, Double>();
-        for (Map.Entry<String, ArrayList<CourseRating>> e:categorized.entrySet()) {
-            double k = 0;
-            double n = 0;
-            for (CourseRating c:e.getValue()) {
-                k+=c.getRating();
-                n+=1;
-            }
-            numericalRatings.put(e.getKey(), k/n);
-        }
 
-        model.addAttribute("ratings", numericalRatings);
+        model.addAttribute("ratings", ratings);
         model.addAttribute("currentUser", auth.getUser(session));
         return "ratings";
     }

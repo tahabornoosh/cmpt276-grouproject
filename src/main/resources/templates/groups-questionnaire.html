@@ -1,0 +1,204 @@
+<th:block th:replace="~{fragments/layout :: head('Group Finder')}"></th:block>
+<th:block th:replace="~{fragments/layout :: bodyStart}"></th:block>
+
+<input type="hidden" id="activeMenuItem" value="menu-groups-find">
+
+<main class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1><i class="fas fa-clipboard-list mr-2"></i>Group Finder</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/groups}">Groups</a></li>
+            <li class="breadcrumb-item active">Questionnaire</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+
+      <div th:if="${param.error != null}" class="alert alert-danger">
+        <i class="icon fas fa-ban"></i> <span th:text="${param.error[0]}">Could not save</span>
+      </div>
+
+      <div class="alert alert-secondary">
+        Answer these and we'll put you in a group with students who want the same thing.
+        Your answers here are separate from the friendship / relationship / study buddy
+        questionnaire, so you can look for a friend group without filling that one in.
+      </div>
+
+      <form th:action="@{/groups/questionnaire}" method="post">
+
+        <div class="card card-primary card-outline">
+          <div class="card-header">
+            <h3 class="card-title">What are you looking for?</h3>
+          </div>
+
+          <div class="card-body">
+
+            <div class="form-group">
+              <div class="icheck-primary">
+                <input type="checkbox" id="looking_for_group" name="looking_for_group"
+                       th:checked="${!hasPreference or preference.lookingForGroup}">
+                <label for="looking_for_group">
+                  I'm looking for a group right now
+                </label>
+              </div>
+              <small class="form-text text-muted">
+                Uncheck this to stay out of the matching pool without deleting your answers.
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label>What kind of group do you want?</label>
+              <select class="form-control" name="vibe" required>
+                <option value="">Select one</option>
+                <option th:each="item : ${vibes}"
+                        th:value="${item.name()}"
+                        th:text="${item.displayName}"
+                        th:selected="${hasPreference and preference.vibe == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>How big should the group be?</label>
+              <select class="form-control" name="size_preference" required>
+                <option value="">Select one</option>
+                <option th:each="item : ${groupSizes}"
+                        th:value="${item.name()}"
+                        th:text="${item.displayName}"
+                        th:selected="${hasPreference and preference.size_preference == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Where would you meet up?</label>
+              <select class="form-control" name="meetup_style" required>
+                <option value="">Select one</option>
+                <option th:each="item : ${meetupStyles}"
+                        th:value="${item.name()}"
+                        th:text="${item.displayName}"
+                        th:selected="${hasPreference and preference.meetup_style == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Which campus are you mostly at?</label>
+              <select class="form-control" name="campus" required>
+                <option value="">Select one</option>
+                <option th:each="item : ${campuses}"
+                        th:value="${item.name()}"
+                        th:text="${item.displayName}"
+                        th:selected="${hasPreference and preference.campus == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>When are you usually free?</label>
+              <select class="form-control" name="availability" required>
+                <option value="">Select one</option>
+                <option th:each="item : ${availabilities}"
+                        th:value="${item.name()}"
+                        th:text="${item.displayName}"
+                        th:selected="${hasPreference and preference.availability == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>How would you describe your lifestyle?</label>
+              <select class="form-control" name="lifestyle">
+                <option value="">Select one</option>
+                <option th:each="item : ${lifestyles}"
+                        th:value="${item.name()}"
+                        th:text="${item.displayName}"
+                        th:selected="${hasPreference and preference.lifestyle == item}"></option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="card card-primary card-outline">
+          <div class="card-header">
+            <h3 class="card-title">Your interests</h3>
+          </div>
+
+          <div class="card-body">
+
+            <div class="form-group">
+              <label>Top interest</label>
+              <select class="form-control" name="top_interest" required>
+                <option value="">Select one</option>
+                <option th:each="item : ${topInterests}"
+                        th:value="${item.name()}"
+                        th:text="${item.displayName}"
+                        th:selected="${hasPreference and preference.top_interest == item}"></option>
+              </select>
+            </div>
+
+            <!-- Weighted 3 / 2 / 1 by the matcher, so the first pick counts most. -->
+            <div class="form-group">
+              <label>Interest 1 (counts the most)</label>
+              <select class="form-control" name="hobby1">
+                <option value="">Select one</option>
+                <option th:each="item : ${hobbies}"
+                        th:value="${item.name()}"
+                        th:text="${#strings.capitalize(#strings.replace(#strings.toLowerCase(item.name()),'_',' '))}"
+                        th:selected="${hasPreference and preference.hobby1 == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Interest 2</label>
+              <select class="form-control" name="hobby2">
+                <option value="">Select one</option>
+                <option th:each="item : ${hobbies}"
+                        th:value="${item.name()}"
+                        th:text="${#strings.capitalize(#strings.replace(#strings.toLowerCase(item.name()),'_',' '))}"
+                        th:selected="${hasPreference and preference.hobby2 == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Interest 3</label>
+              <select class="form-control" name="hobby3">
+                <option value="">Select one</option>
+                <option th:each="item : ${hobbies}"
+                        th:value="${item.name()}"
+                        th:text="${#strings.capitalize(#strings.replace(#strings.toLowerCase(item.name()),'_',' '))}"
+                        th:selected="${hasPreference and preference.hobby3 == item}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Anything else a group should know? (optional)</label>
+              <textarea class="form-control" name="blurb" rows="3" maxlength="300"
+                        placeholder="e.g. third year CS, always down for late night food runs"
+                        th:text="${hasPreference ? preference.blurb : ''}"></textarea>
+              <small class="form-text text-muted">Up to 300 characters.</small>
+            </div>
+
+          </div>
+
+          <div class="card-footer">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save mr-1"></i> Save and find groups
+            </button>
+            <a th:href="@{/groups}" class="btn btn-secondary">Cancel</a>
+          </div>
+        </div>
+
+      </form>
+
+    </div>
+  </section>
+</main>
+
+<th:block th:replace="~{fragments/layout :: bodyEnd}"></th:block>

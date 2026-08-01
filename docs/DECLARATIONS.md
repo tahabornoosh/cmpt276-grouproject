@@ -2,6 +2,8 @@
 ## Resources used
 - Course Material on Canvas
 - [AdminLTE](https://github.com/ColorlibHQ/AdminLTE) - Template and Docs
+- SFU Course Outlines REST API/Documentation
+- Zoom REST API/Documentation
   
 ## AI Tools used
 - ChatGPT used to find Dockerfile issue (initial deployment)
@@ -20,4 +22,5 @@
 - AI used to assist with regex and UI configuration for course ratings feature
 - AI helped in CAS authentication programming
 - The app uses an AI generated test Django CAS server (identity provider)
+- AI used to help in implementation of course ratings
 - AI used to help implement Zoom calling

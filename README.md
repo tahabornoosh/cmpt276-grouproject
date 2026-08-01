@@ -81,6 +81,8 @@ Additionally, our app provides a host of features such as deterministic (score b
 - Login and CAS Integration: app allows logging in with a CAS server (with the ultimate goal being the SFU CAS server), using a username and password, or both.  
 - Profile optimization: Users can edit their profile by adding their picture and biography. Includes some basic automated moderation.
 - Groups: Users will be able to form groups, invite new members, and have both a group chat and posts/threads to discuss ideas and activities
+- Course Ratings: A simple ratings sytem where users can submit 1-5 ratings for recent SFU courses
+  - **Uses SFU Outlines REST API to validate entered courses and pull full course titles**
 
 
 ## Group Members and Expertise
@@ -736,7 +738,7 @@ Mike clicks on the three-dot icon next to Janice's name in the top bar of the ch
 
 ## Case: Calling (3 points)
 **Iteration**
-To be completed in Iteration 3.
+Completed in Iteration 3.
 
 **Personas/Actors**
 1. Primary actor: Mike - a second-year SFU student
@@ -748,10 +750,10 @@ To be completed in Iteration 3.
 - Mike and Janice should have an existing chat thread
 
 **Actions/Triggers**
-Mike clicks on the phone icon next to Janice's name in the chat window, and is redirected to a page in an external video conferencing application. At the same time, a link is sent to Janice in the chat to join the call.
+Mike clicks on the call button next to Janice's name in the chat window, and is redirected to a page in an external video conferencing application. At the same time, a link is sent to Janice in the chat to join the call.
 
 **Acceptance Criteria**
-- If neither party have blocked each other, the call should go through and obtain a meeting link via API
+- If neither party have blocked each other, the call should go through and a meeting link should be obtained via API
 - If either (or both) parties have blocked each other, the call should not succeed.
 
 **Post-conditions**
@@ -768,7 +770,7 @@ Mike clicks on the phone icon next to Janice's name in the chat window, and is r
 
 ## Case: CAS Login/Signup (5 points)
 **Iteration**
-To be completed in Iteration 3.
+Completed in Iteration 3.
 
 **Personas/Actors**
 1. Primary actor: Mike - a second-year SFU student
@@ -797,34 +799,216 @@ Mike clicks on "Login with CAS server" button at the bottom of the login page, a
 - An existing CAS user using CAS to login should be logged in and redirected to dashboard directly
 - An existing CAS user should not under any circumstances be able to log in using email/password
 
-## Case: Profile Updates (2 points)
+## Case: Course Ratings viewing (2 points)
 **Iteration**
-To be completed in Iteration 3.
+Completed in Iteration 3.
 
 **Personas/Actors**
 1. Primary actor: Mike - a second-year SFU student
 
 **Pre-conditions**
-- Mike must be logged in and be in his profile page
+- Mike must be logged in
 
 **Actions/Triggers**
-Mike goes to the "Updates" tab in his profile, where he will see a text box and a "Post" button below his previous updates. He writes an update in the textbox, and clicks "Post"
+Mike clicks "Course Ratings" from any location in the app, and is redirected to the course ratings page, where he will see a table of courses and their average rating out of 5, and an option to add a rating
 
 **Acceptance Criteria**
-- If the post does not contain any banned words, then it should be immediately be added to the top of Mike's "updates" profile section
-- If Mike is not logged in, or the post contains banned words, then the update should not be posted and an error message should be displayed
+- Courses should be displayed with their name and full title (e.g., CMPT 276 Introduction to Software Engineering)
+- Mike should be able to search through the table of ratings
 
 **Post-conditions**
-- Successful updates posted should be added to the database
+- None
 
 **Non-functional requirements**
 - All pages should load in less than one second
-- The errors should be clear and specific
 
 **Tests**
-- The update "Celebrating my graduation today!" should successfuly go through for a logged-in user.
-- A logged-out user should not be able to submit an update
-- An update containing a common curse word should not be accepted
+- If two ratings 2.0 and 3.0 for CMPT 276 exist, then a line item "CMPT 276 Introduction to Software Engineering" should be displayed in the table with a rating of 2.5.
+- If no ratings exist for CMPT 300, then CMPT 300 should not be displayed in the table
+
+## Case: Course Ratings Submission (2 points)
+**Iteration**
+Completed in Iteration 3.
+
+**Personas/Actors**
+1. Primary actor: Mike - a second-year SFU student
+2. Secondary Actor: SFU Outlines API
+
+**Pre-conditions**
+- Mike must be logged in
+- Mike must be on the course ratings page
+
+**Actions/Triggers**
+Mike enters a course name and a rating in the "+ Add Rating" section, and presses "Submit".
+
+**Acceptance Criteria**
+- If Mike has entered a course name with an invalid format (where a valid format is a department name - CMPT, ENSC, MATH, etc., a space, and a 3-digit course number and possibly a "W" designation), then his input should be rejected and he should get an error message
+- If Mike has entered a decimal rating, a rating above 5, or a rating below 1, then his input should be rejected with an error message
+- If the course Mike has entered does not correspond with at least one course outline within the past two years (from Outlines API), then his input should be rejected
+- If Mike's input is valid (does not meet any of the above), and he has not rated the course before, then a new rating should be registered for that course
+- If Mike's input is valid (does not meet any of the above), and he has rated the course before, then his previous rating must be updated to reflect the new rating value.
+
+**Post-conditions**
+- A course record with the course's full name and title (from Outlines API) should be created or updated upon every rating submission
+- Changes or additions to ratings must be reflected in the database
+
+**Non-functional requirements**
+- All pages should load in less than one second
+- All error messages should be clear and understandable
+
+**Tests**
+- The inputs ["CMPT 277", 3] and ["CMPT 2235", 1] should be rejected for non-existing or malformed course names
+- The inputs ["CMPT 276", 66] and ["CMPT 276", -1] should be rejected for out-of-range ratings
+- The input ["ENSC 220", 4] should be accepted
+- Re-submitting a rating should not create a new database ratings record
+- A rejected input should not create a new database record
+
+## Case: Group Viewing and Formation (2 points)
+**Iteration**
+Completed in Iteration 3.
+
+**Personas/Actors**
+1. Primary actor: Mike - a second-year SFU student
+
+**Pre-conditions**
+- Mike must be logged in
+
+**Actions/Triggers**
+Mike clicks "Groups" from any location in the app, and is redirected to the groups page, where he will see a table of all groups he is a member of. Then, he clicks on the "Create Group" button on the top of the page, Enters a name for the group in the pop-up window, and clicks "submit"
+
+**Acceptance Criteria**
+- All groups with Mike as their member must be displayed in the table
+- If a name with at least 3 characters is entered, then the input should be accepted and a group should be created, and Mike should be redirected to that group's home page
+- If a name less than 3 characters long is entered, then the submission should not go through
+
+**Post-conditions**
+- New groups should be added to the database
+
+**Non-functional requirements**
+- All pages should load in less than one second
+
+**Tests**
+- An existing group created earlier by Mike should be visible in the list of groups
+- A group named "Mike's group" should be created successfuly.
+- A group named "a" should not be created successfuly.
+
+## Case: Group Chats (1 point)
+**Iteration**
+Completed in Iteration 3.
+
+**Personas/Actors**
+1. Primary actor: Mike - a second-year SFU student
+2. Secondar actors: other group members
+
+**Pre-conditions**
+- Mike must be logged in
+- Mike must be a member of "Group A"
+
+**Actions/Triggers**
+Mike opens the chat page from anywhere on the app, and clicks on the group name in the chat menu.
+
+**Acceptance Criteria**
+- Mike should see a list of messages sent in the group chat, and be able to send messages in the chat
+
+**Post-conditions**
+- All chat messages should be registered in the database
+
+**Non-functional requirements**
+- All pages should load in less than one second
+
+**Tests**
+- All groups for which a user is an active member must be displayed in the chat menu
+- All active group members should be able to send chat messages
+
+## Case: Group Threads/Discussions (3 points)
+**Iteration**
+Completed in Iteration 3.
+
+**Personas/Actors**
+1. Primary actor: Mike - a second-year SFU student
+2. Secondary actors: other group members
+
+**Pre-conditions**
+- Mike must be logged in
+- Mike must be on the group page
+
+**Actions/Triggers**
+Mike must be able to see a list of existing threads, and be able to create a new thread using the "Create Thread" button. Mike clicks on a thread, and sees a list of replies, as well as an option to add replies.
+
+**Acceptance Criteria**
+- All group threads should be visible to Mike
+- Mike should be able to create new threads and reply to existing threads
+
+**Post-conditions**
+- All new threads/replies must be added to the database
+
+**Non-functional requirements**
+- All pages should load in less than one second
+
+**Tests**
+- A previously created thread should be visible to Mike
+- Mike should be able to create a new thread
+- Mike should be able to reply to an existing thread
+
+## Case: Group member management/EOIs (2 points)
+**Iteration**
+Completed in Iteration 3.
+
+**Personas/Actors**
+1. Primary actor: Mike - a second-year SFU student
+
+**Pre-conditions**
+- Mike must be logged in
+- Mike and Janice should have a chat thread with at least one message
+- Mike must be a member of the group in question, and be on the group page
+
+**Actions/Triggers**
+Mike goes to the group management section, and sees a table of pending EOIs with the option to accept, delete, or hide them. He also sees a button for him to leave the group, as well as as a section for hidden EOIs.
+
+**Acceptance Criteria**
+- Mike must be a member of the group to be able to view any of the pages in this story or make any actions
+- Mike must be able to leave the group by clicking the "Leave Group" button
+- Mike must be able to accept, delete, or hide EOIs, where accepting an EOI adds the sender to the group's member list
+
+**Post-conditions**
+- All records should be reflected in the database
+
+**Non-functional requirements**
+- All pages should load in less than one second
+
+**Tests**
+- If Mike is not a member of Group A, then he must not be able to accept EOIs for that group
+- After leaving, Mike should no longer be able to view the group's threads
+
+## Case: Public Groups Explore Page (1 point)
+**Iteration**
+Completed in Iteration 3.
+
+**Personas/Actors**
+1. Primary actor: Mike - a second-year SFU student
+
+**Pre-conditions**
+- Mike must be logged in
+
+**Actions/Triggers**
+Mike clicks on the "Groups" item in the menu, and chooses the sub-item "Explore". He is then redirected to a page containing a searchable table of existing groups with the option to send EOIs to each
+
+**Acceptance Criteria**
+- Mike should not be able to send EOIs to groups he is already a member of (should get error message)
+- Mike should not be able to send EOIs to groups for which he has a pending EOI
+- Mike should be able to search through and sort the groups table
+
+**Post-conditions**
+- EOIs should be reigstered in the database
+
+**Non-functional requirements**
+- All pages should load in less than one second
+- Error messages should be general but clear
+
+**Tests**
+- Mike should not be able to send an EOI to a group he has made and is a member of
+- Mike should be able to send an EOI to a group he is not a member of
+- Mike should not be able to send a second EOI to a group he has already sent an EOI to.
 
 </div>
 

@@ -1,6 +1,8 @@
 package com.cmpt276.group3.grouproject.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.never;
@@ -9,11 +11,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -23,9 +29,13 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import javax.imageio.ImageIO;
+
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 
@@ -67,6 +77,18 @@ public class EditUnitTests {
                 .standaloneSetup(usersController)
                 .setViewResolvers(viewResolver)
                 .build();
+    }
+
+    private byte[] createValidPng() throws Exception {
+        BufferedImage image = new BufferedImage(
+            2,
+            2,
+            BufferedImage.TYPE_INT_RGB
+        );
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", output);
+        return output.toByteArray();
     }
 
     @Test
@@ -223,5 +245,268 @@ public class EditUnitTests {
 
         verify(usersRepository).save(targetUser);
     }
+
+
+    @Test
+    void edit_savesTrimmedBio() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        user.setRole(Role.USER);
+        user.setFirst_name("Test");
+        user.setLast_name("User");
+
+        when(usersRepository.findById(1L))
+            .thenReturn(Optional.of(user));
+
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loggedUserId", 1L);
+
+        mockMvc.perform(
+                multipart("/account/edit/1")
+                    .session(session)
+                    .param("first_name", "Test")
+                    .param("last_name", "User")
+                    .param("gender", "MALE")
+                    .param("bio", "  Computer science student  ")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(
+                redirectedUrl("/account/edit/1?success=1")
+            );
+
+        assertEquals(
+            "Computer science student",
+            user.getBio()
+        );
+
+        verify(usersRepository).save(user);
+    }
+
+    @Test
+    void edit_rejectsBioLongerThan500Characters()
+            throws Exception {
+
+        User user = new User();
+        user.setId(1L);
+        user.setRole(Role.USER);
+
+        when(usersRepository.findById(1L))
+            .thenReturn(Optional.of(user));
+
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loggedUserId", 1L);
+
+        mockMvc.perform(
+                multipart("/account/edit/1")
+                    .session(session)
+                    .param("first_name", "Test")
+                    .param("last_name", "User")
+                    .param("gender", "MALE")
+                    .param("bio", "a".repeat(501))
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(
+                redirectedUrl("/account/edit/1?error=1")
+            );
+
+        assertNull(user.getBio());
+        verify(usersRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void edit_uploadsAndServesValidPngAvatar()
+            throws Exception {
+
+        User user = new User();
+        user.setId(1L);
+        user.setRole(Role.USER);
+
+        when(usersRepository.findById(1L))
+            .thenReturn(Optional.of(user));
+
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loggedUserId", 1L);
+
+        byte[] pngBytes = createValidPng();
+
+        MockMultipartFile avatar = new MockMultipartFile(
+            "avatarFile",
+            "avatar.png",
+            MediaType.IMAGE_PNG_VALUE,
+            pngBytes
+        );
+
+        mockMvc.perform(
+                multipart("/account/edit/1")
+                    .file(avatar)
+                    .session(session)
+                    .param("first_name", "Test")
+                    .param("last_name", "User")
+                    .param("gender", "MALE")
+                    .param("bio", "Hello")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(
+                redirectedUrl("/account/edit/1?success=1")
+            );
+
+        assertArrayEquals(pngBytes, user.getAvatarData());
+        assertEquals(
+            MediaType.IMAGE_PNG_VALUE,
+            user.getAvatarContentType()
+        );
+        assertEquals("/users/1/avatar", user.getAvatar());
+
+        mockMvc.perform(get("/users/1/avatar"))
+            .andExpect(status().isOk())
+            .andExpect(
+                content().contentType(MediaType.IMAGE_PNG)
+            )
+            .andExpect(content().bytes(pngBytes));
+    }
+
+
+
+    @Test
+    void edit_rejectsInvalidAvatarContent() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        user.setRole(Role.USER);
+
+        when(usersRepository.findById(1L))
+            .thenReturn(Optional.of(user));
+
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loggedUserId", 1L);
+
+        MockMultipartFile invalidAvatar = new MockMultipartFile(
+            "avatarFile",
+            "fake.png",
+            MediaType.IMAGE_PNG_VALUE,
+            "not an image".getBytes()
+        );
+
+        mockMvc.perform(
+                multipart("/account/edit/1")
+                    .file(invalidAvatar)
+                    .session(session)
+                    .param("first_name", "Test")
+                    .param("last_name", "User")
+                    .param("gender", "MALE")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(
+                redirectedUrl("/account/edit/1?avatarError=1")
+            );
+
+        assertNull(user.getAvatarData());
+        assertNull(user.getAvatarContentType());
+        verify(usersRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void edit_rejectsAvatarLargerThanTwoMegabytes()
+            throws Exception {
+
+        User user = new User();
+        user.setId(1L);
+        user.setRole(Role.USER);
+
+        when(usersRepository.findById(1L))
+            .thenReturn(Optional.of(user));
+
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loggedUserId", 1L);
+
+        byte[] oversizedBytes =
+            new byte[(2 * 1024 * 1024) + 1];
+
+        MockMultipartFile oversizedAvatar = new MockMultipartFile(
+            "avatarFile",
+            "large.png",
+            MediaType.IMAGE_PNG_VALUE,
+            oversizedBytes
+        );
+
+        mockMvc.perform(
+                multipart("/account/edit/1")
+                    .file(oversizedAvatar)
+                    .session(session)
+                    .param("first_name", "Test")
+                    .param("last_name", "User")
+                    .param("gender", "MALE")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(
+                redirectedUrl("/account/edit/1?avatarError=1")
+            );
+
+        assertNull(user.getAvatarData());
+        verify(usersRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void edit_removesExistingAvatar() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        user.setRole(Role.USER);
+        user.setAvatarData(createValidPng());
+        user.setAvatarContentType(MediaType.IMAGE_PNG_VALUE);
+
+        when(usersRepository.findById(1L))
+            .thenReturn(Optional.of(user));
+
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loggedUserId", 1L);
+
+        mockMvc.perform(
+                multipart("/account/edit/1")
+                    .session(session)
+                    .param("first_name", "Test")
+                    .param("last_name", "User")
+                    .param("gender", "MALE")
+                    .param("removeAvatar", "true")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(
+                redirectedUrl("/account/edit/1?success=1")
+            );
+
+        assertNull(user.getAvatarData());
+        assertNull(user.getAvatarContentType());
+        assertEquals("/user.png", user.getAvatar());
+        verify(usersRepository).save(user);
+    }
+
+    @Test
+    void avatarEndpoint_returns404WhenAvatarDoesNotExist()
+            throws Exception {
+
+        User user = new User();
+        user.setId(1L);
+
+        when(usersRepository.findById(1L))
+            .thenReturn(Optional.of(user));
+
+        mockMvc.perform(get("/users/1/avatar"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void editPost_redirectsToLoginWhenUnauthenticated()
+            throws Exception {
+
+        mockMvc.perform(
+                multipart("/account/edit/1")
+                    .param("first_name", "Test")
+                    .param("last_name", "User")
+                    .param("gender", "MALE")
+            )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/login"));
+
+        verify(usersRepository, never()).save(any(User.class));
+    }
+
 
 }

@@ -4,9 +4,11 @@ import com.cmpt276.group3.grouproject.auth.Auth;
 import com.cmpt276.group3.grouproject.enums.Gender;
 import com.cmpt276.group3.grouproject.enums.Role;
 import com.cmpt276.group3.grouproject.models.User;
+import com.cmpt276.group3.grouproject.models.ExpressionOfInterestRepository;
 import com.cmpt276.group3.grouproject.models.MatchingProfile;
 import com.cmpt276.group3.grouproject.models.MatchingProfileRepository;
 import com.cmpt276.group3.grouproject.models.UsersRepository;
+import com.cmpt276.group3.grouproject.services.ChatMessageService;
 import com.cmpt276.group3.grouproject.services.UserService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +48,12 @@ public class AdminControllerTest {
 
     @MockitoBean
     private MatchingProfileRepository matchingProfileRepository;
+
+    @MockitoBean
+    private ChatMessageService chatMessageService;
+
+    @MockitoBean
+    private ExpressionOfInterestRepository expressionOfInterestRepository;
 
     private MockHttpSession session;
     private User adminUser;

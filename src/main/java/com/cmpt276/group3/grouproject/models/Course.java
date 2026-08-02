@@ -3,7 +3,7 @@ package com.cmpt276.group3.grouproject.models;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="courses")
+@Table(name="course")
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

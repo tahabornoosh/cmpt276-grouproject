@@ -104,7 +104,7 @@ public class CourseRatingService {
                     if (response.statusCode() != 200) {
                         continue;
                     }
-                    
+
                     JSONArray sections = new JSONArray(response.body());
 
                     if (!sections.isEmpty()) {
@@ -113,15 +113,21 @@ public class CourseRatingService {
                                 .getString("title");
 
                         List<Course> courses = CR.findAll();
-                        for (Course co:courses) {
-                            if (co.getCourseCode().equals(code.toUpperCase()) && co.getTopiCode().equals(dep.toUpperCase())) {
+                        for (Course co : courses) {
+                            if (co.getCourseCode().equals(code.toUpperCase())
+                                    && co.getTopiCode().equals(dep.toUpperCase())) {
                                 co.setDescription(title); // update name
                                 CR.save(co);
                                 return co;
                             }
-                        } Course co = new Course(dep.toUpperCase(), code.toUpperCase(), title);
-                        CR.save(co);
-                        return co;
+                        }
+
+                        Course co = new Course(
+                                dep.toUpperCase(Locale.ROOT),
+                                code.toUpperCase(Locale.ROOT),
+                                title);
+
+                        return CR.save(co);
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();

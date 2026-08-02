@@ -66,8 +66,24 @@
     </a>
     <div class="sidebar">
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-        <div class="image"><img th:src="@{/user.png}" src="/user.png" class="img-circle elevation-2" alt="User Image"></div>
-        <div class="info"><a href="/" class="d-block"><span th:text="${currentUser.first_name}"></span> (<span th:text="${currentUser.role}"></span>)</a></div>
+        <div class="image">
+          <a th:href="@{/profile/{id}(id=${currentUser.id})}">
+            <img th:src="${currentUser.avatar}"
+                 src="/user.png"
+                 class="img-circle elevation-2"
+                 alt="User avatar"
+                 width="34"
+                 height="34"
+                 style="object-fit: cover;">
+          </a>
+        </div>
+        <div class="info">
+          <a th:href="@{/profile/{id}(id=${currentUser.id})}"
+             class="d-block">
+            <span th:text="${currentUser.first_name}"></span>
+            (<span th:text="${currentUser.role}"></span>)
+          </a>
+        </div>
       </div>
       <div hidden class="form-inline">
         <div class="input-group" data-widget="sidebar-search">

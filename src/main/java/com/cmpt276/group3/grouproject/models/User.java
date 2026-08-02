@@ -26,6 +26,21 @@ public class User {
     private Gender gender;
     @Nullable
     private String avatar;
+
+    @Nullable
+    @Size(max = 500)
+    @Column(length = 500)
+    private String bio;
+
+    @Nullable
+    @Column(name = "avatar_data", length = 2097152)
+    private byte[] avatarData;
+
+    @Nullable
+    @Size(max = 100)
+    @Column(name = "avatar_content_type", length = 100)
+    private String avatarContentType;
+
     @Nullable
     private Boolean isCAS = false;
 
@@ -100,11 +115,50 @@ public class User {
     }
 
     public String getAvatar() {
+        if (hasUploadedAvatar() && id > 0) {
+            return "/users/" + id + "/avatar";
+        }
+
+        if (avatar == null || avatar.isBlank()) {
+            return "/user.png";
+        }
+
         return avatar;
     }
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public byte[] getAvatarData() {
+        return avatarData;
+    }
+
+    public void setAvatarData(byte[] avatarData) {
+        this.avatarData = avatarData;
+    }
+
+    public String getAvatarContentType() {
+        return avatarContentType;
+    }
+
+    public void setAvatarContentType(String avatarContentType) {
+        this.avatarContentType = avatarContentType;
+    }
+
+    public boolean hasUploadedAvatar() {
+        return avatarData != null
+            && avatarData.length > 0
+            && avatarContentType != null
+            && !avatarContentType.isBlank();
     }
 
     public boolean isAdmin() {

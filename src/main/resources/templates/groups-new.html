@@ -1,0 +1,133 @@
+<th:block th:replace="~{fragments/layout :: head('Create a Group')}"></th:block>
+<th:block th:replace="~{fragments/layout :: bodyStart}"></th:block>
+
+<input type="hidden" id="activeMenuItem" value="menu-groups-mine">
+
+<main class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1><i class="fas fa-plus mr-2"></i>Create a Group</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/groups}">Groups</a></li>
+            <li class="breadcrumb-item active">Create</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+
+      <div th:if="${param.error != null}" class="alert alert-danger">
+        <i class="icon fas fa-ban"></i> <span th:text="${param.error[0]}">Could not create the group</span>
+      </div>
+
+      <div class="alert alert-secondary">
+        You'll be the group's admin, so you can rename it, manage members, and close it to new
+        joins later. The answers below are what other students see when the finder scores your
+        group for them, so pick them the way you'd pick your own.
+      </div>
+
+      <form th:action="@{/groups/new}" method="post">
+        <div class="card card-primary card-outline">
+          <div class="card-header">
+            <h3 class="card-title">Group details</h3>
+          </div>
+
+          <div class="card-body">
+
+            <div class="form-group">
+              <label>Group name</label>
+              <input type="text" class="form-control" name="name" maxlength="60" required
+                     placeholder="e.g. Burnaby Late Night Study Crew">
+            </div>
+
+            <div class="form-group">
+              <label>Description (optional)</label>
+              <textarea class="form-control" name="description" rows="3" maxlength="500"
+                        placeholder="What does this group actually do?"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Group vibe</label>
+              <select class="form-control" name="vibe" required>
+                <option value="">Select one</option>
+                <option th:each="item : ${vibes}"
+                        th:value="${item.name()}"
+                        th:text="${item.displayName}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Group size</label>
+              <select class="form-control" name="size_preference" required>
+                <option value="">Select one</option>
+                <option th:each="item : ${groupSizes}"
+                        th:value="${item.name()}"
+                        th:text="${item.displayName}"></option>
+              </select>
+              <small class="form-text text-muted">This sets the maximum number of members.</small>
+            </div>
+
+            <div class="form-group">
+              <label>Where you meet</label>
+              <select class="form-control" name="meetup_style" required>
+                <option value="">Select one</option>
+                <option th:each="item : ${meetupStyles}"
+                        th:value="${item.name()}"
+                        th:text="${item.displayName}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Campus</label>
+              <select class="form-control" name="campus" required>
+                <option value="">Select one</option>
+                <option th:each="item : ${campuses}"
+                        th:value="${item.name()}"
+                        th:text="${item.displayName}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Usual availability</label>
+              <select class="form-control" name="availability" required>
+                <option value="">Select one</option>
+                <option th:each="item : ${availabilities}"
+                        th:value="${item.name()}"
+                        th:text="${item.displayName}"></option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Main interest</label>
+              <select class="form-control" name="top_interest" required>
+                <option value="">Select one</option>
+                <option th:each="item : ${topInterests}"
+                        th:value="${item.name()}"
+                        th:text="${item.displayName}"></option>
+              </select>
+            </div>
+
+          </div>
+
+          <div class="card-footer">
+            <button type="submit" class="btn btn-success">
+              <i class="fas fa-plus mr-1"></i> Create group
+            </button>
+            <a th:href="@{/groups}" class="btn btn-secondary">Cancel</a>
+          </div>
+        </div>
+      </form>
+
+    </div>
+  </section>
+</main>
+
+<th:block th:replace="~{fragments/layout :: bodyEnd}"></th:block>

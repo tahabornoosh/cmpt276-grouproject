@@ -13,6 +13,7 @@ import com.cmpt276.group3.grouproject.enums.GroupRole;
 import com.cmpt276.group3.grouproject.enums.GroupSizePreference;
 import com.cmpt276.group3.grouproject.models.FriendGroup;
 import com.cmpt276.group3.grouproject.models.FriendGroupRepository;
+import com.cmpt276.group3.grouproject.models.GroupChatMessageRepository;
 import com.cmpt276.group3.grouproject.models.GroupMembership;
 import com.cmpt276.group3.grouproject.models.GroupMembershipRepository;
 import com.cmpt276.group3.grouproject.models.GroupPreference;
@@ -28,14 +29,18 @@ public class FriendGroupService {
     private final FriendGroupRepository friendGroupRepository;
     private final GroupMembershipRepository groupMembershipRepository;
     private final GroupPreferenceRepository groupPreferenceRepository;
+    private final GroupChatMessageRepository groupChatMessageRepository;
 
     public FriendGroupService(
             FriendGroupRepository friendGroupRepository,
             GroupMembershipRepository groupMembershipRepository,
-            GroupPreferenceRepository groupPreferenceRepository) {
+            GroupPreferenceRepository groupPreferenceRepository,
+            GroupChatMessageRepository groupChatMessageRepository
+        ) {
         this.friendGroupRepository = friendGroupRepository;
         this.groupMembershipRepository = groupMembershipRepository;
         this.groupPreferenceRepository = groupPreferenceRepository;
+        this.groupChatMessageRepository = groupChatMessageRepository;
     }
 
     // ----- Preferences (the group finder questionnaire) -----
@@ -143,6 +148,7 @@ public class FriendGroupService {
         FriendGroup group = requireGroup(groupId);
         requireAdmin(actor, group);
 
+        groupChatMessageRepository.deleteByGroup(group);
         groupMembershipRepository.deleteByGroup(group);
         friendGroupRepository.delete(group);
     }

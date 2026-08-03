@@ -4,8 +4,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.cmpt276.group3.grouproject.models.FriendGroup;
+import com.cmpt276.group3.grouproject.models.FriendGroupRepository;
 import com.cmpt276.group3.grouproject.models.GroupChatMessage;
 import com.cmpt276.group3.grouproject.models.GroupChatMessageRepository;
+import com.cmpt276.group3.grouproject.models.GroupMembershipRepository;
 import com.cmpt276.group3.grouproject.models.User;
 import com.cmpt276.group3.grouproject.util.GroupMessageResponse;
 

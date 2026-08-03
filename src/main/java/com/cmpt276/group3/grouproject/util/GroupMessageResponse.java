@@ -2,6 +2,7 @@ package com.cmpt276.group3.grouproject.util;
 
 import java.time.Instant;
 
+import com.cmpt276.group3.grouproject.models.FriendGroup;
 import com.cmpt276.group3.grouproject.models.GroupChatMessage;
 import com.cmpt276.group3.grouproject.models.User;
 

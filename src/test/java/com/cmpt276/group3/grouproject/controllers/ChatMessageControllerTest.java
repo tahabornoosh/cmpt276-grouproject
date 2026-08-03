@@ -64,6 +64,7 @@ class ChatMessageControllerTest {
     @Mock
     private UserBlockRepository userBlockRepository;
 
+
     @Mock
     private UsersRepository usersRepository;
 
@@ -297,7 +298,9 @@ class ChatMessageControllerTest {
         Model model = Mockito.mock(Model.class);
         User currentUser = Mockito.mock(User.class);
         ContactResponse contact = Mockito.mock(ContactResponse.class);
+        GroupMembership membership = Mockito.mock(GroupMembership.class);
         List<ContactResponse> contacts = List.of(contact);
+        List<GroupMembership> groupMemberships = List.of(membership);
 
         when(auth.isLoggedIn(session)).thenReturn(true);
         when(auth.getUser(session)).thenReturn(currentUser);
@@ -305,16 +308,17 @@ class ChatMessageControllerTest {
             chatMessageService.getExistingConversations(currentUser)
         ).thenReturn(contacts);
         when(friendGroupService.getMyMemberships(currentUser))
-            .thenReturn(List.<GroupMembership>of());
+            .thenReturn(groupMemberships);
 
         String view = chatController.loadChat(2L, null, session, model);
 
         assertEquals("chat", view);
 
+        verify(model).addAttribute("requestedGroupId", null);
         verify(model).addAttribute("requestedUserId", 2L);
         verify(model).addAttribute("currentUser", currentUser);
         verify(model).addAttribute("contacts", contacts);
-        verify(model).addAttribute("groupMemberships", List.of());
+        verify(model).addAttribute("groupMemberships", groupMemberships);
     }
 
     @Test

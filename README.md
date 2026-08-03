@@ -72,15 +72,14 @@ Our app provides near equal focus on romantic relationships, friendships, and st
 
 Additionally, our app provides a host of features such as deterministic (score based) matching, text chats, voice and video calls, event/date planning, and more, to meet the needs of all users.
 
-## List of Epics/Features (small changes made in iteration2/3)
+## List of Main Epics/Features (small changes made in iteration2/3)
 
 - Profiles and Questionnair: Three-part interleaved profile built using a comprehensive questionnair, divided into general questions and three specialized parts (dating, friendship, study buddies) with the possibility of disabling each part. Includes questions about interests, preferences, and academic experiences.
 - Feeds: Allow users to see profiles matched to their profile and send expressions of interest. Suggestions in feeds will be given based on matching score calculation algorithms dedicated to each profile/stream.
-- Chat and virtual meeting features: Individual chats with security features (e.g., blocking, no media/photo sharing) and voice/video calls (outsourced \- using **APIs** of either Zoom, BigBlueButton, or similar solution)  
-  - APIs will be used to obtain meeting join links once a user initiates or joins a call, and involve sending the user's display name to the API.
+- Chat and virtual meeting features: Individual chats with security features (e.g., blocking, no media/photo sharing) and voice/video calls (using **Zoom REST API**)  
+  - APIs will be used to obtain meeting join links once a user initiates or joins a call
 - Login and CAS Integration: app allows logging in with a CAS server (with the ultimate goal being the SFU CAS server), using a username and password, or both.  
-- Profile optimization: Users can edit their profile by adding their picture and biography. Includes some basic automated moderation.
-- Groups: Users will be able to form groups, invite new members, and have both a group chat and posts/threads to discuss ideas and activities
+- Groups: Users will be able create groups using matching features (with a small questionnair dedicated to groups), as well as manually creating groups and exploring and joining existing groups using a matching-score ordered groups list/feed. Group members can chat using dedicated group chats.
 - Course Ratings: A simple ratings sytem where users can submit 1-5 ratings for recent SFU courses
   - **Uses SFU Outlines REST API to validate entered courses and pull full course titles**
 
@@ -143,11 +142,21 @@ See `docs/meeting-notes` in project repository
 - Total story points completed: 20
 - Average Velocity: 10 points/week
 
-**Improvements:**
+
+**Process Improvement**
 - We did not divide controllers and templates for features between more than 1 person, and our development went a lot more smootly.
 - Our pace was a bit better (still with room for improvement)
 - No considerable bugs or errors made it to `main` in this iteration (unlike iteration 1)
+
   
+## Iteration 3
+
+- Total story points completed: 28
+- Average Velocity: 14 points/week
+
+**Process Improvement**
+- We did a more logical dividing of tasks in iteration 3 compared to iterations 2 and 1
+- We were clearer in communication in Iteration 3
 
 # User Stories
 
@@ -799,7 +808,7 @@ Mike clicks on "Login with CAS server" button at the bottom of the login page, a
 - An existing CAS user using CAS to login should be logged in and redirected to dashboard directly
 - An existing CAS user should not under any circumstances be able to log in using email/password
 
-## Case: Course Ratings viewing (2 points)
+## Case: Course Ratings viewing (1 points)
 **Iteration**
 Completed in Iteration 3.
 
@@ -826,7 +835,7 @@ Mike clicks "Course Ratings" from any location in the app, and is redirected to 
 - If two ratings 2.0 and 3.0 for CMPT 276 exist, then a line item "CMPT 276 Introduction to Software Engineering" should be displayed in the table with a rating of 2.5.
 - If no ratings exist for CMPT 300, then CMPT 300 should not be displayed in the table
 
-## Case: Course Ratings Submission (2 points)
+## Case: Course Ratings Submission (3 points)
 **Iteration**
 Completed in Iteration 3.
 
@@ -863,36 +872,81 @@ Mike enters a course name and a rating in the "+ Add Rating" section, and presse
 - Re-submitting a rating should not create a new database ratings record
 - A rejected input should not create a new database record
 
-## Case: Group Viewing and Formation (2 points)
+## Case: Your Groups page (2 points)
 **Iteration**
 Completed in Iteration 3.
 
 **Personas/Actors**
 1. Primary actor: Mike - a second-year SFU student
+2. Secondary actors: Group A, and other group members
 
 **Pre-conditions**
 - Mike must be logged in
+- Mike must be a member of Group A
 
 **Actions/Triggers**
-Mike clicks "Groups" from any location in the app, and is redirected to the groups page, where he will see a table of all groups he is a member of. Then, he clicks on the "Create Group" button on the top of the page, Enters a name for the group in the pop-up window, and clicks "submit"
+Mike clicks on the "Groups" item in the menu, and selects the "Your Groups" sub-option from anywhere on the app. Then, he is redirected to a page containing a table of groups that he is a member of, or has a pending request to join. He must see the group's name, and an option to view groups in which he is an active member.
+
+On top of the page, he also sees options to change his answers to the groups questionnair, create a new group, or go to the groups explore page.
+
+Mike clicks on the title of Group A, and is redirected to a page containing the basic group information on the left, a banner with a link to the group chat on the right, a table of group members below that banner, and a collapsible group edit form under the members table (if he is an admin)
 
 **Acceptance Criteria**
-- All groups with Mike as their member must be displayed in the table
-- If a name with at least 3 characters is entered, then the input should be accepted and a group should be created, and Mike should be redirected to that group's home page
-- If a name less than 3 characters long is entered, then the submission should not go through
+- All groups with Mike as their member (pending or active) must be displayed in the Your Groups table. View buttons should only be displayed for active memberships (not pending)
+- Mike must be able to create groups using the "Create Group" button by entering the basic details of the group. After creation, he must be redirected to the group page.
+- The "Edit Your Answer" button should redirect him to the groups questionnair, allowing him to complete or update his answers
 
 **Post-conditions**
-- New groups should be added to the database
+- All new information should be registered in the database
 
 **Non-functional requirements**
 - All pages should load in less than one second
 
 **Tests**
-- An existing group created earlier by Mike should be visible in the list of groups
-- A group named "Mike's group" should be created successfuly.
-- A group named "a" should not be created successfuly.
+- Mike should not see a group he is not a member of in the Your Groups table
+- Mike should not see a button to view a group he is a pending member of, but must see the group in the table
+- Mike should see the group and see a button to view the group if he is a member or admin of that group
 
-## Case: Group Chats (1 point)
+## Case: Group Home Page (3 points)
+**Iteration**
+Completed in Iteration 3.
+
+**Personas/Actors**
+1. Primary actor: Mike - a second-year SFU student
+2. Secondary actors: Group A, and other group members
+
+**Pre-conditions**
+- Mike must be logged in
+- Mike must be a member of Group A
+- Mike must be on the "Your Groups" page
+
+**Actions/Triggers**
+Mike clicks on the "View" button next to Group A's record in his groups table.
+
+He is then is redirected to a page containing the basic group information on the left, a banner with a link to the group chat on the right, a table of group members below that banner, and a collapsible group edit form under the members table (if he is an admin)
+
+**Acceptance Criteria**
+- Mike should not be able to view the group home page (should be redirected to dashboard) unless he is either an active member of that group, an admin of that group, or a system-wide moderator or admin.
+- The chat button should redirect Mike directly to the chat page, and open the group chat into view.
+- Mike should be able to see all group members in the group members section
+- If Mike is a system-wide moderator or admin, or is the admin of Group A, then he must see options in the members table to approve pending users, change existing users' roles, or remove users from the group
+- If Mike is an admin, then he should be able to edit all details of the group using the group edit form.
+
+**Post-conditions**
+- All new information should be registered in the database
+
+**Non-functional requirements**
+- All pages should load in less than one second
+- Group admins should be able to use all functions of the page without prior training with at most 1 error.
+
+**Tests**
+- If Mike is a group admin, he should be able to accept a pending user
+- If Mike is not a group admin and not a system-wide moderator or admin, he must not be allowed to remove users from the group or edit the group
+- If Mike is not a system wide admin and opens a group home page:
+  - He should be redirected to dashboard if he is a pending member or non-member
+  - He should be able to view the page if he is an active member or admin of the group
+
+## Case: Group Chats (2 point)
 **Iteration**
 Completed in Iteration 3.
 
@@ -907,8 +961,14 @@ Completed in Iteration 3.
 **Actions/Triggers**
 Mike opens the chat page from anywhere on the app, and clicks on the group name in the chat menu.
 
+Alternatively, he clicks the group chat button on the group's home page.
+
+Then, Mike is redirected to the chat page, with the group chat open.
+
 **Acceptance Criteria**
 - Mike should see a list of messages sent in the group chat, and be able to send messages in the chat
+- All messages should contain the sender's name
+- All messages should be sent and be loaded in AJAX
 
 **Post-conditions**
 - All chat messages should be registered in the database
@@ -919,38 +979,40 @@ Mike opens the chat page from anywhere on the app, and clicks on the group name 
 **Tests**
 - All groups for which a user is an active member must be displayed in the chat menu
 - All active group members should be able to send chat messages
+- A message sent by another group member should be received by Mike if he is on the chat page, without refreshing the page
 
-## Case: Group Threads/Discussions (3 points)
+## Case: Group Questionnair (2 points)
 **Iteration**
 Completed in Iteration 3.
 
 **Personas/Actors**
 1. Primary actor: Mike - a second-year SFU student
-2. Secondary actors: other group members
 
 **Pre-conditions**
 - Mike must be logged in
-- Mike must be on the group page
+- Mike must be on the group explore page
 
 **Actions/Triggers**
-Mike must be able to see a list of existing threads, and be able to create a new thread using the "Create Thread" button. Mike clicks on a thread, and sees a list of replies, as well as an option to add replies.
+Mike clicks on the Complete Questionnair button (or update button), and is redirected to a form page allowing him to complete a set of questions relating to his group-finding preferences 
 
 **Acceptance Criteria**
-- All group threads should be visible to Mike
-- Mike should be able to create new threads and reply to existing threads
+- If Mike has not completed the questionnair before, he should see an empty questionnair and be able to enter new answers
+- If Mike has previously completed the quesionnair, he should see his previous answers and be able to update them
+- If Mike leaves a field empty and presses "Submit", he should get an error message and the record should not be updated
+- If Mike completes the questionnair fully, then he must be able to submit it and his submission should be accepted.
 
 **Post-conditions**
-- All new threads/replies must be added to the database
+- All updates to the group questionnair must be registered in the database
 
 **Non-functional requirements**
 - All pages should load in less than one second
 
 **Tests**
-- A previously created thread should be visible to Mike
-- Mike should be able to create a new thread
-- Mike should be able to reply to an existing thread
+- A user without a group questionnair record should see an empty form
+- A submission missing a field should fail
+- A complete submission should be accepted
 
-## Case: Group member management/EOIs (2 points)
+## Case: Groups Administration (1 points)
 **Iteration**
 Completed in Iteration 3.
 
@@ -959,56 +1021,127 @@ Completed in Iteration 3.
 
 **Pre-conditions**
 - Mike must be logged in
-- Mike and Janice should have a chat thread with at least one message
-- Mike must be a member of the group in question, and be on the group page
+- Mike must be a moderator or administrator
 
 **Actions/Triggers**
-Mike goes to the group management section, and sees a table of pending EOIs with the option to accept, delete, or hide them. He also sees a button for him to leave the group, as well as as a section for hidden EOIs.
+Mike clicks on the "Administration" option on the app menu from anywhere in the app, and chooses the "Groups Admin" option.
+
+He is then redirected to a page containing a table of all existing groups within the app, as well as an option to view them
 
 **Acceptance Criteria**
-- Mike must be a member of the group to be able to view any of the pages in this story or make any actions
-- Mike must be able to leave the group by clicking the "Leave Group" button
-- Mike must be able to accept, delete, or hide EOIs, where accepting an EOI adds the sender to the group's member list
+- The groups admin page as well as the menu item should only be visible to system-wide moderators and admins
+- The groups list should include all groups within the app
 
 **Post-conditions**
-- All records should be reflected in the database
+- None
 
 **Non-functional requirements**
 - All pages should load in less than one second
 
 **Tests**
-- If Mike is not a member of Group A, then he must not be able to accept EOIs for that group
-- After leaving, Mike should no longer be able to view the group's threads
+- If Mike is not an admin, then he should not be allowed to open the groups admin page and should be redirected to the home page instead
+- If a group "Group A" exists within the app, then it should be visible in the groups table in the groups admin page
 
-## Case: Public Groups Explore Page (1 point)
+## Case: Public Groups Explore Page (2 point)
 **Iteration**
 Completed in Iteration 3.
 
 **Personas/Actors**
 1. Primary actor: Mike - a second-year SFU student
+2. Secondary actors: groups and group members
 
 **Pre-conditions**
 - Mike must be logged in
 
 **Actions/Triggers**
-Mike clicks on the "Groups" item in the menu, and chooses the sub-item "Explore". He is then redirected to a page containing a searchable table of existing groups with the option to send EOIs to each
+Mike clicks on the "Groups" item in the menu, and chooses the sub-item "Find a Group". He is then redirected to a page containing a searchable table, ordered by matching score, of existing open groups with the option to send join requests to each, as well as options to change his groups questionnair answers, create new groups by entering a name, description, and matching details, or create an automated group based on matching scores
 
 **Acceptance Criteria**
-- Mike should not be able to send EOIs to groups he is already a member of (should get error message)
-- Mike should not be able to send EOIs to groups for which he has a pending EOI
-- Mike should be able to search through and sort the groups table
+- Mike should see the list of all groups if and only if he has completed the groups questionnair, otherwise, he must see a notice to complete the questionnair
+- All displayed groups must be open for membership requests and have a match score with Mike's groups questionnair
 
 **Post-conditions**
-- EOIs should be reigstered in the database
+- New groups should be registered in the database
+- All new explore page join requests should be registered with a "pending" role in the database, requiring group admin approval
 
 **Non-functional requirements**
 - All pages should load in less than one second
 - Error messages should be general but clear
 
 **Tests**
-- Mike should not be able to send an EOI to a group he has made and is a member of
-- Mike should be able to send an EOI to a group he is not a member of
-- Mike should not be able to send a second EOI to a group he has already sent an EOI to.
+- Mike should be able to send a join request to an existing group if and only if he has completed his groups questionnair
+- If Group A is open to enrolment and has a matching score of 80%, then Mike must see it on his group explore page
+
+
+## Case: Group Creation Methods (3 point)
+**Iteration**
+Completed in Iteration 3.
+
+**Personas/Actors**
+1. Primary actor: Mike - a second-year SFU student
+2. Secondary actors: groups and group members
+
+**Pre-conditions**
+- Mike must be logged in
+
+**Actions/Triggers**
+Mike takes any of the following three actions:
+1. He opens the "Your Groups" menu item, and clicks on the "Create a Group Option"
+2. He opens the "Find a Group" (explore) menu item, and clicks on "Or, create your own"
+
+3. Or alternatively, he opens the "Find a Group" menu item and clicks on "Match me into a group"
+
+**Acceptance Criteria**
+- If Mike uses options 1 or 2, then he should be prompted for the basic details of his group including name and description, and then he should be redirected to the new group's home page
+- If Mike uses the automated matching option (3), then he must be redirected to a new group's homepage, which must contain other users matched based on their group questionnairs, and the basic details of the group (other than name and description) pre-filled based on the matching details.
+- In all cases, Mike must be an admin in the new group
+- If a sufficient number of users with completed and enabled group questionnairs do not exist in the app, then option 3 should fail with an error message
+
+**Post-conditions**
+- New groups and memberships should be registered in the database
+
+**Non-functional requirements**
+- All pages should load in less than one second
+- Error messages should be general but clear
+
+**Tests**
+- If Mike creates a new group, then he must be automatically added to that group with an admin role
+- If Mike uses the automated matching function, then the created group must contain at least one other automatically matched member, or if there is an insufficient number of eligible users, the creation should fail with an error message
+- A manual group creation request missing the group name parameter should not be accepted and should result in an error message.
+- A complete manual group creation request must go through and redirect Mike to the created group's homepage.
+
+
+## Case: Avatar Upload and Bio (2 point)
+**Iteration**
+Completed in Iteration 3.
+
+**Personas/Actors**
+1. Primary actor: Mike - a second-year SFU student
+
+**Pre-conditions**
+- Mike must be logged in
+
+**Actions/Triggers**
+Mike opens the edit page for a user, either through the dashboard for himself, or through the admin panel for another user, if he is an admin
+
+Mike then sees two options at the bottom of the edit page: one to upload an avatar for the user, and one to write a bio for the user.
+
+**Acceptance Criteria**
+- The avatar input should only accept image file formats
+- The bio section should only accept inputs up to 500 characters long
+- Both fields should be optional
+- If no avatar is provided, then a default avatar should be set as the user's avatar
+
+**Post-conditions**
+- All new changes should be reflected in the database
+
+**Non-functional requirements**
+- All pages should load in less than one second
+
+**Tests**
+- An input containing both a 200-character bio and a .png avatar should be accepted
+- An input containing a 2500-character bio should be rejected with an error message
+- An input containing one or neither of these fields should be accepted (given that they are optional)
 
 </div>
 
@@ -1046,11 +1179,12 @@ Mike clicks on the "Groups" item in the menu, and chooses the sub-item "Explore"
 ![alt text](UIMockups/landingpage.png)
 ![alt text](UIMockups/adminlandingpage.png)
 
-## Tables (Admin Panel/Feeds)
+## Tables (Admin Panels/Feeds/ratings page/groups pages)
 
 **Requirements**
 - A menu on the left, displaying navigation items and the user's name
 - A menu on the top, displaying a link for logout
+- (For some pages) a card above the table card, with a title and three columns of form inputs or buttons
 - A card containing a title, a headings row, and the table contents in rows
 
 **Digital Design Mockup**
@@ -1061,7 +1195,7 @@ Mike clicks on the "Groups" item in the menu, and chooses the sub-item "Explore"
 ![alt text](UIMockups/modpanel.png)
 
 
-## In-app Forms (questionnair, edit, admin controls)
+## In-app Forms (questionnairs, edit, admin controls)
 
 **Requirements**
 - A menu on the left, displaying navigation items and the user's name
@@ -1100,3 +1234,16 @@ Mike clicks on the "Groups" item in the menu, and chooses the sub-item "Explore"
 
 **Digital Design Mockups**
 ![alt text](UIMockups/mockup_profile.jpg)
+
+## Group Home Page
+
+**Requirements**
+- A menu on the left, displaying navigation items and the user's name
+- A menu on the top, displaying a link for logout
+- A card with basic group info on the top left of the page
+- A banner announcing the existence of chat capabilities, and a button to go to the chat page for the group
+- A card with a table of users on the top right of the page, below the chat banner
+
+**Digital Design Mockups**
+![alt text](UIMockups/mockup_group.png)
+

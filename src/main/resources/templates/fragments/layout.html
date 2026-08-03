@@ -125,7 +125,20 @@
           <li class="nav-item"><a id="menu-eois" href="/eois" class="nav-link"><i class="nav-icon fas fa-heart"></i><p>EOIs</p></a></li>
           <li class="nav-item"><a id="menu-chat" href="/chat" class="nav-link"><i class="nav-icon fas fa-comment"></i><p>Your Chats</p></a></li>
           <li class="nav-item"><a id="menu-ratings" href="/course/ratings" class="nav-link"><i class="nav-icon fas fa-chalkboard-teacher"></i><p>Course Ratings</p></a></li>
-          <li th:if="${currentUser.isAdmin() || currentUser.isMod()}" class="nav-item"><a id="menu-admin" href="/admin" class="nav-link"><i class="nav-icon fas fa-cogs"></i><p>Administration<span th:if="${currentUser.isMod()}" class="right badge badge-danger">Read-only</span></p></a></li>
+
+          <li th:if="${currentUser.isAdmin() || currentUser.isMod()}" class="nav-item">
+            <a id="menu-groups" href="#" class="nav-link">
+              <i class="nav-icon fas fa-cogs"></i>
+              <p>
+                Administration<span th:if="${currentUser.isMod()}" class="right badge badge-danger">Read-only</span>
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li th:if="${currentUser.isAdmin() || currentUser.isMod()}" class="nav-item"><a id="menu-admin" href="/admin" class="nav-link"><i class="far fa-circle nav-icon"></i><p>Users Admin</p></a></li>
+              <li th:if="${currentUser.isAdmin() || currentUser.isMod()}" class="nav-item"><a id="menu-admin-groups" href="/admin/groups" class="nav-link"><i class="far fa-circle nav-icon"></i><p>Groups Admin</p></a></li>
+            </ul>
+          </li>
         </ul>
       </nav>
     </div>

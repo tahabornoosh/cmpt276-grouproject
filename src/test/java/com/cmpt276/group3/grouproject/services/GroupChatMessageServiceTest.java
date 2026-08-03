@@ -21,10 +21,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.cmpt276.group3.grouproject.enums.GroupRole;
 import com.cmpt276.group3.grouproject.models.FriendGroup;
 import com.cmpt276.group3.grouproject.models.FriendGroupRepository;
 import com.cmpt276.group3.grouproject.models.GroupChatMessage;
 import com.cmpt276.group3.grouproject.models.GroupChatMessageRepository;
+import com.cmpt276.group3.grouproject.models.GroupMembership;
 import com.cmpt276.group3.grouproject.models.GroupMembershipRepository;
 import com.cmpt276.group3.grouproject.models.User;
 import com.cmpt276.group3.grouproject.util.GroupMessageResponse;
@@ -49,10 +51,15 @@ class GroupChatMessageServiceTest {
         User sender = Mockito.mock(User.class);
         FriendGroup group = Mockito.mock(FriendGroup.class);
 
+        GroupMembership membership =
+            new GroupMembership(group, sender, GroupRole.MEMBER);
+
         when(friendGroupRepository.findById(10L))
             .thenReturn(Optional.of(group));
-        when(groupMembershipRepository.existsByGroupAndUser(group, sender))
-            .thenReturn(true);
+
+        when(groupMembershipRepository.findByGroupAndUser(group, sender))
+            .thenReturn(Optional.of(membership));
+
         when(groupChatMessageRepository.save(any(GroupChatMessage.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -133,8 +140,9 @@ class GroupChatMessageServiceTest {
 
         when(friendGroupRepository.findById(10L))
             .thenReturn(Optional.of(group));
-        when(groupMembershipRepository.existsByGroupAndUser(group, sender))
-            .thenReturn(false);
+
+        when(groupMembershipRepository.findByGroupAndUser(group, sender))
+            .thenReturn(Optional.empty());
 
         assertThrows(
             IllegalStateException.class,
@@ -156,10 +164,14 @@ class GroupChatMessageServiceTest {
         User sender = Mockito.mock(User.class);
         FriendGroup group = Mockito.mock(FriendGroup.class);
 
+        GroupMembership membership =
+            new GroupMembership(group, sender, GroupRole.MEMBER);
+
         when(friendGroupRepository.findById(10L))
             .thenReturn(Optional.of(group));
-        when(groupMembershipRepository.existsByGroupAndUser(group, sender))
-            .thenReturn(true);
+
+        when(groupMembershipRepository.findByGroupAndUser(group, sender))
+            .thenReturn(Optional.of(membership));
 
         assertAll(
             () -> assertThrows(
@@ -201,6 +213,9 @@ class GroupChatMessageServiceTest {
         User secondSender = Mockito.mock(User.class);
         FriendGroup group = Mockito.mock(FriendGroup.class);
 
+        GroupMembership membership =
+            new GroupMembership(group, currentUser, GroupRole.MEMBER);
+
         when(group.getId()).thenReturn(10L);
 
         when(firstSender.getId()).thenReturn(1L);
@@ -221,12 +236,14 @@ class GroupChatMessageServiceTest {
 
         when(friendGroupRepository.findById(10L))
             .thenReturn(Optional.of(group));
+
         when(
-            groupMembershipRepository.existsByGroupAndUser(
+            groupMembershipRepository.findByGroupAndUser(
                 group,
                 currentUser
             )
-        ).thenReturn(true);
+        ).thenReturn(Optional.of(membership));
+
         when(groupChatMessageRepository.findByGroupOrderBySentAtAsc(group))
             .thenReturn(List.of(firstMessage, secondMessage));
 
@@ -270,12 +287,13 @@ class GroupChatMessageServiceTest {
 
         when(friendGroupRepository.findById(10L))
             .thenReturn(Optional.of(group));
+
         when(
-            groupMembershipRepository.existsByGroupAndUser(
+            groupMembershipRepository.findByGroupAndUser(
                 group,
                 currentUser
             )
-        ).thenReturn(false);
+        ).thenReturn(Optional.empty());
 
         assertThrows(
             IllegalStateException.class,

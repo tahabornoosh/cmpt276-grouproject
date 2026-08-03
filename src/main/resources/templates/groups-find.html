@@ -114,9 +114,9 @@
                             th:text="${suggestion.score} + '%'">0%</span>
                     </td>
                     <td>
-                      <form th:action="@{/groups/{id}/join(id=${suggestion.group.id})}" method="post" class="d-inline">
+                      <form th:action="@{/groups/{id}/request-join(id=${suggestion.group.id})}" method="post" class="d-inline">
                         <button type="submit" class="btn btn-primary btn-sm">
-                          <i class="fas fa-user-plus"></i> Join
+                          <i class="fas fa-user-plus"></i> Request to join
                         </button>
                       </form>
                     </td>

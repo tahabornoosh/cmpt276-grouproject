@@ -161,6 +161,25 @@ public class FriendGroupServiceTest {
     }
 
     @Test
+    void updateGroup_canChangeAllEditableGroupDetails() {
+        membersAre(new GroupMembership(group, owner, GroupRole.ADMIN));
+
+        FriendGroup updated = friendGroupService.updateGroup(
+                owner, 10L, "Updated Group", "new desc", GroupVibe.CHILL_HANGOUT,
+                GroupSizePreference.LARGE, MeetupStyle.MIXED, Campus.SURREY,
+                Availability.WEEKENDS, TopInterest.FOOD_TRAVEL, false);
+
+        assertEquals("Updated Group", updated.getName());
+        assertEquals(GroupVibe.CHILL_HANGOUT, updated.getVibe());
+        assertEquals(GroupSizePreference.LARGE, updated.getSize_preference());
+        assertEquals(GroupSizePreference.LARGE.getMaxSize(), updated.getMaxMembers());
+        assertEquals(MeetupStyle.MIXED, updated.getMeetup_style());
+        assertEquals(Campus.SURREY, updated.getCampus());
+        assertEquals(Availability.WEEKENDS, updated.getAvailability());
+        assertEquals(TopInterest.FOOD_TRAVEL, updated.getTop_interest());
+    }
+
+    @Test
     void updateGroup_isRefusedForAPlainMember() {
         membersAre(new GroupMembership(group, owner, GroupRole.ADMIN),
                 new GroupMembership(group, outsider, GroupRole.MEMBER));
@@ -251,7 +270,8 @@ public class FriendGroupServiceTest {
         GroupMembership otherMembership = new GroupMembership(group, outsider, GroupRole.MEMBER);
         membersAre(ownerMembership, otherMembership);
 
-        // After the delete, only the remaining member is left.
+        // leaveGroup queries this repository after deleting ownerMembership,
+        // so it must see only the remaining member.
         when(groupMembershipRepository.findByGroupOrderByJoinedAtAsc(group))
                 .thenReturn(new ArrayList<>(Arrays.asList(otherMembership)));
 
@@ -267,6 +287,8 @@ public class FriendGroupServiceTest {
         GroupMembership ownerMembership = new GroupMembership(group, owner, GroupRole.ADMIN);
         membersAre(ownerMembership);
 
+        // leaveGroup queries this repository after deleting ownerMembership,
+        // so an empty result means the group has no members left.
         when(groupMembershipRepository.findByGroupOrderByJoinedAtAsc(group))
                 .thenReturn(new ArrayList<>());
 
@@ -281,6 +303,7 @@ public class FriendGroupServiceTest {
         GroupMembership otherAdmin = new GroupMembership(group, outsider, GroupRole.ADMIN);
         membersAre(ownerMembership, otherAdmin);
 
+        // leaveGroup queries this repository after deleting ownerMembership.
         when(groupMembershipRepository.findByGroupOrderByJoinedAtAsc(group))
                 .thenReturn(new ArrayList<>(Arrays.asList(otherAdmin)));
 
@@ -301,6 +324,18 @@ public class FriendGroupServiceTest {
     // --- Roles ---
 
     @Test
+    void requestToJoinGroup_addsTheUserAsPending() {
+        when(groupMembershipRepository.existsByGroupAndUser(group, outsider)).thenReturn(false);
+        when(groupMembershipRepository.countByGroup(group)).thenReturn(1L);
+
+        friendGroupService.requestToJoinGroup(outsider, 10L);
+
+        verify(groupMembershipRepository).save(argThat((GroupMembership membership) ->
+                membership.getUser().getId() == outsider.getId()
+                        && membership.getRole() == GroupRole.PENDING));
+    }
+
+    @Test
     void changeRole_promotesAMemberToAdmin() {
         membersAre(new GroupMembership(group, owner, GroupRole.ADMIN),
                 new GroupMembership(group, outsider, GroupRole.MEMBER));
@@ -308,6 +343,25 @@ public class FriendGroupServiceTest {
         GroupMembership updated = friendGroupService.changeRole(owner, 10L, outsider.getId(), GroupRole.ADMIN);
 
         assertEquals(GroupRole.ADMIN, updated.getRole());
+    }
+
+    @Test
+    void changeRole_approvesAPendingMember() {
+        GroupMembership pending = new GroupMembership(group, outsider, GroupRole.PENDING);
+        membersAre(new GroupMembership(group, owner, GroupRole.ADMIN), pending);
+
+        GroupMembership updated = friendGroupService.changeRole(owner, 10L, outsider.getId(), GroupRole.MEMBER);
+
+        assertEquals(GroupRole.MEMBER, updated.getRole());
+    }
+
+    @Test
+    void changeRole_refusesToMakeAMemberPending() {
+        membersAre(new GroupMembership(group, owner, GroupRole.ADMIN),
+                new GroupMembership(group, outsider, GroupRole.MEMBER));
+
+        assertThrows(IllegalStateException.class,
+                () -> friendGroupService.changeRole(owner, 10L, outsider.getId(), GroupRole.PENDING));
     }
 
     @Test
@@ -499,6 +553,25 @@ public class FriendGroupServiceTest {
         assertTrue(friendGroupService.isAdmin(group, owner));
         assertFalse(friendGroupService.isAdmin(group, outsider));
         assertTrue(friendGroupService.isMember(group, outsider));
+    }
+
+    @Test
+    void isAdmin_isTrueForSitewideAdminWithoutAMembership() {
+        User sitewideAdmin = user(99L, "Sitewide");
+        sitewideAdmin.setRole(Role.ADMIN);
+
+        assertTrue(friendGroupService.isAdmin(group, sitewideAdmin));
+    }
+
+    @Test
+    void updateGroup_allowsASitewideModeratorWithoutAMembership() {
+        User moderator = user(100L, "Moderator");
+        moderator.setRole(Role.MOD);
+
+        FriendGroup updated = friendGroupService.updateGroup(
+                moderator, 10L, "Moderated Group", "updated by moderation", true);
+
+        assertEquals("Moderated Group", updated.getName());
     }
 
     @Test

@@ -109,46 +109,17 @@
             </div>
           </div>
 
-          <!-- Admin-only settings -->
-          <div th:if="${isGroupAdmin}" class="card card-warning card-outline">
-            <div class="card-header">
-              <h3 class="card-title">Group settings</h3>
-            </div>
-
-            <form th:action="@{/groups/{id}/edit(id=${group.id})}" method="post">
-              <div class="card-body">
-                <div class="form-group">
-                  <label>Name</label>
-                  <input type="text" class="form-control" name="name" maxlength="60" required
-                         th:value="${group.name}">
-                </div>
-
-                <div class="form-group">
-                  <label>Description</label>
-                  <textarea class="form-control" name="description" rows="3" maxlength="500"
-                            th:text="${group.description}"></textarea>
-                </div>
-
-                <div class="form-group mb-0">
-                  <div class="icheck-primary">
-                    <input type="checkbox" id="open_to_new_members" name="open_to_new_members"
-                           th:checked="${group.openToNewMembers}">
-                    <label for="open_to_new_members">Accepting new members</label>
-                  </div>
-                </div>
-              </div>
-
-              <div class="card-footer">
-                <button type="submit" class="btn btn-primary btn-sm">
-                  <i class="fas fa-save mr-1"></i> Save changes
-                </button>
-              </div>
-            </form>
-          </div>
         </div>
 
         <!-- Right column: who's in it -->
         <div class="col-md-7">
+          <div th:if="${isApprovedMember}" class="alert alert-info d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-comments mr-1"></i> Chat with everyone in this group.</span>
+            <a th:href="@{/chat(groupId=${group.id})}" class="btn btn-primary btn-sm ml-3">
+              Open group chat
+            </a>
+          </div>
+
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">Members</h3>
@@ -166,7 +137,7 @@
                       <th>Member</th>
                       <th>Role</th>
                       <th>Joined</th>
-                      <th th:if="${isMember}">Actions</th>
+                      <th th:if="${isGroupAdmin}">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -189,14 +160,18 @@
 
                       <td th:text="${#temporals.format(membership.joinedAt, 'MMM d, yyyy')}">Jul 30, 2026</td>
 
-                      <td th:if="${isMember}">
-                        <a th:if="${membership.user.id != currentUser.id}"
-                           th:href="@{/chat(userId=${membership.user.id})}" class="btn btn-secondary btn-sm">
-                          <i class="fas fa-comment"></i> Message
-                        </a>
-
+                      <td th:if="${isGroupAdmin}">
                         <!-- Role controls are admin-only and never shown against yourself. -->
-                        <form th:if="${isGroupAdmin and membership.user.id != currentUser.id and membership.role.name() != 'ADMIN'}"
+                        <form th:if="${isGroupAdmin and membership.user.id != currentUser.id and membership.role.name() == 'PENDING'}"
+                              th:action="@{/groups/{id}/members/{userId}/role(id=${group.id},userId=${membership.user.id})}"
+                              method="post" class="d-inline">
+                          <input type="hidden" name="role" value="MEMBER">
+                          <button type="submit" class="btn btn-success btn-sm">
+                            <i class="fas fa-user-check"></i> Approve
+                          </button>
+                        </form>
+
+                        <form th:if="${isGroupAdmin and membership.user.id != currentUser.id and membership.role.name() == 'MEMBER'}"
                               th:action="@{/groups/{id}/members/{userId}/role(id=${group.id},userId=${membership.user.id})}"
                               method="post" class="d-inline">
                           <input type="hidden" name="role" value="ADMIN">
@@ -227,6 +202,100 @@
                   </tbody>
                 </table>
               </div>
+            </div>
+          </div>
+
+          <!-- Admin-only group settings, collapsed to keep member management prominent. -->
+          <div th:if="${isGroupAdmin}" class="card card-warning card-outline">
+            <div class="card-header">
+              <h3 class="card-title">
+                <a href="#group-settings" data-toggle="collapse" role="button" aria-expanded="false"
+                   aria-controls="group-settings" class="text-dark">
+                  <i class="fas fa-cog mr-1"></i> Group settings
+                  <i class="fas fa-chevron-down ml-1"></i>
+                </a>
+              </h3>
+            </div>
+
+            <div id="group-settings" class="collapse">
+              <form th:action="@{/groups/{id}/edit(id=${group.id})}" method="post">
+                <div class="card-body">
+                  <div class="form-group">
+                    <label for="group-name">Name</label>
+                    <input id="group-name" type="text" class="form-control" name="name" maxlength="60" required
+                           th:value="${group.name}">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="group-description">Description</label>
+                    <textarea id="group-description" class="form-control" name="description" rows="3" maxlength="500"
+                              th:text="${group.description}"></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="group-vibe">Group vibe</label>
+                    <select id="group-vibe" class="form-control" name="vibe" required>
+                      <option th:each="item : ${vibes}" th:value="${item.name()}"
+                              th:text="${item.displayName}" th:selected="${item == group.vibe}">Vibe</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="group-size">Group size</label>
+                    <select id="group-size" class="form-control" name="size_preference" required>
+                      <option th:each="item : ${groupSizes}" th:value="${item.name()}"
+                              th:text="${item.displayName}" th:selected="${item == group.size_preference}">Size</option>
+                    </select>
+                    <small class="form-text text-muted">The group cannot be resized below its current member count.</small>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="group-meetup-style">Where you meet</label>
+                    <select id="group-meetup-style" class="form-control" name="meetup_style" required>
+                      <option th:each="item : ${meetupStyles}" th:value="${item.name()}"
+                              th:text="${item.displayName}" th:selected="${item == group.meetup_style}">Meetup style</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="group-campus">Campus</label>
+                    <select id="group-campus" class="form-control" name="campus" required>
+                      <option th:each="item : ${campuses}" th:value="${item.name()}"
+                              th:text="${item.displayName}" th:selected="${item == group.campus}">Campus</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="group-availability">Usual availability</label>
+                    <select id="group-availability" class="form-control" name="availability" required>
+                      <option th:each="item : ${availabilities}" th:value="${item.name()}"
+                              th:text="${item.displayName}" th:selected="${item == group.availability}">Availability</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="group-interest">Main interest</label>
+                    <select id="group-interest" class="form-control" name="top_interest" required>
+                      <option th:each="item : ${topInterests}" th:value="${item.name()}"
+                              th:text="${item.displayName}" th:selected="${item == group.top_interest}">Interest</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group mb-0">
+                    <div class="icheck-primary">
+                      <input type="checkbox" id="open_to_new_members" name="open_to_new_members"
+                             th:checked="${group.openToNewMembers}">
+                      <label for="open_to_new_members">Accepting new members</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card-footer">
+                  <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="fas fa-save mr-1"></i> Save changes
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

@@ -9,6 +9,7 @@ import com.cmpt276.group3.grouproject.models.FriendGroupRepository;
 import com.cmpt276.group3.grouproject.models.GroupChatMessage;
 import com.cmpt276.group3.grouproject.models.GroupChatMessageRepository;
 import com.cmpt276.group3.grouproject.models.GroupMembershipRepository;
+import com.cmpt276.group3.grouproject.enums.GroupRole;
 import com.cmpt276.group3.grouproject.models.User;
 import com.cmpt276.group3.grouproject.util.GroupMessageResponse;
 
@@ -40,7 +41,7 @@ public class GroupChatMessageService {
         requireCurrentUser(currentUser);
 
         FriendGroup group = requireGroup(groupId);
-        requireGroupMember(group, currentUser);
+        requireApprovedGroupMember(group, currentUser);
 
         return groupChatMessageRepository
             .findByGroupOrderBySentAtAsc(group)
@@ -58,7 +59,7 @@ public class GroupChatMessageService {
         requireCurrentUser(sender);
 
         FriendGroup group = requireGroup(groupId);
-        requireGroupMember(group, sender);
+        requireApprovedGroupMember(group, sender);
 
         String cleanedContent = validateAndCleanContent(content);
 
@@ -95,19 +96,18 @@ public class GroupChatMessageService {
         );
     }
 
-    private void requireGroupMember(
+    private void requireApprovedGroupMember(
         FriendGroup group,
         User user
     ) {
-        boolean isMember = 
-            groupMembershipRepository.existsByGroupAndUser(
-                group, 
-                user
-            );
+        boolean isApprovedMember = groupMembershipRepository
+            .findByGroupAndUser(group, user)
+            .map(membership -> membership.getRole() != GroupRole.PENDING)
+            .orElse(false);
 
-        if (!isMember) {
+        if (!isApprovedMember) {
             throw new IllegalStateException(
-                "You must be a member of this group"
+                "You must be an approved member of this group"
             );
         }
     }

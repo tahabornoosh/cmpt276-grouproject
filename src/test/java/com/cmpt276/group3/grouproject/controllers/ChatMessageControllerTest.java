@@ -64,11 +64,12 @@ class ChatMessageControllerTest {
     @Mock
     private UserBlockRepository userBlockRepository;
 
-    @Mock
-    private FriendGroupService friendGroupService;
 
     @Mock
     private UsersRepository usersRepository;
+
+    @Mock
+    private FriendGroupService friendGroupService;
 
     @InjectMocks
     private ChatController chatController;

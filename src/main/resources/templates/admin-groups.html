@@ -1,0 +1,52 @@
+<th:block th:replace="~{fragments/layout :: head('Group Administration')}"></th:block>
+<th:block th:replace="~{fragments/layout :: bodyStart}"></th:block>
+
+<input type="hidden" id="activeMenuItem" value="menu-admin-groups">
+
+<main class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6"><h1>Group Administration</h1></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">Groups</h3></div>
+        <div class="card-body">
+          <table id="groupsTable" class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>Group name</th>
+                <th>Creation date</th>
+                <th>Creator</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="group : ${groups}">
+                <td th:text="${group.name}">Group name</td>
+                <td th:text="${#temporals.format(group.createdAt, 'MMM d, yyyy')}">Jul 30, 2026</td>
+                <td th:text="${group.createdBy != null ? group.createdBy.first_name + ' ' + group.createdBy.last_name : '-'}">Creator</td>
+                <td><a th:href="@{/groups/{id}(id=${group.id})}" class="btn btn-info btn-sm">View</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.jQuery && window.jQuery.fn.DataTable) {
+        $('#groupsTable').DataTable({ responsive: true, lengthChange: false, autoWidth: false });
+      }
+    });
+  </script>
+</main>
+
+<th:block th:replace="~{fragments/layout :: bodyEnd}"></th:block>

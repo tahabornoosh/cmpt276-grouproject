@@ -24,3 +24,5 @@
 - The app uses an AI generated test Django CAS server (identity provider)
 - AI used to help in implementation of course ratings
 - AI used to help implement Zoom calling
+- AI used to help improve and debug chat and groups functionality
+- AI used to help expand admin functions

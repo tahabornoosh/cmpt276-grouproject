@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.cmpt276.group3.grouproject.auth.Auth;
+import com.cmpt276.group3.grouproject.enums.GroupRole;
 import com.cmpt276.group3.grouproject.models.ChatMessage;
 import com.cmpt276.group3.grouproject.models.GroupMembership;
 import com.cmpt276.group3.grouproject.models.User;
@@ -76,8 +77,16 @@ public class ChatController {
         List<ContactResponse> contacts =
             chatMessageService.getExistingConversations(currentUser);
 
-        List<GroupMembership> groupMemberships =
-            friendGroupService.getMyMemberships(currentUser);
+        List<GroupMembership> groupMemberships = friendGroupService
+            .getMyMemberships(currentUser)
+            .stream()
+            .filter(membership -> membership.getRole() != GroupRole.PENDING)
+            .toList();
+
+        if (groupId != null && groupMemberships.stream().noneMatch(
+                membership -> Objects.equals(membership.getGroup().getId(), groupId))) {
+            return "redirect:/groups?error=Group+chat+is+available+after+approval";
+        }
 
         model.addAttribute("requestedGroupId", groupId);
         model.addAttribute("requestedUserId", userId);

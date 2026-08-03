@@ -9,8 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cmpt276.group3.grouproject.algorithms.GroupMatchingAlgorithm;
-import com.cmpt276.group3.grouproject.enums.GroupRole;
-import com.cmpt276.group3.grouproject.enums.GroupSizePreference;
+import com.cmpt276.group3.grouproject.enums.*;
 import com.cmpt276.group3.grouproject.models.FriendGroup;
 import com.cmpt276.group3.grouproject.models.FriendGroupRepository;
 import com.cmpt276.group3.grouproject.models.GroupChatMessageRepository;
@@ -142,6 +141,42 @@ public class FriendGroupService {
         return friendGroupRepository.save(group);
     }
 
+    // Extended admin edit used by the group settings form. The smaller overload above
+    // remains for callers that only update the original fields.
+    @Transactional
+    public FriendGroup updateGroup(User actor, Long groupId, String name, String description,
+            GroupVibe vibe, GroupSizePreference size, MeetupStyle meetupStyle, Campus campus,
+            Availability availability, TopInterest topInterest, boolean openToNewMembers) {
+        if (vibe == null || size == null || meetupStyle == null || campus == null
+                || availability == null || topInterest == null) {
+            throw new IllegalArgumentException("Complete all group details");
+        }
+
+        FriendGroup group = requireGroup(groupId);
+        requireAdmin(actor, group);
+
+        if (groupMembershipRepository.countByGroup(group) > size.getMaxSize()) {
+            throw new IllegalStateException("The selected group size is smaller than the current member count");
+        }
+
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("A group name is required");
+        }
+
+        group.setName(trimToLength(name, 60));
+        group.setDescription(trimToLength(description, 500));
+        group.setVibe(vibe);
+        group.setSize_preference(size);
+        group.setMaxMembers(size.getMaxSize());
+        group.setMeetup_style(meetupStyle);
+        group.setCampus(campus);
+        group.setAvailability(availability);
+        group.setTop_interest(topInterest);
+        group.setOpenToNewMembers(openToNewMembers);
+
+        return friendGroupRepository.save(group);
+    }
+
     // Only a group admin can delete. Memberships go first so no rows are orphaned.
     @Transactional
     public void deleteGroup(User actor, Long groupId) {
@@ -186,6 +221,9 @@ public class FriendGroupService {
 
     @Transactional(readOnly = true)
     public boolean isAdmin(FriendGroup group, User user) {
+        if (isSitewideGroupAdmin(user)) {
+            return true;
+        }
         GroupMembership membership = getMembership(group, user);
         return membership != null && membership.getRole() == GroupRole.ADMIN;
     }
@@ -200,6 +238,16 @@ public class FriendGroupService {
 
     @Transactional
     public GroupMembership joinGroup(User user, Long groupId) {
+        return addUserToOpenGroup(user, groupId, GroupRole.MEMBER);
+    }
+
+    // Requests made from the explore list wait for an existing admin's approval.
+    @Transactional
+    public GroupMembership requestToJoinGroup(User user, Long groupId) {
+        return addUserToOpenGroup(user, groupId, GroupRole.PENDING);
+    }
+
+    private GroupMembership addUserToOpenGroup(User user, Long groupId, GroupRole role) {
         if (user == null) {
             throw new IllegalArgumentException("A user is required");
         }
@@ -218,7 +266,7 @@ public class FriendGroupService {
             throw new IllegalStateException("This group is full");
         }
 
-        return groupMembershipRepository.save(new GroupMembership(group, user, GroupRole.MEMBER));
+        return groupMembershipRepository.save(new GroupMembership(group, user, role));
     }
 
     // Leaving is always allowed. If the last admin leaves, the longest-standing remaining
@@ -262,6 +310,14 @@ public class FriendGroupService {
 
         if (target.getRole() == newRole) {
             return target; // nothing to do
+        }
+
+        boolean isAllowedTransition =
+                (target.getRole() == GroupRole.PENDING && newRole == GroupRole.MEMBER)
+                || (target.getRole() == GroupRole.MEMBER && newRole == GroupRole.ADMIN)
+                || (target.getRole() == GroupRole.ADMIN && newRole == GroupRole.MEMBER);
+        if (!isAllowedTransition) {
+            throw new IllegalStateException("That role change is not allowed");
         }
 
         if (newRole == GroupRole.MEMBER && isLastAdmin(group, target)) {
@@ -418,11 +474,19 @@ public class FriendGroupService {
             throw new IllegalArgumentException("A user is required");
         }
 
+        if (isSitewideGroupAdmin(actor)) {
+            return;
+        }
+
         Optional<GroupMembership> membership = groupMembershipRepository.findByGroupAndUser(group, actor);
 
         if (membership.isEmpty() || membership.get().getRole() != GroupRole.ADMIN) {
             throw new IllegalStateException("Only a group admin can do that");
         }
+    }
+
+    private boolean isSitewideGroupAdmin(User user) {
+        return user != null && (user.getRole() == Role.ADMIN || user.getRole() == Role.MOD);
     }
 
     private GroupMembership findMembershipByUserId(FriendGroup group, long targetUserId) {

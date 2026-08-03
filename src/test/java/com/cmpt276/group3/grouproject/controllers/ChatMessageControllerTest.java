@@ -300,7 +300,7 @@ class ChatMessageControllerTest {
             chatMessageService.getExistingConversations(currentUser)
         ).thenReturn(contacts);
 
-        String view = chatController.loadChat(2L, session, model);
+        String view = chatController.loadChat(2L, null, session, model);
 
         assertEquals("chat", view);
 
@@ -316,7 +316,7 @@ class ChatMessageControllerTest {
 
         when(auth.isLoggedIn(session)).thenReturn(false);
 
-        String view = chatController.loadChat(null, session, model);
+        String view = chatController.loadChat(null, null, session, model);
 
         assertEquals("redirect:/login", view);
         verifyNoInteractions(chatMessageService);

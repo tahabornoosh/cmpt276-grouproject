@@ -18,10 +18,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.cmpt276.group3.grouproject.auth.Auth;
 import com.cmpt276.group3.grouproject.models.ChatMessage;
+import com.cmpt276.group3.grouproject.models.GroupMembership;
 import com.cmpt276.group3.grouproject.models.User;
 import com.cmpt276.group3.grouproject.models.UserBlock;
 import com.cmpt276.group3.grouproject.models.UserBlockRepository;
 import com.cmpt276.group3.grouproject.services.ChatMessageService;
+import com.cmpt276.group3.grouproject.services.FriendGroupService;
 import com.cmpt276.group3.grouproject.services.UserService;
 import com.cmpt276.group3.grouproject.util.ContactResponse;
 import com.cmpt276.group3.grouproject.util.MessageResponse;
@@ -37,24 +39,28 @@ public class ChatController {
     private final ChatMessageService chatMessageService;
     private final SimpMessagingTemplate messagingTemplate;
     private final UserBlockRepository userBlockRepository;
+    private final FriendGroupService friendGroupService;
 
     public ChatController(
         Auth auth,
         UserService userService,
         ChatMessageService chatMessageService,
         SimpMessagingTemplate messagingTemplate,
-        UserBlockRepository userBlockRepository
+        UserBlockRepository userBlockRepository,
+        FriendGroupService friendGroupService
     ) {
         this.auth = auth;
         this.userService = userService;
         this.chatMessageService = chatMessageService;
         this.messagingTemplate = messagingTemplate;
         this.userBlockRepository = userBlockRepository;
+        this.friendGroupService = friendGroupService;
     }
 
     @GetMapping("/chat")
     public String loadChat(
         @RequestParam(required = false) Long userId,
+        @RequestParam(required = false) Long groupId,
         HttpSession session,
         Model model
     ) {
@@ -70,9 +76,14 @@ public class ChatController {
         List<ContactResponse> contacts =
             chatMessageService.getExistingConversations(currentUser);
 
+        List<GroupMembership> groupMemberships =
+            friendGroupService.getMyMemberships(currentUser);
+
+        model.addAttribute("requestedGroupId", groupId);
         model.addAttribute("requestedUserId", userId);
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("contacts", contacts);
+        model.addAttribute("groupMemberships",groupMemberships);
 
         return "chat";
     }

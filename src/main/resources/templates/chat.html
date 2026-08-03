@@ -15,6 +15,43 @@
         flex-shrink: 0 !important;
       }
 
+      .chat-section-title {
+        padding: 0.55rem 1rem;
+        margin: 0;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #6c757d;
+        background: #eef1f4;
+        border-bottom: 1px solid #dee2e6;
+      }
+
+      .chat-sender-name {
+        display: block;
+        margin-bottom: 0.15rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #495057;
+      }
+
+      .chat-message.me .chat-sender-name {
+        color: rgba(255, 255, 255, 0.85);
+      }
+
+      .chat-bubble a {
+        text-decoration: underline;
+        overflow-wrap: anywhere;
+      }
+
+      .chat-message.me .chat-bubble a {
+        color: #ffffff;
+      }
+
+      .chat-bubble {
+        overflow-wrap: anywhere;
+      }
+
       .chat-app {
         display: grid;
         grid-template-columns: 320px 1fr;
@@ -169,7 +206,7 @@
       <div 
       class="card card-primary card-outline chat-app"
       id="chat-app"
-      th:attr="data-current-user-id=${currentUser.id}, data-requested-user-id=${requestedUserId}"
+      th:attr="data-current-user-id=${currentUser.id}, data-requested-user-id=${requestedUserId}, data-requested-group-id=${requestedGroupId}"
       >
         <!-- Contacts -->
         <aside class="chat-contacts">
@@ -183,64 +220,114 @@
 </div>
           </div>
           <div class="flex-grow-1 overflow-auto" id="chat-contacts">
+            <section id="direct-chat-section">
+              <p class="chat-section-title">Direct Messages</p>
+
+              <div id="direct-chat-list">
+                <a
+                  href="#"
+                  class="chat-contact"
+                  data-chat-type="direct"
+                  th:each="contact : ${contacts}"
+                  th:attr="
+                    data-user-id=${contact.userId},
+                    data-conversation-name=${contact.firstName + ' ' + contact.lastName},
+                    data-conversation-avatar=${#strings.substring(contact.firstName, 0, 1) + #strings.substring(contact.lastName, 0, 1)}"
+                    >
+                    <span
+                      class="chat-avatar bg-primary text-white"
+                      th:text="${#strings.substring(contact.firstName, 0, 1) + #strings.substring(contact.lastName, 0, 1)}"
+                      >
+                      AB
+                    </span>
+
+                    <div class="flex-grow-1 overflow-hidden">
+                      <div class="d-flex align-items-center w-100">
+                        <p
+                          class="mb-0 text-truncate flex-grow-1 chat-contact-name"
+                          th:text="${contact.firstName + ' ' + contact.lastName}"
+                          >
+                          First Last
+                        </p>
+
+                        <small
+                          class="text-muted flex-shrink-0 ml-2 chat-contact-time"
+                          th:attr="data-sent-at=${contact.lastMessageAt}"
+                          ></small>
+
+                        <span
+                          class="unread-badge"
+                          th:if="${contact.unread}"
+                          title="Unread message"
+                          aria-label="Unread message"
+                          ></span>
+                      </div>
+
+                      <small class="text-truncate text-muted d-block chat-contact-preview">
+                        <span th:if="${contact.lastMessageSentByCurrentUser}">You: </span><span
+                          th:text="${contact.lastMessage}"
+                          >Latest Message</span>
+                      </small>
+                    </div>
+                  </a>
+              </div>
+            <p
+              class="p-3 mb-0 text-muted direct-empty-message"
+              th:if="${#lists.isEmpty(contacts)}"
+              >
+              No conversations yet.
+            </p>
+        </section>
+
+        <section id="group-chat-section">
+          <p class="chat-section-title">Groups</p>
+
+          <div id="group-chat-list">
             <a
               href="#"
               class="chat-contact"
-              th:each="contact : ${contacts}"
+              data-chat-type="group"
+              th:each="membership : ${groupMemberships}"
               th:attr="
-                data-user-id=${contact.userId},
-                data-user-name=${contact.firstName + ' ' + contact.lastName},
-                data-user-initials=${#strings.substring(contact.firstName, 0 , 1) + #strings.substring(contact.lastName, 0, 1)}
-                "
+                data-group-id=${membership.group.id},
+                data-conversation-name=${membership.group.name},
+                data-conversation-avatar=${#strings.substring(membership.group.name,0 ,1)}
+              "
               >
-                <span
-                  class="chat-avatar bg-primary text-white"
-                  th:text="${#strings.substring(contact.firstName, 0, 1) + #strings.substring(contact.lastName, 0, 1)}"
-                  >
-                  AB
+                <span class="chat-avatar bg-secondary text-white">
+                  <i class="fas fa-users" aria-hidden="true"></i>
                 </span>
 
                 <div class="flex-grow-1 overflow-hidden">
                   <div class="d-flex align-items-center w-100">
                     <p
-                      class="mb-0 text-truncate flex-grow-1"
-                      th:text="${contact.firstName + ' ' + contact.lastName}"
+                      class="mb-0 text-truncate flex-grow-1 chat-contact-name"
+                      th:text="${membership.group.name}"
                       >
-                        First Last
+                      Group name
                     </p>
 
                     <small
                       class="text-muted flex-shrink-0 ml-2 chat-contact-time"
-                      th:attr="data-sent-at=${contact.lastMessageAt}"
+                      data-sent-at=""
                       ></small>
-
-                    <span
-                      class="unread-badge"
-                      th:if="${contact.unread}"
-                      title="Unread message"
-                      aria-label="Unread message"
-                    ></span>
                   </div>
 
-                  <small
-                    class="text-truncate text-muted d-block chat-contact-preview"
-                    >
-                      <span
-                        th:if="${contact.lastMessageSentByCurrentUser}"
-                        >You: </span><span
-                        th:text="${contact.lastMessage}"
-                        >Latest message</span>
+                  <small class="text-truncate text-muted d-block chat-contact-preview">
+                    Group conversation
                   </small>
                 </div>
             </a>
 
             <p
-              class="p-3 text-muted"
-              th:if="${#lists.isEmpty(contacts)}"
+              class="p-3 mb-0 text-muted group-empty-message"
+              th:if="${#lists.isEmpty(groupMemberships)}"
               >
-              No conversations yet.
+              You have not joined any groups.
             </p>
           </div>
+        </section>
+        </div>
         </aside>
 
         <!-- Conversation -->
@@ -271,7 +358,7 @@
 
             <span
               class="chat-avatar bg-primary text-white"
-              id="selected-user-avatar"
+              id="selected-conversation-avatar"
               >
               ?
             </span>
@@ -279,7 +366,7 @@
             <div class="flex-grow-1">
               <p
                 class="mb-0 font-weight-bold"
-                id="selected-user-name"
+                id="selected-conversation-name"
                 >
                 Select a conversation
               </p>
@@ -291,9 +378,10 @@
                 title="Start Zoom call"
                 aria-label="Start Zoom call"
                 disabled
+                hidden
                 >
                 <i class="fas fa-video" aria-hidden="true"></i>
-                <span class="m1-1">Call</span>
+                <span class="ml-1">Call</span>
               </button>
               <small
                 class="text-danger d-block"
@@ -309,7 +397,7 @@
 
           <div class="chat-messages" id="chat-messages">
             <p class="text-center text-muted" id="empty-chat-message">
-              Select a user to view your conversation.
+              Select a conversation to view its messages.
             </p>
           </div>
 
@@ -318,7 +406,7 @@
               <input
                 type="text"
                 class="form-control"
-                placeholder="Select a user first.."
+                placeholder="Select a conversation first..."
                 aria-label="Type a message"
                 id="chat-input"
                 maxlength="300"
@@ -359,10 +447,10 @@
       document.getElementById("chat-input");
     const sendButton = 
       document.getElementById("send-message-button");
-    const selectedUserName =
-      document.getElementById("selected-user-name");
-    const selectedUserAvatar =
-      document.getElementById("selected-user-avatar");
+    const selectedConversationName =
+      document.getElementById("selected-conversation-name");
+    const selectedConversationAvatar =
+      document.getElementById("selected-conversation-avatar");
     const connectionStatus =
       document.getElementById("connection-status");
     const chatActions =
@@ -375,9 +463,25 @@
       document.getElementById("contact-search")
     const contactsContainer = 
       document.getElementById("chat-contacts")
+    const directChatSection = 
+      document.getElementById("direct-chat-section")
+    const groupChatSection =
+      document.getElementById("group-chat-section")
+    const directChatList =
+      document.getElementById("direct-chat-list")
+    const groupChatList = 
+      document.getElementById("group-chat-list")
 
     const contactElements =
       Array.from(document.querySelectorAll(".chat-contact"));
+
+    const currentUserId = Number(chatApp.dataset.currentUserId);
+
+    let selectedRecipientId = null;
+    let selectedBlockStatus = null;
+    let stompClient = null;
+    let selectedConversationType = null;
+    let selectedGroupId = null;
 
     const relativeTimeFormatter = 
         new Intl.RelativeTimeFormat("en", {
@@ -447,20 +551,35 @@
       60_000
     );
 
-    function getContactByUserId(userId) {
+    function getDirectContactByUserId(userId) {
       const numericUserId = Number(userId);
       if (!Number.isFinite(numericUserId)) {
         return null;
       }
 
       return document.querySelector(
-        `.chat-contact[data-user-id="${numericUserId}"]`
+        `.chat-contact[data-chat-type="direct"]` +
+        `[data-user-id="${numericUserId}"]`
       );
+    }
+
+    function getGroupContactByGroupId(groupId) {
+      const numericGroupId = Number(groupId);
+
+      if (!Number.isFinite(numericGroupId)) {
+        return null;
+      }
+
+      return document.querySelector(
+        `.chat-contact[data-chat-type="group"]` +
+        `[data-group-id="${numericGroupId}"]`
+      )
     }
 
     async function startZoomCall() {
       if (
-        !selectedRecipientId
+        selectedConversationType !== "direct"
+        || !selectedRecipientId
         || startZoomCallButton.disabled
         || (
           selectedBlockStatus
@@ -475,6 +594,15 @@
         return;
       }
 
+      const zoomWindow = window.open("about:blank", "_blank");
+      if (!zoomWindow) {
+        alert("Your browser blocked the Zoom tab. " + "Allow pop-ups for this site and try again.");
+        return;
+      }
+
+      zoomWindow.opener = null;
+      zoomWindow.document.title = "Starting Zoom call...";
+      zoomWindow.document.body.textContent = "Creating your Zoom meeting...";
       startZoomCallButton.disabled = true;
 
       const originalButtonHtml =
@@ -483,7 +611,7 @@
       startZoomCallButton.innerHTML = 
         '<span class ="spinner-border spinner-border-sm" ' +
         'aria-hidden="true"></span>' +
-        '<span class="m1-1">Starting...</span>';
+        '<span class="ml-1">Starting...</span>';
 
       try {
         const response = await fetch("/api/zoom/meetings", {
@@ -497,6 +625,7 @@
         });
 
         if (response.status === 401) {
+          zoomWindow.close();
           window.location.href = "/login";
           return;
         }
@@ -527,21 +656,15 @@
         });
 
         setTimeout(() => {
-          window.location.assign(meeting.hostUrl);
+          zoomWindow.location.href = meeting.hostUrl;
         }, 250);
       } catch (error) {
+        zoomWindow.close();
         console.error(error);
         alert("The zoom meeting could not be created.");
-
-        startZoomCallButton.innerHTML = 
-          originalButtomHtml;
-
-        startZoomCallButton.disabled = 
-          !selectedRecipientId
-          || Boolean(
-            selectedBlockStatus
-            && selectedBlockStatus.communicationBlocked
-          )
+      } finally {
+        startZoomCallButton.innerHTML = originalButtonHtml;
+        updateDirectControls();
       }
     }
 
@@ -575,13 +698,47 @@
     function setComposerEnabled(enabled, placeholder) {
       messageInput.disabled = !enabled;
       sendButton.disabled = !enabled;
-      startZoomCallButton.disabled = 
-        !enabled || !selectedRecipientId;
       messageInput.placeholder = placeholder;
     }
 
+    function updateDirectControls() {
+      const directSelected = selectedConversationType === "direct" && Number.isFinite(selectedRecipientId);
+
+      chatActions.hidden = !directSelected;
+      startZoomCallButton.hidden = !directSelected;
+
+      const blockStatusLoaded = selectedBlockStatus !== null;
+      const communicationBlocked = selectedBlockStatus?.communicationBlocked === true;
+
+      startZoomCallButton.disabled = !directSelected || !blockStatusLoaded || communicationBlocked;
+    }
+
+    function setActiveContact(contact) {
+      document
+        .querySelectorAll(".chat-contact")
+        .forEach(item => item.classList.remove("active"));
+      
+        contact.classList.add("active")
+    }
+
+    function setConversationHeader(contact, isGroup) {
+      selectedConversationName.textContent = contact.dataset.conversationName || "Conversation";
+      
+      selectedConversationAvatar.classList.toggle("bg-primary", !isGroup);
+      selectedConversationAvatar.classList.toggle("bg-secondary", isGroup);
+      selectedConversationAvatar.textContent = isGroup?"#" : (contact.dataset.conversationAvatar || "?");
+    }
+
+    function clearBlockUi() {
+      selectedBlockStatus = null;
+      blockStatusMessage.hidden = true;
+      blockStatusMessage.textContent = "";
+      toggleBlockButton.disabled = true;
+      updateDirectControls();
+    }
+
     function applyBlockStatus(status) {
-      if (!status || Number(status.otherUserId) !== selectedRecipientId) {
+      if (selectedConversationType !== "direct" || !status || Number(status.otherUserId) !== selectedRecipientId) {
         return;
       }
 
@@ -615,12 +772,12 @@
         setComposerEnabled(true, "Type a message...");
         messageInput.focus();
       }
+
+      updateDirectControls();
     }
 
     async function loadBlockStatus(otherUserId) {
-      selectedBlockStatus = null;
-      toggleBlockButton.disabled = true;
-      blockStatusMessage.hidden = true;
+      clearBlockUi();
 
       try {
         const response = await fetch(
@@ -642,14 +799,15 @@
         applyBlockStatus(status);
       } catch (error) {
         console.error(error);
-        if (Number(otherUserId) === selectedRecipientId) {
+        if (selectedConversationType === "direct" && Number(otherUserId) === selectedRecipientId) {
           setComposerEnabled(false, "Messaging status could not be loaded.");
+          updateDirectControls();
         }
       }
     }
 
     async function changeBlockState() {
-      if (!selectedRecipientId || !selectedBlockStatus) {
+      if (selectedConversationType !== "direct" || !selectedRecipientId || !selectedBlockStatus) {
         return;
       }
 
@@ -684,26 +842,53 @@
       }
     }
 
-    function openContact(contact) {
+    function openDirectContact(contact) {
       if (!contact) {
         return false;
       }
 
-      document
-        .querySelectorAll(".chat-contact")
-        .forEach(item => item.classList.remove("active"));
+      setActiveContact(contact);
 
-      contact.classList.add("active");
-
+      selectedConversationType = "direct";
       selectedRecipientId = Number(contact.dataset.userId);
-      selectedUserName.textContent = contact.dataset.userName;
-      selectedUserAvatar.textContent = contact.dataset.userInitials;
+      selectedGroupId = null;
 
-      chatActions.hidden = false;
+      setConversationHeader(contact, false);
+      clearBlockUi();
       setComposerEnabled(false, "Loading conversation...");
-      loadConversation(selectedRecipientId);
+
+      loadDirectConversation(selectedRecipientId);
       loadBlockStatus(selectedRecipientId);
       return true;
+    }
+
+    function openGroupContact(contact) {
+      if (!contact) {
+        return false;
+      }
+
+      setActiveContact(contact);
+      selectedConversationType = "group";
+      selectedRecipientId = null;
+      selectedGroupId = Number(contact.dataset.groupId);
+
+      setConversationHeader(contact, true);
+      clearBlockUi();
+      setComposerEnabled(false, "Loading group conversation...");
+      setUnreadBadge(contact, false);
+
+      loadGroupConversation(selectedGroupId);
+      return true;
+    }
+
+    function openConversation(contact) {
+      if (!contact) {
+        return false;
+      }
+
+      return contact.dataset.chatType === "group"
+       ? openGroupContact(contact)
+       : openDirectContact(contact);
     }
 
 
@@ -725,13 +910,108 @@
           );
         }
 
-        setUnreadBadge(getContactByUserId(otherUserId), false);
+        setUnreadBadge(getDirectContactByUserId(otherUserId), false);
       } catch (error) {
         console.error(error);
       }
     }
 
-    function updateContactPreview(message) {
+    function updateGroupContactPreview(
+      message,
+      moveToTop = true
+    ) {
+      const contact =
+        getGroupContactByGroupId(message.groupId);
+
+      if (!contact) {
+        return;
+      }
+
+      const sentByCurrentUser =
+        Number(message.senderId) === currentUserId;
+
+      const preview =
+        contact.querySelector(".chat-contact-preview");
+
+      const time =
+        contact.querySelector(".chat-contact-time");
+
+      const senderLabel = sentByCurrentUser
+        ? "You"
+        : (message.senderName || "Member");
+
+      if (preview) {
+        preview.textContent =
+          `${senderLabel}: ${message.content}`;
+      }
+
+      if (time) {
+        time.dataset.sentAt = message.sentAt;
+        time.textContent =
+          formatRelativeTime(message.sentAt);
+      }
+
+      if (moveToTop) {
+        groupChatList.prepend(contact);
+      }
+    }
+
+    async function loadInitialGroupPreviews() {
+      const groupContacts = Array.from(
+        document.querySelectorAll(
+          '.chat-contact[data-chat-type="group"]'
+        )
+      );
+
+      await Promise.all(
+        groupContacts.map(async contact => {
+          const groupId =
+            Number(contact.dataset.groupId);
+
+          if (!Number.isFinite(groupId)) {
+            return;
+          }
+
+          try {
+            const response = await fetch(
+              `/api/group-chat/messages?groupId=${groupId}`
+            );
+
+            if (response.status === 401) {
+              window.location.href = "/login";
+              return;
+            }
+
+            if (!response.ok) {
+              throw new Error(
+                `Could not load group preview: ${response.status}`
+              );
+            }
+
+            const messages = await response.json();
+
+            if (messages.length === 0) {
+              return;
+            }
+
+            const latestMessage =
+              messages[messages.length - 1];
+
+            updateGroupContactPreview(
+              latestMessage,
+              false
+            );
+          } catch (error) {
+            console.error(
+              `Could not load preview for group ${groupId}:`,
+              error
+            );
+          }
+        })
+      );
+    }
+
+    function updateDirectContactPreview(message) {
       const senderId = Number(message.senderId);
       const recipientId = Number(message.recipientId);
 
@@ -739,7 +1019,7 @@
 
       const otherUserId = sentByCurrentUser ? recipientId : senderId;
 
-      const contact = getContactByUserId(otherUserId);
+      const contact = getDirectContactByUserId(otherUserId);
 
       if (!contact) {
         window.location.reload();
@@ -753,7 +1033,7 @@
       time.dataset.sentAt = message.sentAt;
       time.textContent = formatRelativeTime(message.sentAt);
 
-      document.getElementById("chat-contacts").prepend(contact);
+      directChatList.prepend(contact);
     }
 
     const noSearchResults = document.createElement("p");
@@ -763,32 +1043,63 @@
 
     contactsContainer.appendChild(noSearchResults);
 
+    function updateSectionVisibility() {
+      const visibleDirectContacts = directChatList.querySelectorAll('.chat-contact:not([hidden])').length;
+      const visibleGroupContacts = groupChatList.querySelectorAll(`.chat-contact:not([hidden])`).length;
+
+      directChatSection.hidden = visibleDirectContacts === 0;
+      groupChatSection.hidden = visibleGroupContacts === 0;
+
+      return visibleDirectContacts + visibleGroupContacts;
+    }
+
     contactSearch.addEventListener("input", () => {
       const searchText =
         contactSearch.value.trim().toLowerCase();
 
-      let visibleContacts = 0;
-
       contactElements.forEach(contact => {
-        const contactName = 
-          (contact.dataset.userName || "")
-            .toLowerCase();
-
-        const matchesSearch = contactName.includes(searchText);
-        contact.hidden = !matchesSearch;
-
-        if (matchesSearch) {
-          visibleContacts++;
-        }
+        const conversationName = (contact.dataset.conversationName || "").toLowerCase();
+        contact.hidden = !conversationName.includes(searchText);
       });
 
+      const visibleContacts = updateSectionVisibility();
       noSearchResults.hidden = searchText === "" || visibleContacts > 0;
-    })
-    const currentUserId = Number(chatApp.dataset.currentUserId);
 
-    let selectedRecipientId = null;
-    let selectedBlockStatus = null;
-    let stompClient = null;
+      if (searchText === "") {
+        directChatSection.hidden = false;
+        groupChatSection.hidden = false;
+      }
+    });
+
+    function appendMessageContent(container, content) {
+      const messageText = content || "";
+      const urlPattern = /https?:\/\/[^\s]+/g;
+      let previousIndex = 0;
+
+      for (const match of messageText.matchAll(urlPattern)) {
+        const url = match[0];
+        const matchIndex = match.index;
+
+        if (matchIndex > previousIndex) {
+          container.appendChild(document.createTextNode(messageText.slice(previousIndex, matchIndex)))
+        }
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.textContent = url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+
+        container.appendChild(link);
+        previousIndex = matchIndex + url.length;
+      }
+
+      if (previousIndex < messageText.length) {
+        container.appendChild(
+          document.createTextNode(messageText.slice(previousIndex))
+        )
+      }
+    }
 
     function formatMessageTime(sentAt) {
       if (!sentAt) {
@@ -801,7 +1112,7 @@
       });
     }
 
-    function displayMessage(message) {
+    function displayMessage(message, groupMessage = false) {
       const messageElement = document.createElement("div");
 
       const sentByCurrentUser = Number(message.senderId) === currentUserId;
@@ -811,8 +1122,16 @@
       const bubbleElement = document.createElement("div");
       bubbleElement.className = "chat-bubble";
 
+      if (groupMessage) {
+        const senderNameElement = document.createElement("span");
+        senderNameElement.className = "chat-sender-name";
+        senderNameElement.textContent = sentByCurrentUser ? "You" : (message.senderName || "Group Member");
+        bubbleElement.appendChild(senderNameElement);
+      }
+
       const contentElement = document.createElement("span");
-      contentElement.textContent = message.content;
+      
+      appendMessageContent(contentElement,message.content);
 
       const timeElement = document.createElement("span");
       timeElement.className = "chat-time";
@@ -827,7 +1146,21 @@
       messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
-    async function loadConversation(otherUserId) {
+    function showEmptyConversation(message) {
+      const emptyMessage = document.createElement("p");
+      emptyMessage.className = "text-center text-muted";
+      emptyMessage.textContent = message;
+      messageContainer.appendChild(emptyMessage);
+    }
+
+    function showConversationLoadError(message) {
+      const errorMessage = document.createElement("p");
+      errorMessage.className = "text-center text-danger";
+      errorMessage.textContent = message;
+      messageContainer.appendChild(errorMessage);
+    }
+
+    async function loadDirectConversation(otherUserId) {
       connectionStatus.hidden = false;
       messageContainer.replaceChildren();
 
@@ -849,48 +1182,84 @@
 
         const messages = await response.json();
 
-        if (Number(otherUserId) !== selectedRecipientId) {
+        if (selectedConversationType !== "direct" || Number(otherUserId) !== selectedRecipientId) {
           return;
         }
 
-        setUnreadBadge(getContactByUserId(otherUserId), false);
+        setUnreadBadge(getDirectContactByUserId(otherUserId), false);
 
         if (messages.length === 0) {
-          const emptyMessage = document.createElement("p");
-          emptyMessage.className = "text-center text-muted";
-          emptyMessage.textContent = "No messages yet. Start the conversation!";
-          messageContainer.appendChild(emptyMessage);
+          showEmptyConversation("No messages yet. Start the conversation!");
           return;
         }
 
-        messages.forEach(displayMessage);
+        messages.forEach(message => displayMessage(message, false));
       } catch (error) {
         console.error(error);
+        showConversationLoadError("The conversation could not be loaded");
+      }
+    }
 
-        const errorMessage = document.createElement("p");
-        errorMessage.className = "text-center text-danger";
-        errorMessage.textContent = "The conversation could not be loaded";
+    async function loadGroupConversation(groupId) {
+      connectionStatus.hidden = false;
+      messageContainer.replaceChildren();
 
-        messageContainer.appendChild(errorMessage);
+      try {
+        const response = await fetch(`/api/group-chat/messages?groupId=${groupId}`);
+
+        if (response.status === 401) {
+          window.location.href = "/login";
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(
+            `Could not load group conversation: ${response.status}`
+          );
+        }
+
+        const messages = await response.json();
+
+        if (
+          selectedConversationType !== "group" || Number(groupId) !== selectedGroupId
+        ) {
+          return;
+        }
+
+        if (messages.length === 0) {
+          showEmptyConversation("No group messages yet. Start the conversation!");
+        } else {
+          messages.forEach(message => displayMessage(message, true));
+        }
+
+        setComposerEnabled(true, "Message the group...");
+        messageInput.focus();
+      } catch (error) {
+        console.error(error);
+        setComposerEnabled(false, "Group chat is unavailable");
+        showConversationLoadError("The group conversation could not be loaded");
       }
     }
 
     toggleBlockButton.addEventListener("click", changeBlockState);
 
-    document
-      .querySelectorAll(".chat-contact")
-      .forEach(contact => {
-        contact.addEventListener("click", event => {
-          event.preventDefault();
-          openContact(contact);
-        });
+    contactElements.forEach(contact => {
+      contact.addEventListener("click", event => {
+        event.preventDefault();
+        openConversation(contact);
       });
+    });
 
+    const requestedGroupId = chatApp.dataset.requestedGroupId;
     const requestedUserId = chatApp.dataset.requestedUserId;
-    if (requestedUserId) {
-      openContact(getContactByUserId(requestedUserId));
+    
+    if (requestedGroupId) {
+      openGroupContact(getGroupContactByGroupId(requestedGroupId));
+    } else if (requestedUserId) {
+      openDirectContact(getDirectContactByUserId(requestedUserId));
     }
-
+    
+      loadInitialGroupPreviews();
       const webSocketProtocol = location.protocol === "https:" ? "wss" : "ws";
 
       stompClient = new StompJs.Client({
@@ -907,16 +1276,20 @@
           frame => {
             const message = JSON.parse(frame.body);
 
-            updateContactPreview(message);
+            updateDirectContactPreview(message);
 
             const senderId = Number(message.senderId);
             const isIncomingMessage = senderId !== currentUserId;
-            const isOpenConversation = senderId === selectedRecipientId;
+            const isOpenConversation = senderId === selectedRecipientId && selectedConversationType === "direct";
 
             if (isIncomingMessage && !isOpenConversation) {
-              setUnreadBadge(getContactByUserId(senderId), true);
+              setUnreadBadge(getDirectContactByUserId(senderId), true);
             } else if (isIncomingMessage && isOpenConversation) {
               markOpenConversationAsRead(senderId);
+            }
+
+            if (selectedConversationType !== "direct") {
+              return;
             }
 
             if (selectedRecipientId === null) {
@@ -944,6 +1317,30 @@
           );
 
           stompClient.subscribe(
+            "/user/queue/group-messages",
+            frame => {
+              const message = JSON.parse(frame.body);
+              updateGroupContactPreview(message);
+
+              const messageGroupId = Number(message.groupId);
+              const isOpenGroupConversation = selectedConversationType === "group" && messageGroupId === selectedGroupId;
+
+              if (!isOpenGroupConversation) {
+                setUnreadBadge(getGroupContactByGroupId(messageGroupId),true);
+                return;
+              }
+
+              const emptyMessage = messageContainer.querySelector(".text-center.text-muted");
+
+              if (emptyMessage) {
+                emptyMessage.remove();
+              }
+
+              displayMessage(message, true);
+            }
+          )
+
+          stompClient.subscribe(
             "/user/queue/block-status",
             frame => {
               const status = JSON.parse(frame.body);
@@ -962,6 +1359,14 @@
                 }
                 alert(error.message);
               }
+            }
+          );
+
+          stompClient.subscribe(
+            "/user/queue/group-chat-errors",
+            frame => {
+              const error = JSON.parse(frame.body);
+              alert(error.message || "The group message could not be sent.");
             }
           );
         },
@@ -987,7 +1392,7 @@
         const content = messageInput.value.trim();
 
         if (
-          !selectedRecipientId
+          !selectedConversationType
           || content === ""
           || messageInput.disabled
           || (selectedBlockStatus
@@ -1001,18 +1406,36 @@
           return;
         }
 
-        stompClient.publish({
-          destination: "/app/chat.send",
-          body: JSON.stringify({
-            recipientId: selectedRecipientId,
-            content: content
-          })
-        });
+        if (selectedConversationType === "direct") {
+          if (!selectedRecipientId || selectedBlockStatus?.communicationBlocked === true) {
+            return;
+          }
+
+          stompClient.publish({
+            destination: "/app/chat.send",
+            body: JSON.stringify({
+              recipientId: selectedRecipientId,
+              content: content
+            })
+          });
+        } else if (selectedConversationType === "group") {
+          if (!selectedGroupId) {
+            return;
+          }
+
+          stompClient.publish({
+            destination: "/app/group-chat.send",
+            body: JSON.stringify({
+              groupId: selectedGroupId,
+              content: content
+            })
+          });
+        }
 
         messageInput.value = "";
         messageInput.focus();
-      })
-  })
+      });
+  });
 
 </script>
 

@@ -21,6 +21,7 @@ import com.cmpt276.group3.grouproject.enums.GroupVibe;
 import com.cmpt276.group3.grouproject.enums.Hobby;
 import com.cmpt276.group3.grouproject.enums.Lifestyle;
 import com.cmpt276.group3.grouproject.enums.MeetupStyle;
+import com.cmpt276.group3.grouproject.enums.Role;
 import com.cmpt276.group3.grouproject.enums.TopInterest;
 import com.cmpt276.group3.grouproject.models.FriendGroup;
 import com.cmpt276.group3.grouproject.models.GroupMembership;
@@ -300,14 +301,29 @@ public class FriendGroupController {
         }
 
         List<GroupMembership> memberships = friendGroupService.getMemberships(group);
+        boolean isSitewideGroupAdmin = currentUser.getRole() == Role.ADMIN || currentUser.getRole() == Role.MOD;
+
+        GroupMembership membership = null;
+        for (GroupMembership g:memberships) {
+            if (g.getUser()==currentUser) {
+                membership = g;
+                break;
+            }
+        }
+        if (membership == null && !isSitewideGroupAdmin) return "redirect:/"; // non-member
+        if (membership != null && membership.getRole() == GroupRole.PENDING && !isSitewideGroupAdmin) {
+            return "redirect:/"; // pending
+        }
 
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("group", group);
         model.addAttribute("memberships", memberships);
         model.addAttribute("memberCount", memberships.size());
         model.addAttribute("isMember", friendGroupService.isMember(group, currentUser));
-        model.addAttribute("isGroupAdmin", friendGroupService.isAdmin(group, currentUser));
+        model.addAttribute("isApprovedMember", membership != null && membership.getRole() != GroupRole.PENDING);
+        model.addAttribute("isGroupAdmin", isSitewideGroupAdmin || friendGroupService.isAdmin(group, currentUser));
         model.addAttribute("isFull", memberships.size() >= group.getMaxMembers());
+        addEnumOptions(model);
 
         return "group";
     }
@@ -318,6 +334,12 @@ public class FriendGroupController {
             HttpSession session,
             @RequestParam("name") String name,
             @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "vibe", required = false) String vibe,
+            @RequestParam(value = "size_preference", required = false) String sizePreference,
+            @RequestParam(value = "meetup_style", required = false) String meetupStyle,
+            @RequestParam(value = "campus", required = false) String campus,
+            @RequestParam(value = "availability", required = false) String availability,
+            @RequestParam(value = "top_interest", required = false) String topInterest,
             @RequestParam(value = "open_to_new_members", required = false) String openToNewMembers) {
 
         if (!auth.isLoggedIn(session)) {
@@ -331,7 +353,15 @@ public class FriendGroupController {
         }
 
         try {
-            friendGroupService.updateGroup(currentUser, id, name, description, openToNewMembers != null);
+            friendGroupService.updateGroup(
+                    currentUser, id, name, description,
+                    parseEnum(GroupVibe.class, vibe),
+                    parseEnum(GroupSizePreference.class, sizePreference),
+                    parseEnum(MeetupStyle.class, meetupStyle),
+                    parseEnum(Campus.class, campus),
+                    parseEnum(Availability.class, availability),
+                    parseEnum(TopInterest.class, topInterest),
+                    openToNewMembers != null);
         } catch (IllegalArgumentException | IllegalStateException e) {
             return "redirect:/groups/" + id + "?error=" + encode(e.getMessage());
         }
@@ -379,6 +409,28 @@ public class FriendGroupController {
         }
 
         return "redirect:/groups/" + id + "?success=" + encode("You joined the group");
+    }
+
+    // Explore-list requests remain on that page while an admin reviews the request.
+    @PostMapping("/groups/{id}/request-join")
+    public String requestToJoinGroup(@PathVariable("id") Long id, HttpSession session) {
+        if (!auth.isLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+        User currentUser = auth.getUser(session);
+
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            friendGroupService.requestToJoinGroup(currentUser, id);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return "redirect:/groups/find?error=" + encode(e.getMessage());
+        }
+
+        return "redirect:/groups/find?success=" + encode("You have been added pending approval");
     }
 
     @PostMapping("/groups/{id}/leave")

@@ -98,7 +98,8 @@ public class FriendGroupControllerTest {
     void groupActions_redirectToLoginWhenNotAuthenticated() throws Exception {
         when(auth.isLoggedIn(session)).thenReturn(false);
 
-        String[] actions = {"/groups/10/join", "/groups/10/leave", "/groups/10/delete", "/groups/auto-match"};
+        String[] actions = {"/groups/10/join", "/groups/10/request-join", "/groups/10/leave",
+                "/groups/10/delete", "/groups/auto-match"};
 
         for (String action : actions) {
             mockMvc.perform(post(action).session(session))
@@ -280,7 +281,26 @@ public class FriendGroupControllerTest {
                 .andExpect(view().name("group"))
                 .andExpect(model().attribute("isGroupAdmin", true))
                 .andExpect(model().attribute("isMember", true))
+                .andExpect(model().attribute("isApprovedMember", true))
                 .andExpect(model().attribute("memberCount", 1));
+    }
+
+    @Test
+    void viewGroup_allowsASitewideModeratorWhoIsNotAMember() throws Exception {
+        User moderator = new User("Mod", "User", "mod@sfu.ca", "pw", Role.MOD, Gender.NONE, "");
+        moderator.setId(99L);
+        when(auth.isLoggedIn(session)).thenReturn(true);
+        when(auth.getUser(session)).thenReturn(moderator);
+        when(friendGroupService.findGroup(10L)).thenReturn(group);
+        when(friendGroupService.getMemberships(group)).thenReturn(new ArrayList<>(
+                Arrays.asList(new GroupMembership(group, mike, GroupRole.ADMIN))));
+        when(friendGroupService.isMember(group, moderator)).thenReturn(false);
+
+        mockMvc.perform(get("/groups/10").session(session))
+                .andExpect(status().isOk())
+                .andExpect(view().name("group"))
+                .andExpect(model().attribute("isGroupAdmin", true))
+                .andExpect(model().attribute("isMember", false));
     }
 
     @Test
@@ -315,6 +335,17 @@ public class FriendGroupControllerTest {
         mockMvc.perform(post("/groups/10/join").session(session))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("/groups/10?error=*"));
+    }
+
+    @Test
+    void requestToJoin_returnsToTheExploreListOnSuccess() throws Exception {
+        loggedIn();
+
+        mockMvc.perform(post("/groups/10/request-join").session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("/groups/find?success=*"));
+
+        verify(friendGroupService).requestToJoinGroup(mike, 10L);
     }
 
     @Test

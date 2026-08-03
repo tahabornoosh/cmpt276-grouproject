@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.cmpt276.group3.grouproject.auth.Auth;
+import com.cmpt276.group3.grouproject.enums.GroupRole;
 import com.cmpt276.group3.grouproject.models.GroupChatMessage;
 import com.cmpt276.group3.grouproject.models.User;
 import com.cmpt276.group3.grouproject.models.GroupMembership;
@@ -81,6 +82,10 @@ public class GroupChatController {
                 friendGroupService.getMemberships(savedMessage.getGroup());
 
             for (GroupMembership membership : memberships) {
+                if (membership.getRole() == GroupRole.PENDING) {
+                    continue;
+                }
+
                 String memberId = String.valueOf(membership.getUser().getId());
 
                 messagingTemplate.convertAndSendToUser(memberId, "/queue/group-messages", response);
@@ -102,7 +107,14 @@ public class GroupChatController {
     ) {
         User currentUser = requireLoggedInUser(session);
 
-        return groupChatMessageService.getMessages(currentUser, groupId);
+        try {
+            return groupChatMessageService.getMessages(currentUser, groupId);
+        } catch (IllegalStateException exception) {
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                exception.getMessage()
+            );
+        }
     }
 
     // Helpers

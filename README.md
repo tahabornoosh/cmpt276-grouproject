@@ -151,8 +151,8 @@ See `docs/meeting-notes` in project repository
   
 ## Iteration 3
 
-- Total story points completed: 24
-- Average Velocity: 12 points/week
+- Total story points completed: 28
+- Average Velocity: 14 points/week
 
 **Process Improvement**
 - We did a more logical dividing of tasks in iteration 3 compared to iterations 2 and 1
@@ -907,7 +907,7 @@ Mike clicks on the title of Group A, and is redirected to a page containing the 
 - Mike should not see a button to view a group he is a pending member of, but must see the group in the table
 - Mike should see the group and see a button to view the group if he is a member or admin of that group
 
-## Case: Group Home Page (2 points)
+## Case: Group Home Page (3 points)
 **Iteration**
 Completed in Iteration 3.
 
@@ -1073,7 +1073,7 @@ Mike clicks on the "Groups" item in the menu, and chooses the sub-item "Find a G
 - If Group A is open to enrolment and has a matching score of 80%, then Mike must see it on his group explore page
 
 
-## Case: Group Creation Methods (2 point)
+## Case: Group Creation Methods (3 point)
 **Iteration**
 Completed in Iteration 3.
 
@@ -1109,6 +1109,39 @@ Mike takes any of the following three actions:
 - If Mike uses the automated matching function, then the created group must contain at least one other automatically matched member, or if there is an insufficient number of eligible users, the creation should fail with an error message
 - A manual group creation request missing the group name parameter should not be accepted and should result in an error message.
 - A complete manual group creation request must go through and redirect Mike to the created group's homepage.
+
+
+## Case: Avatar Upload and Bio (2 point)
+**Iteration**
+Completed in Iteration 3.
+
+**Personas/Actors**
+1. Primary actor: Mike - a second-year SFU student
+
+**Pre-conditions**
+- Mike must be logged in
+
+**Actions/Triggers**
+Mike opens the edit page for a user, either through the dashboard for himself, or through the admin panel for another user, if he is an admin
+
+Mike then sees two options at the bottom of the edit page: one to upload an avatar for the user, and one to write a bio for the user.
+
+**Acceptance Criteria**
+- The avatar input should only accept image file formats
+- The bio section should only accept inputs up to 500 characters long
+- Both fields should be optional
+- If no avatar is provided, then a default avatar should be set as the user's avatar
+
+**Post-conditions**
+- All new changes should be reflected in the database
+
+**Non-functional requirements**
+- All pages should load in less than one second
+
+**Tests**
+- An input containing both a 200-character bio and a .png avatar should be accepted
+- An input containing a 2500-character bio should be rejected with an error message
+- An input containing one or neither of these fields should be accepted (given that they are optional)
 
 </div>
 

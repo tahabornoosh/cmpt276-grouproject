@@ -32,11 +32,13 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.cmpt276.group3.grouproject.auth.Auth;
 import com.cmpt276.group3.grouproject.models.ChatMessage;
+import com.cmpt276.group3.grouproject.models.GroupMembership;
 import com.cmpt276.group3.grouproject.models.User;
 import com.cmpt276.group3.grouproject.models.UserBlock;
 import com.cmpt276.group3.grouproject.models.UserBlockRepository;
 import com.cmpt276.group3.grouproject.models.UsersRepository;
 import com.cmpt276.group3.grouproject.services.ChatMessageService;
+import com.cmpt276.group3.grouproject.services.FriendGroupService;
 import com.cmpt276.group3.grouproject.services.UserService;
 import com.cmpt276.group3.grouproject.util.ContactResponse;
 import com.cmpt276.group3.grouproject.util.MessageResponse;
@@ -61,6 +63,9 @@ class ChatMessageControllerTest {
 
     @Mock
     private UserBlockRepository userBlockRepository;
+
+    @Mock
+    private FriendGroupService friendGroupService;
 
     @Mock
     private UsersRepository usersRepository;
@@ -292,21 +297,27 @@ class ChatMessageControllerTest {
         Model model = Mockito.mock(Model.class);
         User currentUser = Mockito.mock(User.class);
         ContactResponse contact = Mockito.mock(ContactResponse.class);
+        GroupMembership membership = Mockito.mock(GroupMembership.class);
         List<ContactResponse> contacts = List.of(contact);
+        List<GroupMembership> groupMemberships = List.of(membership);
 
         when(auth.isLoggedIn(session)).thenReturn(true);
         when(auth.getUser(session)).thenReturn(currentUser);
         when(
             chatMessageService.getExistingConversations(currentUser)
         ).thenReturn(contacts);
+        when(friendGroupService.getMyMemberships(currentUser))
+            .thenReturn(groupMemberships);
 
         String view = chatController.loadChat(2L, null, session, model);
 
         assertEquals("chat", view);
 
+        verify(model).addAttribute("requestedGroupId", null);
         verify(model).addAttribute("requestedUserId", 2L);
         verify(model).addAttribute("currentUser", currentUser);
         verify(model).addAttribute("contacts", contacts);
+        verify(model).addAttribute("groupMemberships", groupMemberships);
     }
 
     @Test

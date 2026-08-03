@@ -253,7 +253,6 @@ public class FriendGroupServiceTest {
 
         // After the delete, only the remaining member is left.
         when(groupMembershipRepository.findByGroupOrderByJoinedAtAsc(group))
-                .thenReturn(new ArrayList<>(Arrays.asList(ownerMembership, otherMembership)))
                 .thenReturn(new ArrayList<>(Arrays.asList(otherMembership)));
 
         friendGroupService.leaveGroup(owner, 10L);
@@ -269,7 +268,6 @@ public class FriendGroupServiceTest {
         membersAre(ownerMembership);
 
         when(groupMembershipRepository.findByGroupOrderByJoinedAtAsc(group))
-                .thenReturn(new ArrayList<>(Arrays.asList(ownerMembership)))
                 .thenReturn(new ArrayList<>());
 
         friendGroupService.leaveGroup(owner, 10L);
@@ -284,7 +282,6 @@ public class FriendGroupServiceTest {
         membersAre(ownerMembership, otherAdmin);
 
         when(groupMembershipRepository.findByGroupOrderByJoinedAtAsc(group))
-                .thenReturn(new ArrayList<>(Arrays.asList(ownerMembership, otherAdmin)))
                 .thenReturn(new ArrayList<>(Arrays.asList(otherAdmin)));
 
         friendGroupService.leaveGroup(owner, 10L);

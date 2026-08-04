@@ -180,6 +180,114 @@
         background: #007bff;
         margin-left: 0.5rem;
       }
+
+      /* Chat dark-mode support */
+      body.dark-mode .chat-app {
+        background-color: #343a40;
+        border-color: #4b545c;
+        color: #f8f9fa;
+      }
+
+      body.dark-mode .chat-contacts {
+        background-color: #343a40;
+        border-right-color: #4b545c;
+      }
+
+      body.dark-mode .chat-conversation,
+      body.dark-mode .chat-header,
+      body.dark-mode .chat-composer {
+        background-color: #343a40;
+        color: #f8f9fa;
+      }
+
+      body.dark-mode .chat-header {
+        border-bottom-color: #4b545c;
+      }
+
+      body.dark-mode .chat-composer {
+        border-top-color: #4b545c;
+      }
+
+      body.dark-mode .chat-messages {
+        background-color: #25282b;
+      }
+
+      /* Contact entries */
+      body.dark-mode .chat-contact {
+        color: #f8f9fa;
+        border-bottom-color: #4b545c;
+      }
+
+      body.dark-mode .chat-contact:hover {
+        background-color: #3f474e;
+        color: #ffffff;
+      }
+
+      body.dark-mode .chat-contact.active {
+        background-color: #454d55;
+        color: #ffffff;
+      }
+
+      body.dark-mode .chat-contact-preview,
+      body.dark-mode .chat-contact-time {
+        color: #adb5bd !important;
+      }
+
+      body.dark-mode .chat-section-title {
+        background-color: #2f353a;
+        color: #adb5bd;
+        border-bottom-color: #4b545c;
+      }
+
+      /* Search bar */
+      body.dark-mode .chat-contacts .input-group-text,
+      body.dark-mode #contact-search {
+        background-color: #454d55 !important;
+        border-color: #6c757d;
+        color: #f8f9fa;
+      }
+
+      body.dark-mode #contact-search::placeholder {
+        color: #adb5bd;
+      }
+
+      /* Message composer */
+      body.dark-mode #chat-input {
+        background-color: #454d55;
+        border-color: #6c757d;
+        color: #f8f9fa;
+      }
+
+      body.dark-mode #chat-input::placeholder {
+        color: #adb5bd;
+      }
+
+      body.dark-mode #chat-input:disabled {
+        background-color: #3a4046;
+        color: #adb5bd;
+      }
+
+      /* Received messages */
+      body.dark-mode .chat-message.them .chat-bubble {
+        background-color: #454d55;
+        border-color: #5c656d;
+        color: #f8f9fa;
+      }
+
+      body.dark-mode .chat-message.them .chat-sender-name {
+        color: #ced4da;
+      }
+
+      body.dark-mode .chat-messages .text-muted {
+        color: #adb5bd !important;
+      }
+
+      /* Conversation menu */
+      body.dark-mode #chat-actions-button {
+        background-color: #454d55;
+        border-color: #5c656d;
+        color: #f8f9fa;
+      }
     </style>
 
 <main class="content-wrapper">
@@ -212,7 +320,7 @@
         <aside class="chat-contacts">
           <div class="p-3 border-bottom">
             <div class="input-group input-group-sm">
-              <span class="input-group-text bg-white">
+              <span class="input-group-text">
                 <i class="fas fa-search" aria-hidden="true"></i>
               </span>
               <!--Search feature-->
